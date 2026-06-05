@@ -54,7 +54,7 @@ class TrainConfig:
     batch_size: int = 32
     epochs: int = 30
     learning_rate: float = 1e-3
-    weight_decay: float = 1e-4
+    weight_decay: float = 5e-4
     label_smoothing: float = 0.05
     scheduler_factor: float = 0.5
     scheduler_patience: int = 2
@@ -70,7 +70,7 @@ class TrainConfig:
     time_mask_param: int = 30
     freq_mask_param: int = 8
     use_random_crop: bool = True
-    max_segments_per_recording: int = 8
+    max_segments_per_recording: int = 12
     device: str = get_default_device()
 
 
@@ -291,7 +291,15 @@ def train(config: TrainConfig) -> dict[str, object]:
         directory.mkdir(parents=True, exist_ok=True)
     history_path = reports_dir / "deepship_mel_cnn_history.json"
 
-    model = MelCNNClassifier(num_classes=len(CLASS_NAMES)).to(config.device)
+    model = MelCNNClassifier(
+        num_classes=len(CLASS_NAMES),
+        channels=(16, 32, 64, 128),
+        drop_rates=(0.0, 0.05, 0.1, 0.1),
+        classifier_dropout=0.35,
+        classifier_hidden=64,
+    ).to(config.device)
+    n_params = sum(p.numel() for p in model.parameters())
+    print(f"Model: 4-block CNN, {n_params:,} parameters")
     class_weights = build_class_weights(stats, config.device)
     if class_weights is not None:
         print(f"Using class-weighted CrossEntropyLoss with weights={class_weights.tolist()}")

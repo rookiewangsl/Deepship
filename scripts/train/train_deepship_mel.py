@@ -19,7 +19,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
-    parser.add_argument("--weight-decay", type=float, default=1e-4)
+    parser.add_argument("--weight-decay", type=float, default=5e-4)
     parser.add_argument("--label-smoothing", type=float, default=0.05)
     parser.add_argument("--scheduler-factor", type=float, default=0.5)
     parser.add_argument("--scheduler-patience", type=int, default=2)
@@ -41,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--no-random-crop", dest="use_random_crop", action="store_false")
     parser.add_argument(
-        "--max-segments-per-recording", type=int, default=8,
+        "--max-segments-per-recording", type=int, default=12,
         help="Max training segments per recording when using random crop.",
     )
     return parser
