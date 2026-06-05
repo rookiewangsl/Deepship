@@ -11,6 +11,7 @@ from typing import Iterable
 import soundfile as sf
 import torch
 import torchaudio
+import torchaudio.functional as AF
 from torch.utils.data import Dataset
 
 
@@ -484,3 +485,448 @@ class DeepShipRandomCropDataset(Dataset):
         mel_spec = self.time_mask(mel_spec)
         mel_spec = self.freq_mask(mel_spec)
         return mel_spec
+
+
+class DeepShipWaveformDataset(Dataset):
+    def __init__(
+        self,
+        segments: list[SegmentRecord],
+        sample_rate: int = 4000,
+        clip_duration: float = 5.0,
+        augment: bool = False,
+        random_time_shift: int = 400,
+        gain_min: float = 0.85,
+        gain_max: float = 1.15,
+        noise_std: float = 0.003,
+    ) -> None:
+        self.segments = segments
+        self.sample_rate = sample_rate
+        self.clip_samples = int(sample_rate * clip_duration)
+        self.augment = augment
+        self.random_time_shift = random_time_shift
+        self.gain_min = gain_min
+        self.gain_max = gain_max
+        self.noise_std = noise_std
+        self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
+
+    def __len__(self) -> int:
+        return len(self.segments)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
+        segment = self.segments[index]
+        waveform, sr = self._load_segment(segment)
+        waveform = self._prepare_waveform(waveform, sr)
+        return waveform, segment.label_index
+
+    def _prepare_waveform(self, waveform: torch.Tensor, sr: int) -> torch.Tensor:
+        if sr != self.sample_rate:
+            waveform = self._resample(waveform, sr)
+        waveform = self._fix_length(waveform)
+        if self.augment:
+            waveform = self._augment_waveform(waveform)
+        waveform = self._standardize(waveform)
+        return waveform
+
+    def _resample(self, waveform: torch.Tensor, src_sr: int) -> torch.Tensor:
+        if src_sr not in self.resamplers:
+            self.resamplers[src_sr] = torchaudio.transforms.Resample(
+                orig_freq=src_sr,
+                new_freq=self.sample_rate,
+            )
+        return self.resamplers[src_sr](waveform)
+
+    def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
+        num_samples = waveform.size(-1)
+        if num_samples > self.clip_samples:
+            waveform = waveform[..., : self.clip_samples]
+        elif num_samples < self.clip_samples:
+            waveform = torch.nn.functional.pad(
+                waveform,
+                (0, self.clip_samples - num_samples),
+            )
+        return waveform
+
+    def _augment_waveform(self, waveform: torch.Tensor) -> torch.Tensor:
+        if self.random_time_shift > 0:
+            shift = int(torch.randint(
+                low=-self.random_time_shift,
+                high=self.random_time_shift + 1,
+                size=(1,),
+            ).item())
+            waveform = torch.roll(waveform, shifts=shift, dims=-1)
+        gain = float(torch.empty(1).uniform_(self.gain_min, self.gain_max).item())
+        waveform = waveform * gain
+        if self.noise_std > 0:
+            waveform = waveform + torch.randn_like(waveform) * self.noise_std
+        waveform = waveform.clamp(-1.0, 1.0)
+        return waveform
+
+    @staticmethod
+    def _standardize(waveform: torch.Tensor) -> torch.Tensor:
+        mean = waveform.mean(dim=-1, keepdim=True)
+        std = waveform.std(dim=-1, keepdim=True).clamp_min(1e-6)
+        return (waveform - mean) / std
+
+    @staticmethod
+    def _load_segment(segment: SegmentRecord) -> tuple[torch.Tensor, int]:
+        audio, sample_rate = sf.read(
+            segment.path,
+            start=segment.start_frame,
+            frames=segment.num_frames if segment.num_frames > 0 else -1,
+            dtype="float32",
+            always_2d=True,
+        )
+        if audio.shape[1] > 1:
+            audio = audio.mean(axis=1, keepdims=True)
+        waveform = torch.from_numpy(audio[:, 0]).unsqueeze(0)
+        return waveform, sample_rate
+
+
+class DeepShipRandomCropWaveformDataset(Dataset):
+    def __init__(
+        self,
+        records: list[AudioRecord],
+        max_segments_per_recording: int = 12,
+        sample_rate: int = 4000,
+        clip_duration: float = 5.0,
+        augment: bool = True,
+        random_time_shift: int = 400,
+        gain_min: float = 0.85,
+        gain_max: float = 1.15,
+        noise_std: float = 0.003,
+    ) -> None:
+        self.records = records
+        self.max_segments_per_recording = max_segments_per_recording
+        self.sample_rate = sample_rate
+        self.clip_duration = clip_duration
+        self.clip_samples = int(sample_rate * clip_duration)
+        self.augment = augment
+        self.random_time_shift = random_time_shift
+        self.gain_min = gain_min
+        self.gain_max = gain_max
+        self.noise_std = noise_std
+        self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
+        self._items: list[int] = []
+        for rec_idx, record in enumerate(records):
+            clip_frames = int(round(record.sample_rate * clip_duration))
+            n_possible = max(1, math.ceil(record.num_frames / clip_frames))
+            n_use = min(n_possible, max_segments_per_recording)
+            self._items.extend([rec_idx] * n_use)
+
+    def __len__(self) -> int:
+        return len(self._items)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
+        record = self.records[self._items[index]]
+        waveform, sr = self._random_crop(record)
+        if sr != self.sample_rate:
+            waveform = self._resample(waveform, sr)
+        waveform = self._fix_length(waveform)
+        if self.augment:
+            waveform = self._augment_waveform(waveform)
+        waveform = self._standardize(waveform)
+        return waveform, record.label_index
+
+    def _random_crop(self, record: AudioRecord) -> tuple[torch.Tensor, int]:
+        clip_frames = int(round(record.sample_rate * self.clip_duration))
+        max_start = max(0, record.num_frames - clip_frames)
+        start_frame = random.randint(0, max_start) if max_start > 0 else 0
+        num_frames = min(clip_frames, record.num_frames - start_frame)
+        audio, sample_rate = sf.read(
+            record.path,
+            start=start_frame,
+            frames=num_frames if num_frames > 0 else -1,
+            dtype="float32",
+            always_2d=True,
+        )
+        if audio.shape[1] > 1:
+            audio = audio.mean(axis=1, keepdims=True)
+        waveform = torch.from_numpy(audio[:, 0]).unsqueeze(0)
+        return waveform, sample_rate
+
+    def _resample(self, waveform: torch.Tensor, src_sr: int) -> torch.Tensor:
+        if src_sr not in self.resamplers:
+            self.resamplers[src_sr] = torchaudio.transforms.Resample(
+                orig_freq=src_sr,
+                new_freq=self.sample_rate,
+            )
+        return self.resamplers[src_sr](waveform)
+
+    def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
+        num_samples = waveform.size(-1)
+        if num_samples > self.clip_samples:
+            waveform = waveform[..., : self.clip_samples]
+        elif num_samples < self.clip_samples:
+            waveform = torch.nn.functional.pad(
+                waveform,
+                (0, self.clip_samples - num_samples),
+            )
+        return waveform
+
+    def _augment_waveform(self, waveform: torch.Tensor) -> torch.Tensor:
+        if self.random_time_shift > 0:
+            shift = int(torch.randint(
+                low=-self.random_time_shift,
+                high=self.random_time_shift + 1,
+                size=(1,),
+            ).item())
+            waveform = torch.roll(waveform, shifts=shift, dims=-1)
+        gain = float(torch.empty(1).uniform_(self.gain_min, self.gain_max).item())
+        waveform = waveform * gain
+        if self.noise_std > 0:
+            waveform = waveform + torch.randn_like(waveform) * self.noise_std
+        waveform = waveform.clamp(-1.0, 1.0)
+        return waveform
+
+    @staticmethod
+    def _standardize(waveform: torch.Tensor) -> torch.Tensor:
+        mean = waveform.mean(dim=-1, keepdim=True)
+        std = waveform.std(dim=-1, keepdim=True).clamp_min(1e-6)
+        return (waveform - mean) / std
+
+
+class DeepShipSTFTDataset(Dataset):
+    def __init__(
+        self,
+        segments: list[SegmentRecord],
+        sample_rate: int = 4000,
+        clip_duration: float = 5.0,
+        n_fft: int = 1024,
+        win_length: int = 1024,
+        hop_length: int = 256,
+        highpass_freq: float = 50.0,
+        freq_min: float = 50.0,
+        freq_max: float = 1000.0,
+        img_h: int = 128,
+        img_w: int = 128,
+        augment: bool = False,
+        random_time_shift: int = 400,
+        gain_min: float = 0.85,
+        gain_max: float = 1.15,
+        noise_std: float = 0.003,
+        time_mask_param: int = 30,
+        freq_mask_param: int = 8,
+    ) -> None:
+        self.segments = segments
+        self.sample_rate = sample_rate
+        self.clip_samples = int(sample_rate * clip_duration)
+        self.augment = augment
+        self.random_time_shift = random_time_shift
+        self.gain_min = gain_min
+        self.gain_max = gain_max
+        self.noise_std = noise_std
+        self.highpass_freq = highpass_freq
+        self.img_h = img_h
+        self.img_w = img_w
+        self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
+        self.spectrogram = torchaudio.transforms.Spectrogram(
+            n_fft=n_fft,
+            win_length=win_length,
+            hop_length=hop_length,
+            power=2.0,
+            center=True,
+            window_fn=torch.hann_window,
+        )
+        self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(stype="power")
+        self.time_mask = torchaudio.transforms.TimeMasking(time_mask_param=time_mask_param)
+        self.freq_mask = torchaudio.transforms.FrequencyMasking(freq_mask_param=freq_mask_param)
+        freqs = torch.linspace(0, sample_rate / 2, steps=(n_fft // 2 + 1))
+        self.freq_mask_tensor = (freqs >= freq_min) & (freqs <= freq_max)
+
+    def __len__(self) -> int:
+        return len(self.segments)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
+        segment = self.segments[index]
+        waveform, sr = DeepShipWaveformDataset._load_segment(segment)
+        spec = self._prepare_spec(waveform, sr)
+        return spec, segment.label_index
+
+    def _prepare_spec(self, waveform: torch.Tensor, sr: int) -> torch.Tensor:
+        if sr != self.sample_rate:
+            waveform = self._resample(waveform, sr)
+        waveform = self._fix_length(waveform)
+        if self.highpass_freq > 0:
+            waveform = AF.highpass_biquad(waveform, self.sample_rate, self.highpass_freq)
+        if self.augment:
+            waveform = self._augment_waveform(waveform)
+        waveform = self._standardize_waveform(waveform)
+        spec = self.spectrogram(waveform)
+        spec = spec[:, self.freq_mask_tensor, :]
+        spec = self.amplitude_to_db(spec)
+        spec = torch.nn.functional.interpolate(
+            spec.unsqueeze(0),
+            size=(self.img_h, self.img_w),
+            mode="bilinear",
+            align_corners=False,
+        ).squeeze(0)
+        spec = self._standardize_spec(spec)
+        if self.augment:
+            spec = self.time_mask(spec)
+            spec = self.freq_mask(spec)
+        return spec
+
+    def _resample(self, waveform: torch.Tensor, src_sr: int) -> torch.Tensor:
+        if src_sr not in self.resamplers:
+            self.resamplers[src_sr] = torchaudio.transforms.Resample(
+                orig_freq=src_sr,
+                new_freq=self.sample_rate,
+            )
+        return self.resamplers[src_sr](waveform)
+
+    def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
+        num_samples = waveform.size(-1)
+        if num_samples > self.clip_samples:
+            waveform = waveform[..., : self.clip_samples]
+        elif num_samples < self.clip_samples:
+            waveform = torch.nn.functional.pad(waveform, (0, self.clip_samples - num_samples))
+        return waveform
+
+    def _augment_waveform(self, waveform: torch.Tensor) -> torch.Tensor:
+        if self.random_time_shift > 0:
+            shift = int(torch.randint(
+                low=-self.random_time_shift,
+                high=self.random_time_shift + 1,
+                size=(1,),
+            ).item())
+            waveform = torch.roll(waveform, shifts=shift, dims=-1)
+        gain = float(torch.empty(1).uniform_(self.gain_min, self.gain_max).item())
+        waveform = waveform * gain
+        if self.noise_std > 0:
+            waveform = waveform + torch.randn_like(waveform) * self.noise_std
+        waveform = waveform.clamp(-1.0, 1.0)
+        return waveform
+
+    @staticmethod
+    def _standardize_waveform(waveform: torch.Tensor) -> torch.Tensor:
+        mean = waveform.mean(dim=-1, keepdim=True)
+        std = waveform.std(dim=-1, keepdim=True).clamp_min(1e-6)
+        return (waveform - mean) / std
+
+    @staticmethod
+    def _standardize_spec(spec: torch.Tensor) -> torch.Tensor:
+        mean = spec.mean()
+        std = spec.std().clamp_min(1e-6)
+        return (spec - mean) / std
+
+
+class DeepShipRandomCropSTFTDataset(Dataset):
+    def __init__(
+        self,
+        records: list[AudioRecord],
+        max_segments_per_recording: int = 12,
+        sample_rate: int = 4000,
+        clip_duration: float = 5.0,
+        n_fft: int = 1024,
+        win_length: int = 1024,
+        hop_length: int = 256,
+        highpass_freq: float = 50.0,
+        freq_min: float = 50.0,
+        freq_max: float = 1000.0,
+        img_h: int = 128,
+        img_w: int = 128,
+        augment: bool = True,
+        random_time_shift: int = 400,
+        gain_min: float = 0.85,
+        gain_max: float = 1.15,
+        noise_std: float = 0.003,
+        time_mask_param: int = 30,
+        freq_mask_param: int = 8,
+    ) -> None:
+        self.records = records
+        self.max_segments_per_recording = max_segments_per_recording
+        self.sample_rate = sample_rate
+        self.clip_duration = clip_duration
+        self.clip_samples = int(sample_rate * clip_duration)
+        self.augment = augment
+        self.random_time_shift = random_time_shift
+        self.gain_min = gain_min
+        self.gain_max = gain_max
+        self.noise_std = noise_std
+        self.highpass_freq = highpass_freq
+        self.img_h = img_h
+        self.img_w = img_w
+        self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
+        self.spectrogram = torchaudio.transforms.Spectrogram(
+            n_fft=n_fft,
+            win_length=win_length,
+            hop_length=hop_length,
+            power=2.0,
+            center=True,
+            window_fn=torch.hann_window,
+        )
+        self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(stype="power")
+        self.time_mask = torchaudio.transforms.TimeMasking(time_mask_param=time_mask_param)
+        self.freq_mask = torchaudio.transforms.FrequencyMasking(freq_mask_param=freq_mask_param)
+        freqs = torch.linspace(0, sample_rate / 2, steps=(n_fft // 2 + 1))
+        self.freq_mask_tensor = (freqs >= freq_min) & (freqs <= freq_max)
+        self._items: list[int] = []
+        for rec_idx, record in enumerate(records):
+            clip_frames = int(round(record.sample_rate * clip_duration))
+            n_possible = max(1, math.ceil(record.num_frames / clip_frames))
+            n_use = min(n_possible, max_segments_per_recording)
+            self._items.extend([rec_idx] * n_use)
+
+    def __len__(self) -> int:
+        return len(self._items)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
+        record = self.records[self._items[index]]
+        waveform, sr = DeepShipRandomCropWaveformDataset._random_crop(self, record)
+        spec = self._prepare_spec(waveform, sr)
+        return spec, record.label_index
+
+    def _prepare_spec(self, waveform: torch.Tensor, sr: int) -> torch.Tensor:
+        if sr != self.sample_rate:
+            waveform = self._resample(waveform, sr)
+        waveform = self._fix_length(waveform)
+        if self.highpass_freq > 0:
+            waveform = AF.highpass_biquad(waveform, self.sample_rate, self.highpass_freq)
+        if self.augment:
+            waveform = self._augment_waveform(waveform)
+        waveform = DeepShipSTFTDataset._standardize_waveform(waveform)
+        spec = self.spectrogram(waveform)
+        spec = spec[:, self.freq_mask_tensor, :]
+        spec = self.amplitude_to_db(spec)
+        spec = torch.nn.functional.interpolate(
+            spec.unsqueeze(0),
+            size=(self.img_h, self.img_w),
+            mode="bilinear",
+            align_corners=False,
+        ).squeeze(0)
+        spec = DeepShipSTFTDataset._standardize_spec(spec)
+        if self.augment:
+            spec = self.time_mask(spec)
+            spec = self.freq_mask(spec)
+        return spec
+
+    def _resample(self, waveform: torch.Tensor, src_sr: int) -> torch.Tensor:
+        if src_sr not in self.resamplers:
+            self.resamplers[src_sr] = torchaudio.transforms.Resample(
+                orig_freq=src_sr,
+                new_freq=self.sample_rate,
+            )
+        return self.resamplers[src_sr](waveform)
+
+    def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
+        num_samples = waveform.size(-1)
+        if num_samples > self.clip_samples:
+            waveform = waveform[..., : self.clip_samples]
+        elif num_samples < self.clip_samples:
+            waveform = torch.nn.functional.pad(waveform, (0, self.clip_samples - num_samples))
+        return waveform
+
+    def _augment_waveform(self, waveform: torch.Tensor) -> torch.Tensor:
+        if self.random_time_shift > 0:
+            shift = int(torch.randint(
+                low=-self.random_time_shift,
+                high=self.random_time_shift + 1,
+                size=(1,),
+            ).item())
+            waveform = torch.roll(waveform, shifts=shift, dims=-1)
+        gain = float(torch.empty(1).uniform_(self.gain_min, self.gain_max).item())
+        waveform = waveform * gain
+        if self.noise_std > 0:
+            waveform = waveform + torch.randn_like(waveform) * self.noise_std
+        waveform = waveform.clamp(-1.0, 1.0)
+        return waveform

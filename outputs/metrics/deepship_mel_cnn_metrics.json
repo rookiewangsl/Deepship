@@ -1,70 +1,70 @@
 {
-  "accuracy": 0.6340023612750886,
-  "macro_f1": 0.6336957601710699,
-  "weighted_f1": 0.637118169475882,
+  "accuracy": 0.7270759543486817,
+  "macro_f1": 0.7292368298950345,
+  "weighted_f1": 0.7287432027263225,
   "classification_report": {
     "Cargo": {
-      "precision": 0.4601990049751244,
-      "recall": 0.4719387755102041,
-      "f1-score": 0.4659949622166247,
+      "precision": 0.6691983122362869,
+      "recall": 0.6743197278911565,
+      "f1-score": 0.6717492587886489,
       "support": 1176.0
     },
     "Passenger": {
-      "precision": 0.697742170429716,
-      "recall": 0.5939243645381277,
-      "f1-score": 0.6416610850636303,
+      "precision": 0.6849881796690307,
+      "recall": 0.7185368877867327,
+      "f1-score": 0.7013615733736762,
       "support": 1613.0
     },
     "Tank": {
-      "precision": 0.5501373626373627,
-      "recall": 0.8173469387755102,
-      "f1-score": 0.6576354679802956,
+      "precision": 0.7015755329008341,
+      "recall": 0.7724489795918368,
+      "f1-score": 0.7353084021369597,
       "support": 980.0
     },
     "Tug": {
-      "precision": 0.8672397325692455,
-      "recall": 0.6915460776846916,
-      "f1-score": 0.7694915254237288,
+      "precision": 0.8756660746003553,
+      "recall": 0.7509520182787509,
+      "f1-score": 0.8085280852808528,
       "support": 1313.0
     },
-    "accuracy": 0.6340023612750886,
+    "accuracy": 0.7270759543486817,
     "macro avg": {
-      "precision": 0.6438295676528621,
-      "recall": 0.6436890391271335,
-      "f1-score": 0.6336957601710699,
+      "precision": 0.7328570248516268,
+      "recall": 0.7290644033871192,
+      "f1-score": 0.7292368298950345,
       "support": 5082.0
     },
     "weighted avg": {
-      "precision": 0.6581016401026982,
-      "recall": 0.6340023612750886,
-      "f1-score": 0.637118169475882,
+      "precision": 0.7337970734335111,
+      "recall": 0.7270759543486817,
+      "f1-score": 0.7287432027263225,
       "support": 5082.0
     }
   },
   "confusion_matrix": [
     [
-      555,
-      104,
-      495,
-      22
+      793,
+      132,
+      204,
+      47
     ],
     [
-      382,
-      958,
-      156,
-      117
+      246,
+      1159,
+      115,
+      93
     ],
     [
-      108,
-      71,
-      801,
+      118,
+      105,
+      757,
       0
     ],
     [
-      161,
-      240,
-      4,
-      908
+      28,
+      296,
+      3,
+      986
     ]
   ],
   "split_stats": {
@@ -139,9 +139,9 @@
         "Tug": 1313
       }
     },
-    "train_effective_samples": 3110,
+    "train_effective_samples": 4421,
     "random_crop": {
-      "max_segments_per_recording": 8
+      "max_segments_per_recording": 12
     }
   },
   "config": {
@@ -161,9 +161,9 @@
     "f_max": 2000.0,
     "batch_size": 32,
     "epochs": 30,
-    "learning_rate": 0.001,
-    "weight_decay": 0.005,
-    "label_smoothing": 0.1,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.0005,
+    "label_smoothing": 0.05,
     "scheduler_factor": 0.5,
     "scheduler_patience": 2,
     "scheduler_threshold": 0.001,
@@ -172,13 +172,13 @@
     "use_augmentation": true,
     "cache_features": false,
     "precomputed_root": "outputs/precomputed/deepship_mel",
-    "early_stopping_patience": 8,
+    "early_stopping_patience": 10,
     "early_stopping_min_delta": 0.001,
     "time_shift_frames": 8,
     "time_mask_param": 30,
     "freq_mask_param": 8,
     "use_random_crop": true,
-    "max_segments_per_recording": 8,
+    "max_segments_per_recording": 12,
     "device": "mps"
   }
 }

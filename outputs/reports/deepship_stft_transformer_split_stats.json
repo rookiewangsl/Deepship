@@ -70,8 +70,5 @@
       "Tug": 1313
     }
   },
-  "train_effective_samples": 4421,
-  "random_crop": {
-    "max_segments_per_recording": 12
-  }
+  "train_effective_samples": 23673
 }
