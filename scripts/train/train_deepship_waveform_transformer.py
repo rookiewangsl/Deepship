@@ -33,6 +33,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--device", default=None)
     parser.add_argument("--precomputed-root", default="outputs/precomputed/deepship_stft")
+    parser.add_argument("--mae-pretrained-path", default=None)
     parser.add_argument("--early-stopping-patience", type=int, default=10)
     parser.add_argument("--early-stopping-min-delta", type=float, default=1e-3)
     parser.add_argument("--use-augmentation", action="store_true")
@@ -84,6 +85,7 @@ def main() -> None:
         num_workers=args.num_workers,
         device=args.device or get_default_device(),
         precomputed_root=args.precomputed_root,
+        mae_pretrained_path=args.mae_pretrained_path,
         early_stopping_patience=args.early_stopping_patience,
         early_stopping_min_delta=args.early_stopping_min_delta,
         use_augmentation=args.use_augmentation,

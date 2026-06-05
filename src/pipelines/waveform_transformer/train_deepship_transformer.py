@@ -26,7 +26,10 @@ from src.evaluation.classification import (
     plot_training_curves,
     save_metrics,
 )
-from src.models.waveform_transformer import STFTTransformerClassifier
+from src.models.waveform_transformer import (
+    STFTTransformerClassifier,
+    load_mae_encoder_weights,
+)
 from src.pipelines.mel_ml.train_shipsear_cnn import (
     collect_predictions,
     get_default_device,
@@ -59,6 +62,7 @@ class TrainConfig:
     use_random_crop: bool = True
     max_segments_per_recording: int = 12
     precomputed_root: str | None = "outputs/precomputed/deepship_stft"
+    mae_pretrained_path: str | None = None
     random_time_shift: int = 400
     gain_min: float = 0.85
     gain_max: float = 1.15
@@ -331,6 +335,9 @@ def train(config: TrainConfig) -> dict[str, object]:
     ).to(config.device)
     n_params = sum(p.numel() for p in model.parameters())
     print(f"Model: STFT transformer, {n_params:,} parameters")
+    if config.mae_pretrained_path:
+        loaded = load_mae_encoder_weights(model, config.mae_pretrained_path)
+        print(f"Loaded {loaded} MAE encoder parameter groups from {config.mae_pretrained_path}")
 
     class_weights = build_class_weights(stats, config.device)
     if class_weights is not None:
