@@ -35,6 +35,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--time-mask-param", type=int, default=30)
     parser.add_argument("--freq-mask-param", type=int, default=8)
     parser.add_argument("--use-augmentation", action="store_true")
+    parser.add_argument(
+        "--use-random-crop", action="store_true", default=True,
+        help="Use random cropping from raw recordings for training (default: True).",
+    )
+    parser.add_argument("--no-random-crop", dest="use_random_crop", action="store_false")
+    parser.add_argument(
+        "--max-segments-per-recording", type=int, default=8,
+        help="Max training segments per recording when using random crop.",
+    )
     return parser
 
 
@@ -62,6 +71,8 @@ def main() -> None:
         time_mask_param=args.time_mask_param,
         freq_mask_param=args.freq_mask_param,
         use_augmentation=args.use_augmentation,
+        use_random_crop=args.use_random_crop,
+        max_segments_per_recording=args.max_segments_per_recording,
     )
     metrics = train(config)
     print(json.dumps(

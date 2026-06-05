@@ -307,3 +307,180 @@ class DeepShipMelDataset(Dataset):
             audio = audio.mean(axis=1, keepdims=True)
         waveform = torch.from_numpy(audio[:, 0]).unsqueeze(0)
         return waveform, sample_rate
+
+
+class DeepShipRandomCropDataset(Dataset):
+    """Training dataset that randomly crops segments from full recordings.
+
+    Each recording contributes at most *max_segments_per_recording*
+    training samples per epoch.  Every ``__getitem__`` call draws a
+    uniformly random start position inside the recording, so the model
+    sees a fresh 5-second view on each access.
+
+    This addresses same-source segment redundancy: instead of 56
+    deterministic slices from a single ~280 s recording, only a small
+    capped number of *random* crops are used, reducing within-recording
+    correlation and discouraging the CNN from memorising recording-level
+    "fingerprints".
+
+    Parameters
+    ----------
+    records : list[AudioRecord]
+        Recording-level metadata (one entry per wav file).
+    max_segments_per_recording : int
+        Upper limit on training samples per recording per epoch.
+    sample_rate : int
+        Target sample rate (Hz) after resampling.
+    clip_duration : float
+        Duration of each random crop in seconds.
+    n_fft, hop_length, win_length, n_mels, f_min, f_max
+        Mel-spectrogram parameters.
+    augment : bool
+        Enable waveform / spectrogram augmentation.
+    time_shift_frames, time_mask_param, freq_mask_param
+        Augmentation hyper-parameters.
+    """
+
+    def __init__(
+        self,
+        records: list[AudioRecord],
+        max_segments_per_recording: int = 8,
+        sample_rate: int = 4000,
+        clip_duration: float = 5.0,
+        n_fft: int = 256,
+        hop_length: int = 64,
+        win_length: int = 256,
+        n_mels: int = 64,
+        f_min: float = 20.0,
+        f_max: float = 2000.0,
+        augment: bool = True,
+        time_shift_frames: int = 8,
+        time_mask_param: int = 12,
+        freq_mask_param: int = 8,
+    ) -> None:
+        self.records = records
+        self.max_segments_per_recording = max_segments_per_recording
+        self.sample_rate = sample_rate
+        self.clip_duration = clip_duration
+        self.clip_samples = int(sample_rate * clip_duration)
+        self.augment = augment
+        self.time_shift_frames = time_shift_frames
+
+        # Build flat index: each entry is a record index.
+        # Long recordings that would produce many fixed segments are capped.
+        self._items: list[int] = []
+        for rec_idx, record in enumerate(records):
+            clip_frames = int(round(record.sample_rate * clip_duration))
+            n_possible = max(1, math.ceil(record.num_frames / clip_frames))
+            n_use = min(n_possible, max_segments_per_recording)
+            self._items.extend([rec_idx] * n_use)
+
+        self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
+        self.mel_transform = torchaudio.transforms.MelSpectrogram(
+            sample_rate=sample_rate,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=win_length,
+            n_mels=n_mels,
+            f_min=f_min,
+            f_max=f_max,
+            power=2.0,
+            center=True,
+        )
+        self.amplitude_to_db = torchaudio.transforms.AmplitudeToDB(stype="power")
+        self.time_mask = torchaudio.transforms.TimeMasking(
+            time_mask_param=time_mask_param,
+        )
+        self.freq_mask = torchaudio.transforms.FrequencyMasking(
+            freq_mask_param=freq_mask_param,
+        )
+
+    def __len__(self) -> int:
+        return len(self._items)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
+        record = self.records[self._items[index]]
+        waveform, sr = self._random_crop(record)
+        if sr != self.sample_rate:
+            waveform = self._resample(waveform, sr)
+        waveform = self._fix_length(waveform)
+        if self.augment:
+            waveform = self._augment_waveform(waveform)
+        mel_spec = self.mel_transform(waveform)
+        mel_spec = self.amplitude_to_db(mel_spec)
+        mel_spec = self._normalize(mel_spec)
+        if self.augment:
+            mel_spec = self._augment_mel(mel_spec)
+        return mel_spec, record.label_index
+
+    # ------------------------------------------------------------------
+    # Audio I/O
+    # ------------------------------------------------------------------
+
+    def _random_crop(self, record: AudioRecord) -> tuple[torch.Tensor, int]:
+        """Read a random *clip_duration*-second window from *record*."""
+        clip_frames = int(round(record.sample_rate * self.clip_duration))
+        max_start = max(0, record.num_frames - clip_frames)
+        start_frame = random.randint(0, max_start) if max_start > 0 else 0
+        num_frames = min(clip_frames, record.num_frames - start_frame)
+        audio, sample_rate = sf.read(
+            record.path,
+            start=start_frame,
+            frames=num_frames if num_frames > 0 else -1,
+            dtype="float32",
+            always_2d=True,
+        )
+        if audio.shape[1] > 1:
+            audio = audio.mean(axis=1, keepdims=True)
+        waveform = torch.from_numpy(audio[:, 0]).unsqueeze(0)
+        return waveform, sample_rate
+
+    def _resample(self, waveform: torch.Tensor, src_sr: int) -> torch.Tensor:
+        if src_sr not in self.resamplers:
+            self.resamplers[src_sr] = torchaudio.transforms.Resample(
+                orig_freq=src_sr,
+                new_freq=self.sample_rate,
+            )
+        return self.resamplers[src_sr](waveform)
+
+    def _fix_length(self, waveform: torch.Tensor) -> torch.Tensor:
+        num_samples = waveform.size(-1)
+        if num_samples > self.clip_samples:
+            waveform = waveform[..., : self.clip_samples]
+        elif num_samples < self.clip_samples:
+            waveform = torch.nn.functional.pad(
+                waveform,
+                (0, self.clip_samples - num_samples),
+            )
+        return waveform
+
+    # ------------------------------------------------------------------
+    # Augmentation (same as DeepShipMelDataset)
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _augment_waveform(waveform: torch.Tensor) -> torch.Tensor:
+        shift = int(torch.randint(low=-400, high=401, size=(1,)).item())
+        waveform = torch.roll(waveform, shifts=shift, dims=-1)
+        gain = float(torch.empty(1).uniform_(0.85, 1.15).item())
+        waveform = waveform * gain
+        waveform = waveform.clamp(-1.0, 1.0)
+        return waveform
+
+    @staticmethod
+    def _normalize(mel_spec: torch.Tensor) -> torch.Tensor:
+        mean = mel_spec.mean()
+        std = mel_spec.std().clamp_min(1e-6)
+        return (mel_spec - mean) / std
+
+    def _augment_mel(self, mel_spec: torch.Tensor) -> torch.Tensor:
+        if self.time_shift_frames > 0:
+            shift = int(torch.randint(
+                low=-self.time_shift_frames,
+                high=self.time_shift_frames + 1,
+                size=(1,),
+            ).item())
+            mel_spec = torch.roll(mel_spec, shifts=shift, dims=-1)
+        mel_spec = self.time_mask(mel_spec)
+        mel_spec = self.freq_mask(mel_spec)
+        return mel_spec

@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from src.data.deepship import (
     CLASS_NAMES,
     DeepShipMelDataset,
+    DeepShipRandomCropDataset,
     build_segment_records,
     save_split_manifest,
     scan_deepship,
@@ -68,6 +69,8 @@ class TrainConfig:
     time_shift_frames: int = 8
     time_mask_param: int = 30
     freq_mask_param: int = 8
+    use_random_crop: bool = True
+    max_segments_per_recording: int = 8
     device: str = get_default_device()
 
 
@@ -134,9 +137,11 @@ def build_precomputed_dataloaders(
 
 
 def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[str, object]]:
-    maybe_precomputed = build_precomputed_dataloaders(config)
-    if maybe_precomputed is not None:
-        return maybe_precomputed
+    # When random_crop is disabled, try to use fully precomputed features.
+    if not config.use_random_crop:
+        maybe_precomputed = build_precomputed_dataloaders(config)
+        if maybe_precomputed is not None:
+            return maybe_precomputed
 
     records = scan_deepship(config.data_root)
     train_records, val_records, test_records = stratified_split(
@@ -146,11 +151,8 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
         test_ratio=config.test_ratio,
         seed=config.seed,
     )
-    train_segments = build_segment_records(train_records, clip_duration=config.clip_duration)
-    val_segments = build_segment_records(val_records, clip_duration=config.clip_duration)
-    test_segments = build_segment_records(test_records, clip_duration=config.clip_duration)
 
-    dataset_kwargs = dict(
+    mel_kwargs = dict(
         sample_rate=config.sample_rate,
         clip_duration=config.clip_duration,
         n_fft=config.n_fft,
@@ -163,26 +165,57 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
         time_mask_param=config.time_mask_param,
         freq_mask_param=config.freq_mask_param,
     )
-    datasets = {
-        "train": DeepShipMelDataset(
+
+    # --- Training dataset ---
+    if config.use_random_crop:
+        train_dataset = DeepShipRandomCropDataset(
+            train_records,
+            max_segments_per_recording=config.max_segments_per_recording,
+            augment=config.use_augmentation,
+            **mel_kwargs,
+        )
+        print(
+            f"Random-crop training: {len(train_records)} recordings "
+            f"→ {len(train_dataset)} samples "
+            f"(max {config.max_segments_per_recording} segments/recording)"
+        )
+    else:
+        train_segments = build_segment_records(
+            train_records, clip_duration=config.clip_duration,
+        )
+        train_dataset = DeepShipMelDataset(
             train_segments,
             augment=config.use_augmentation,
             cache_features=config.cache_features and not config.use_augmentation,
-            **dataset_kwargs,
-        ),
-        "val": DeepShipMelDataset(
+            **mel_kwargs,
+        )
+
+    # --- Val / Test datasets (always deterministic segments) ---
+    # Try precomputed features for val/test first.
+    val_test_precomputed = _try_precomputed_val_test(config)
+    if val_test_precomputed is not None:
+        val_dataset, test_dataset = val_test_precomputed
+    else:
+        val_segments = build_segment_records(
+            val_records, clip_duration=config.clip_duration,
+        )
+        test_segments = build_segment_records(
+            test_records, clip_duration=config.clip_duration,
+        )
+        val_dataset = DeepShipMelDataset(
             val_segments,
             augment=False,
             cache_features=config.cache_features,
-            **dataset_kwargs,
-        ),
-        "test": DeepShipMelDataset(
+            **mel_kwargs,
+        )
+        test_dataset = DeepShipMelDataset(
             test_segments,
             augment=False,
             cache_features=config.cache_features,
-            **dataset_kwargs,
-        ),
-    }
+            **mel_kwargs,
+        )
+
+    datasets = {"train": train_dataset, "val": val_dataset, "test": test_dataset}
     dataloaders = {
         split: DataLoader(
             dataset,
@@ -195,20 +228,54 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
 
     split_dir = Path(config.output_root) / "reports"
     save_split_manifest(split_dir, train_records, val_records, test_records)
+
+    # Build segment records for statistics only (not for training data).
+    all_train_segments = build_segment_records(
+        train_records, clip_duration=config.clip_duration,
+    )
+    all_val_segments = build_segment_records(
+        val_records, clip_duration=config.clip_duration,
+    )
+    all_test_segments = build_segment_records(
+        test_records, clip_duration=config.clip_duration,
+    )
     stats = {
         "full_recordings": summarize_records(records),
         "train_recordings": summarize_records(train_records),
         "val_recordings": summarize_records(val_records),
         "test_recordings": summarize_records(test_records),
-        "train_segments": summarize_segments(train_segments),
-        "val_segments": summarize_segments(val_segments),
-        "test_segments": summarize_segments(test_segments),
+        "train_segments": summarize_segments(all_train_segments),
+        "val_segments": summarize_segments(all_val_segments),
+        "test_segments": summarize_segments(all_test_segments),
+        "train_effective_samples": len(train_dataset),
     }
+    if config.use_random_crop:
+        stats["random_crop"] = {
+            "max_segments_per_recording": config.max_segments_per_recording,
+        }
     (split_dir / "deepship_split_stats.json").write_text(
         json.dumps(stats, indent=2),
         encoding="utf-8",
     )
     return dataloaders, stats
+
+
+def _try_precomputed_val_test(
+    config: TrainConfig,
+) -> tuple[Dataset, Dataset] | None:
+    """Load precomputed val/test bundles if they exist."""
+    if not config.precomputed_root:
+        return None
+    precomputed_root = Path(config.precomputed_root)
+    val_path = precomputed_root / "val.pt"
+    test_path = precomputed_root / "test.pt"
+    if not (val_path.exists() and test_path.exists()):
+        return None
+    from src.data.shipsear import PrecomputedMelDataset
+    val_dataset = PrecomputedMelDataset(val_path, augment=False)
+    test_dataset = PrecomputedMelDataset(test_path, augment=False)
+    print(f"Using precomputed val/test features from {precomputed_root}")
+    return val_dataset, test_dataset
 
 
 def train(config: TrainConfig) -> dict[str, object]:
