@@ -37,9 +37,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--n-fft", type=int, default=1024)
     parser.add_argument("--win-length", type=int, default=1024)
     parser.add_argument("--hop-length", type=int, default=256)
-    parser.add_argument("--highpass-freq", type=float, default=50.0)
-    parser.add_argument("--freq-min", type=float, default=50.0)
-    parser.add_argument("--freq-max", type=float, default=1000.0)
+    parser.add_argument("--highpass-freq", type=float, default=100.0)
+    parser.add_argument("--freq-min", type=float, default=100.0)
+    parser.add_argument("--freq-max", type=float, default=2000.0)
     parser.add_argument("--img-h", type=int, default=128)
     parser.add_argument("--img-w", type=int, default=128)
     return parser

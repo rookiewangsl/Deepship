@@ -273,7 +273,7 @@ class ShipsearMelDataset(Dataset):
         return waveform, sample_rate
 
 
-class PrecomputedMelDataset(Dataset):
+class PrecomputedSpectrogramDataset(Dataset):
     def __init__(
         self,
         bundle_path: str | Path,
@@ -308,3 +308,7 @@ class PrecomputedMelDataset(Dataset):
             feature = self.time_mask(feature)
             feature = self.freq_mask(feature)
         return feature, int(self.labels[index].item())
+
+
+# Backward-compatible alias for existing Mel/CNN pipelines.
+PrecomputedMelDataset = PrecomputedSpectrogramDataset

@@ -19,7 +19,7 @@ from src.data.deepship import (
     summarize_records,
     summarize_segments,
 )
-from src.data.shipsear import PrecomputedMelDataset
+from src.data.shipsear import PrecomputedSpectrogramDataset
 from src.evaluation.classification import (
     compute_metrics,
     plot_confusion_matrix,
@@ -63,6 +63,8 @@ class TrainConfig:
     max_segments_per_recording: int = 12
     precomputed_root: str | None = "outputs/precomputed/deepship_stft"
     mae_pretrained_path: str | None = None
+    use_weighted_sampler: bool = True
+    use_class_weights: bool = True
     random_time_shift: int = 400
     gain_min: float = 0.85
     gain_max: float = 1.15
@@ -70,18 +72,18 @@ class TrainConfig:
     n_fft: int = 1024
     win_length: int = 1024
     hop_length: int = 256
-    highpass_freq: float = 50.0
-    freq_min: float = 50.0
-    freq_max: float = 1000.0
+    highpass_freq: float = 100.0
+    freq_min: float = 100.0
+    freq_max: float = 2000.0
     img_h: int = 128
     img_w: int = 128
     time_mask_param: int = 30
     freq_mask_param: int = 8
-    patch_size_freq: int = 32
+    patch_size_freq: int = 8
     patch_size_time: int = 8
-    embed_dim: int = 96
-    num_layers: int = 4
-    num_heads: int = 4
+    embed_dim: int = 128
+    num_layers: int = 6
+    num_heads: int = 8
     mlp_ratio: float = 2.0
     dropout: float = 0.1
     early_stopping_patience: int = 10
@@ -119,7 +121,7 @@ def build_precomputed_dataloaders(
         return None
 
     datasets = {
-        split: PrecomputedMelDataset(
+        split: PrecomputedSpectrogramDataset(
             path,
             augment=(split == "train" and config.use_augmentation),
             time_shift_frames=0,
@@ -128,12 +130,16 @@ def build_precomputed_dataloaders(
         )
         for split, path in required_files.items()
     }
-    train_sampler = build_weighted_sampler(datasets["train"])
+    train_sampler = (
+        build_weighted_sampler(datasets["train"])
+        if config.use_weighted_sampler
+        else None
+    )
     dataloaders = {
         "train": DataLoader(
             datasets["train"],
             batch_size=config.batch_size,
-            shuffle=False,
+            shuffle=train_sampler is None,
             sampler=train_sampler,
             num_workers=config.num_workers,
         ),
@@ -258,12 +264,16 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
         **stft_kwargs,
     )
 
-    train_sampler = build_weighted_sampler(train_dataset)
+    train_sampler = (
+        build_weighted_sampler(train_dataset)
+        if config.use_weighted_sampler
+        else None
+    )
     dataloaders = {
         "train": DataLoader(
             train_dataset,
             batch_size=config.batch_size,
-            shuffle=False,
+            shuffle=train_sampler is None,
             sampler=train_sampler,
             num_workers=config.num_workers,
         ),
@@ -339,9 +349,15 @@ def train(config: TrainConfig) -> dict[str, object]:
         loaded = load_mae_encoder_weights(model, config.mae_pretrained_path)
         print(f"Loaded {loaded} MAE encoder parameter groups from {config.mae_pretrained_path}")
 
-    class_weights = build_class_weights(stats, config.device)
+    class_weights = (
+        build_class_weights(stats, config.device)
+        if config.use_class_weights
+        else None
+    )
     if class_weights is not None:
         print(f"Using class-weighted CrossEntropyLoss with weights={class_weights.tolist()}")
+    else:
+        print("Using unweighted CrossEntropyLoss")
     criterion = nn.CrossEntropyLoss(
         weight=class_weights,
         label_smoothing=config.label_smoothing,

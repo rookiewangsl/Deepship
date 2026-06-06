@@ -34,6 +34,20 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", default=None)
     parser.add_argument("--precomputed-root", default="outputs/precomputed/deepship_stft")
     parser.add_argument("--mae-pretrained-path", default=None)
+    parser.add_argument(
+        "--use-weighted-sampler", action="store_true", default=True,
+        help="Use WeightedRandomSampler for the training split (default: True).",
+    )
+    parser.add_argument(
+        "--no-weighted-sampler", dest="use_weighted_sampler", action="store_false"
+    )
+    parser.add_argument(
+        "--use-class-weights", action="store_true", default=True,
+        help="Use class-weighted CrossEntropyLoss (default: True).",
+    )
+    parser.add_argument(
+        "--no-class-weights", dest="use_class_weights", action="store_false"
+    )
     parser.add_argument("--early-stopping-patience", type=int, default=10)
     parser.add_argument("--early-stopping-min-delta", type=float, default=1e-3)
     parser.add_argument("--use-augmentation", action="store_true")
@@ -50,18 +64,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--n-fft", type=int, default=1024)
     parser.add_argument("--win-length", type=int, default=1024)
     parser.add_argument("--hop-length", type=int, default=256)
-    parser.add_argument("--highpass-freq", type=float, default=50.0)
-    parser.add_argument("--freq-min", type=float, default=50.0)
-    parser.add_argument("--freq-max", type=float, default=1000.0)
+    parser.add_argument("--highpass-freq", type=float, default=100.0)
+    parser.add_argument("--freq-min", type=float, default=100.0)
+    parser.add_argument("--freq-max", type=float, default=2000.0)
     parser.add_argument("--img-h", type=int, default=128)
     parser.add_argument("--img-w", type=int, default=128)
     parser.add_argument("--time-mask-param", type=int, default=30)
     parser.add_argument("--freq-mask-param", type=int, default=8)
-    parser.add_argument("--patch-size-freq", type=int, default=32)
+    parser.add_argument("--patch-size-freq", type=int, default=8)
     parser.add_argument("--patch-size-time", type=int, default=8)
-    parser.add_argument("--embed-dim", type=int, default=96)
-    parser.add_argument("--num-layers", type=int, default=4)
-    parser.add_argument("--num-heads", type=int, default=4)
+    parser.add_argument("--embed-dim", type=int, default=128)
+    parser.add_argument("--num-layers", type=int, default=6)
+    parser.add_argument("--num-heads", type=int, default=8)
     parser.add_argument("--mlp-ratio", type=float, default=2.0)
     parser.add_argument("--dropout", type=float, default=0.1)
     return parser
@@ -86,6 +100,8 @@ def main() -> None:
         device=args.device or get_default_device(),
         precomputed_root=args.precomputed_root,
         mae_pretrained_path=args.mae_pretrained_path,
+        use_weighted_sampler=args.use_weighted_sampler,
+        use_class_weights=args.use_class_weights,
         early_stopping_patience=args.early_stopping_patience,
         early_stopping_min_delta=args.early_stopping_min_delta,
         use_augmentation=args.use_augmentation,

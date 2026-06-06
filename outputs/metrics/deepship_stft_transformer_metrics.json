@@ -1,0 +1,192 @@
+{
+  "accuracy": 0.5932703659976387,
+  "macro_f1": 0.5933284166033684,
+  "weighted_f1": 0.5951829170506489,
+  "classification_report": {
+    "Cargo": {
+      "precision": 0.48176718092566617,
+      "recall": 0.5841836734693877,
+      "f1-score": 0.528055342044581,
+      "support": 1176.0
+    },
+    "Passenger": {
+      "precision": 0.6738589211618258,
+      "recall": 0.5034097954122753,
+      "f1-score": 0.5762952448545068,
+      "support": 1613.0
+    },
+    "Tank": {
+      "precision": 0.5232945091514143,
+      "recall": 0.6418367346938776,
+      "f1-score": 0.5765352887259395,
+      "support": 980.0
+    },
+    "Tug": {
+      "precision": 0.7101681345076061,
+      "recall": 0.6755521706016756,
+      "f1-score": 0.6924277907884465,
+      "support": 1313.0
+    },
+    "accuracy": 0.5932703659976387,
+    "macro avg": {
+      "precision": 0.5972721864366282,
+      "recall": 0.601245593544304,
+      "f1-score": 0.5933284166033684,
+      "support": 5082.0
+    },
+    "weighted avg": {
+      "precision": 0.6097544321486582,
+      "recall": 0.5932703659976387,
+      "f1-score": 0.5951829170506489,
+      "support": 5082.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      687,
+      79,
+      339,
+      71
+    ],
+    [
+      377,
+      812,
+      189,
+      235
+    ],
+    [
+      230,
+      65,
+      629,
+      56
+    ],
+    [
+      132,
+      249,
+      45,
+      887
+    ]
+  ],
+  "split_stats": {
+    "full_recordings": {
+      "num_recordings": 609,
+      "class_counts": {
+        "Cargo": 109,
+        "Passenger": 191,
+        "Tank": 240,
+        "Tug": 69
+      },
+      "total_duration_seconds": 169995.0,
+      "avg_duration_seconds": 279.13793103448273
+    },
+    "train_recordings": {
+      "num_recordings": 426,
+      "class_counts": {
+        "Cargo": 76,
+        "Passenger": 134,
+        "Tank": 168,
+        "Tug": 48
+      },
+      "total_duration_seconds": 117573.0,
+      "avg_duration_seconds": 275.99295774647885
+    },
+    "val_recordings": {
+      "num_recordings": 91,
+      "class_counts": {
+        "Cargo": 16,
+        "Passenger": 29,
+        "Tank": 36,
+        "Tug": 10
+      },
+      "total_duration_seconds": 27176.0,
+      "avg_duration_seconds": 298.6373626373626
+    },
+    "test_recordings": {
+      "num_recordings": 92,
+      "class_counts": {
+        "Cargo": 17,
+        "Passenger": 28,
+        "Tank": 36,
+        "Tug": 11
+      },
+      "total_duration_seconds": 25246.0,
+      "avg_duration_seconds": 274.4130434782609
+    },
+    "train_segments": {
+      "num_segments": 23673,
+      "class_counts": {
+        "Cargo": 5197,
+        "Passenger": 6405,
+        "Tank": 6564,
+        "Tug": 5507
+      }
+    },
+    "val_segments": {
+      "num_segments": 5472,
+      "class_counts": {
+        "Cargo": 1370,
+        "Passenger": 1333,
+        "Tank": 1452,
+        "Tug": 1317
+      }
+    },
+    "test_segments": {
+      "num_segments": 5082,
+      "class_counts": {
+        "Cargo": 1176,
+        "Passenger": 1613,
+        "Tank": 980,
+        "Tug": 1313
+      }
+    }
+  },
+  "config": {
+    "data_root": "DeepShip",
+    "output_root": "outputs",
+    "sample_rate": 4000,
+    "clip_duration": 5.0,
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 42,
+    "batch_size": 32,
+    "epochs": 30,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.05,
+    "scheduler_factor": 0.5,
+    "scheduler_patience": 2,
+    "scheduler_threshold": 0.001,
+    "scheduler_min_lr": 1e-06,
+    "num_workers": 0,
+    "use_augmentation": true,
+    "use_random_crop": false,
+    "max_segments_per_recording": 12,
+    "precomputed_root": "outputs/precomputed/deepship_stft",
+    "mae_pretrained_path": "outputs/models/deepship_stft_mae_pretrained.pt",
+    "random_time_shift": 400,
+    "gain_min": 0.85,
+    "gain_max": 1.15,
+    "noise_std": 0.003,
+    "n_fft": 1024,
+    "win_length": 1024,
+    "hop_length": 256,
+    "highpass_freq": 50.0,
+    "freq_min": 50.0,
+    "freq_max": 1000.0,
+    "img_h": 128,
+    "img_w": 128,
+    "time_mask_param": 30,
+    "freq_mask_param": 8,
+    "patch_size_freq": 32,
+    "patch_size_time": 8,
+    "embed_dim": 96,
+    "num_layers": 4,
+    "num_heads": 4,
+    "mlp_ratio": 2.0,
+    "dropout": 0.1,
+    "early_stopping_patience": 10,
+    "early_stopping_min_delta": 0.001,
+    "device": "mps"
+  }
+}
