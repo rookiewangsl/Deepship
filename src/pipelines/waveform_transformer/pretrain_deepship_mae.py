@@ -31,17 +31,17 @@ from src.pipelines.mel_ml.train_shipsear_cnn import get_default_device, set_seed
 class PretrainConfig:
     data_root: str = "DeepShip"
     output_root: str = "outputs"
-    sample_rate: int = 4000
+    sample_rate: int = 3000
     clip_duration: float = 5.0
     train_ratio: float = 0.70
     val_ratio: float = 0.15
     test_ratio: float = 0.15
     seed: int = 42
     batch_size: int = 32
-    epochs: int = 100
+    epochs: int = 30
     learning_rate: float = 1e-3
     weight_decay: float = 0.05
-    scheduler_tmax: int = 100
+    scheduler_tmax: int = 30
     num_workers: int = 0
     mask_ratio: float = 0.75
     n_fft: int = 1024
@@ -49,7 +49,7 @@ class PretrainConfig:
     hop_length: int = 256
     highpass_freq: float = 100.0
     freq_min: float = 100.0
-    freq_max: float = 2000.0
+    freq_max: float = 1500.0
     img_h: int = 128
     img_w: int = 128
     time_mask_param: int = 12
@@ -62,7 +62,7 @@ class PretrainConfig:
     patch_size_freq: int = 8
     patch_size_time: int = 8
     embed_dim: int = 128
-    num_layers: int = 6
+    num_layers: int = 4
     num_heads: int = 8
     mlp_ratio: float = 2.0
     dropout: float = 0.0
@@ -76,14 +76,14 @@ class DynamicSTFTMAEDataset(Dataset):
     def __init__(
         self,
         segments,
-        sample_rate: int = 4000,
+        sample_rate: int = 3000,
         clip_duration: float = 5.0,
         n_fft: int = 1024,
         win_length: int = 1024,
         hop_length: int = 256,
         highpass_freq: float = 100.0,
         freq_min: float = 100.0,
-        freq_max: float = 2000.0,
+        freq_max: float = 1500.0,
         img_h: int = 128,
         img_w: int = 128,
         time_mask_param: int = 12,

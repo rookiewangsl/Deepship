@@ -69,9 +69,5 @@
       "Tank": 980,
       "Tug": 1313
     }
-  },
-  "train_effective_samples": 4421,
-  "random_crop": {
-    "max_segments_per_recording": 12
   }
 }

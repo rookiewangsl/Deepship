@@ -42,7 +42,7 @@ from src.pipelines.mel_ml.train_shipsear_cnn import (
 class TrainConfig:
     data_root: str = "DeepShip"
     output_root: str = "outputs"
-    sample_rate: int = 4000
+    sample_rate: int = 3000
     clip_duration: float = 5.0
     train_ratio: float = 0.70
     val_ratio: float = 0.15
@@ -74,7 +74,7 @@ class TrainConfig:
     hop_length: int = 256
     highpass_freq: float = 100.0
     freq_min: float = 100.0
-    freq_max: float = 2000.0
+    freq_max: float = 1500.0
     img_h: int = 128
     img_w: int = 128
     time_mask_param: int = 30
@@ -82,7 +82,7 @@ class TrainConfig:
     patch_size_freq: int = 8
     patch_size_time: int = 8
     embed_dim: int = 128
-    num_layers: int = 6
+    num_layers: int = 4
     num_heads: int = 8
     mlp_ratio: float = 2.0
     dropout: float = 0.1
