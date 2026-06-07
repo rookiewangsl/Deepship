@@ -2,3 +2,6 @@ Deepship/*
 ShipsEar/*
 outputs/precomputed/*
 .DS_Store
+._*
+__pycache__/
+*.pyc
