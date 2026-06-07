@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import math
-
 import torch
 from torch import nn
+
+THREE_BRANCH_KERNEL_SIZES = (8, 16, 32)
 
 
 class ConvBNReLU(nn.Module):
@@ -59,16 +59,9 @@ class AsymmetricBranch(nn.Module):
 
 
 class PaperAttentionFusion(nn.Module):
-    """Approximation of the paper's improved ECA weighting.
+    """Channel reweighting over the fused three-branch feature maps."""
 
-    The paper states that eight distinct convolution blocks each produce a channel
-    weight vector and that these weight vectors are added together before reweighting
-    the fused multi-branch features. Using eight independent 1D convs with kernel
-    size 3 matches the paper's reported +24 parameters over the 0.996 M MA-CNN
-    backbone.
-    """
-
-    def __init__(self, num_blocks: int = 8) -> None:
+    def __init__(self, num_blocks: int = len(THREE_BRANCH_KERNEL_SIZES) * 2) -> None:
         super().__init__()
         self.pool = nn.AdaptiveAvgPool2d(1)
         self.weight_generators = nn.ModuleList(
@@ -89,19 +82,21 @@ class PaperAttentionFusion(nn.Module):
 
 
 class MACNNAClassifier(nn.Module):
-    """Paper-oriented MA-CNN-A reproduction."""
+    """Three-branch MA-CNN-A classifier."""
 
     def __init__(
         self,
         num_classes: int,
         branch_channels: int = 88,
-        kernel_sizes: tuple[int, ...] = (8, 16, 32, 64),
     ) -> None:
         super().__init__()
         self.branches = nn.ModuleList(
-            [AsymmetricBranch(branch_channels, kernel_size) for kernel_size in kernel_sizes]
+            [
+                AsymmetricBranch(branch_channels, kernel_size)
+                for kernel_size in THREE_BRANCH_KERNEL_SIZES
+            ]
         )
-        self.attention = PaperAttentionFusion(num_blocks=len(kernel_sizes) * 2)
+        self.attention = PaperAttentionFusion(num_blocks=len(THREE_BRANCH_KERNEL_SIZES) * 2)
         self.refine_time = ConvBNReLU(
             branch_channels,
             branch_channels,

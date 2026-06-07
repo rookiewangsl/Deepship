@@ -1,0 +1,103 @@
+{
+  "recordings": {
+    "num_recordings": 609,
+    "class_counts": {
+      "Cargo": 109,
+      "Passenger": 191,
+      "Tank": 240,
+      "Tug": 69
+    },
+    "total_duration_seconds": 169995.0,
+    "avg_duration_seconds": 279.13793103448273
+  },
+  "all_segments": {
+    "num_segments": 56468,
+    "class_counts": {
+      "Cargo": 12801,
+      "Passenger": 15410,
+      "Tank": 14762,
+      "Tug": 13495
+    }
+  },
+  "paper_protocol": {
+    "clip_duration": 3.0,
+    "samples_per_class": 5000,
+    "train_per_class": 3500,
+    "val_per_class": 1000,
+    "test_per_class": 500,
+    "sampling_rule": "segment-level random sampling from all non-overlapping 3-second segments"
+  },
+  "available_segments_per_class": {
+    "Cargo": 12801,
+    "Passenger": 15410,
+    "Tank": 14762,
+    "Tug": 13495
+  },
+  "selected_segments_per_class": {
+    "Cargo": {
+      "train": 3500,
+      "val": 1000,
+      "test": 500
+    },
+    "Passenger": {
+      "train": 3500,
+      "val": 1000,
+      "test": 500
+    },
+    "Tank": {
+      "train": 3500,
+      "val": 1000,
+      "test": 500
+    },
+    "Tug": {
+      "train": 3500,
+      "val": 1000,
+      "test": 500
+    }
+  },
+  "train_segments": {
+    "num_segments": 14000,
+    "class_counts": {
+      "Cargo": 3500,
+      "Passenger": 3500,
+      "Tank": 3500,
+      "Tug": 3500
+    }
+  },
+  "val_segments": {
+    "num_segments": 4000,
+    "class_counts": {
+      "Cargo": 1000,
+      "Passenger": 1000,
+      "Tank": 1000,
+      "Tug": 1000
+    }
+  },
+  "test_segments": {
+    "num_segments": 2000,
+    "class_counts": {
+      "Cargo": 500,
+      "Passenger": 500,
+      "Tank": 500,
+      "Tug": 500
+    }
+  },
+  "sampled_recording_overlap": {
+    "Cargo": {
+      "unique_recordings": 109,
+      "max_segments_from_one_recording": 145
+    },
+    "Passenger": {
+      "unique_recordings": 181,
+      "max_segments_from_one_recording": 191
+    },
+    "Tank": {
+      "unique_recordings": 229,
+      "max_segments_from_one_recording": 90
+    },
+    "Tug": {
+      "unique_recordings": 69,
+      "max_segments_from_one_recording": 200
+    }
+  }
+}

@@ -10,7 +10,7 @@ Paper: `jmse-12-00130.pdf`
 4. The previous implementation split by recording first, then evaluated on `8445` test segments instead of the paper's `2000`.
 5. The previous implementation used random crop training, waveform augmentation, time masking, frequency masking, weighted sampling, class weights, label smoothing, and cosine scheduling. The paper explicitly states no data augmentation and only specifies plain cross-entropy, batch size `16`, learning rate `1e-2`, and early stopping patience `10`.
 6. The paper reports `1.00 M` parameters for MA-CNN-A. The previous implementation had only `181,895` parameters, so it was not the same network.
-7. The paper states four asymmetric branches with scales `8, 16, 32, 64`, branch fusion by addition, and attention weights generated from eight convolution blocks. The previous implementation used three branches `8, 16, 32`, concatenation plus `1x1` fusion, and a standard ECA-like block.
+7. The current stable implementation is fixed to a three-branch MA-CNN-A variant with scales `8, 16, 32` and additive fusion. This is intentionally narrower than the four-branch paper description in exchange for a single reproducible code path.
 
 ## Likely dominant cause of the 98.2% vs ~70% gap
 

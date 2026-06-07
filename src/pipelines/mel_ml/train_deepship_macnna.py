@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from contextlib import nullcontext
 from dataclasses import asdict, dataclass
-from pathlib import Path
 import json
 import random
 
@@ -25,8 +24,11 @@ from src.evaluation.classification import (
     plot_training_curves,
     save_metrics,
 )
-from src.models.ma_cnn_a import MACNNAClassifier
+from src.models.ma_cnn_a import MACNNAClassifier, THREE_BRANCH_KERNEL_SIZES
 from src.utils.pathing import resolve_path
+
+
+TARGET_SAMPLE_RATE = 16000
 
 
 def get_default_device() -> str:
@@ -49,7 +51,6 @@ def set_seed(seed: int) -> None:
 class TrainConfig:
     data_root: str = "DeepShip"
     output_root: str = "outputs/deepship_macnna_paper"
-    sample_rate: int = 16000
     clip_duration: float = 3.0
     samples_per_class: int = 5000
     train_per_class: int = 3500
@@ -60,6 +61,7 @@ class TrainConfig:
     hop_length: int = 512
     win_length: int = 1024
     n_mels: int = 64
+    highpass_freq: float | None = None
     batch_size: int = 16
     epochs: int = 100
     learning_rate: float = 1e-2
@@ -80,12 +82,13 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
         seed=config.seed,
     )
     dataset_kwargs = dict(
-        sample_rate=config.sample_rate,
+        sample_rate=TARGET_SAMPLE_RATE,
         clip_duration=config.clip_duration,
         n_fft=config.n_fft,
         hop_length=config.hop_length,
         win_length=config.win_length,
         n_mels=config.n_mels,
+        highpass_freq=config.highpass_freq,
     )
     datasets = {
         split: DeepShipMelSegmentDataset(segments, **dataset_kwargs)
@@ -275,9 +278,12 @@ def train(config: TrainConfig) -> dict[str, object]:
         ],
         "inferred_from_paper_text": [
             "segment-level random sampling is used to emulate the paper's 20,000-sample subset",
-            "branch channel width is set to 88 to match the reported ~1.00M parameters",
-            "eight independent 1D conv attention heads are used to match the paper's reported +24 parameters",
+            "branch channel width is set to 88 for the fixed three-branch MA-CNN-A variant",
         ],
+        "fixed_architecture": {
+            "sample_rate": TARGET_SAMPLE_RATE,
+            "kernel_sizes": list(THREE_BRANCH_KERNEL_SIZES),
+        },
     }
     (reports_dir / "deepship_macnna_run_config.json").write_text(
         json.dumps(run_config, indent=2),

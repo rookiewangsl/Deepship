@@ -19,7 +19,7 @@ from src.utils.pathing import default_deepship_root  # noqa: E402
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Train the paper-oriented MA-CNN-A DeepShip reproduction.",
+        description="Train the stable three-branch MA-CNN-A DeepShip model.",
     )
     parser.add_argument("--data-root", default=default_deepship_root())
     parser.add_argument("--output-root", default="outputs/deepship_macnna_paper")
@@ -28,7 +28,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--learning-rate", type=float, default=1e-2)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default=None)
-    parser.add_argument("--sample-rate", type=int, default=16000)
     parser.add_argument("--clip-duration", type=float, default=3.0)
     parser.add_argument("--samples-per-class", type=int, default=5000)
     parser.add_argument("--train-per-class", type=int, default=3500)
@@ -38,6 +37,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--win-length", type=int, default=1024)
     parser.add_argument("--hop-length", type=int, default=512)
     parser.add_argument("--n-mels", type=int, default=64)
+    parser.add_argument("--highpass-freq", type=float, default=None)
     parser.add_argument("--early-stopping-patience", type=int, default=10)
     parser.add_argument("--branch-channels", type=int, default=88)
     return parser
@@ -48,7 +48,6 @@ def main() -> None:
     config = TrainConfig(
         data_root=args.data_root,
         output_root=args.output_root,
-        sample_rate=args.sample_rate,
         clip_duration=args.clip_duration,
         samples_per_class=args.samples_per_class,
         train_per_class=args.train_per_class,
@@ -59,6 +58,7 @@ def main() -> None:
         hop_length=args.hop_length,
         win_length=args.win_length,
         n_mels=args.n_mels,
+        highpass_freq=args.highpass_freq,
         batch_size=args.batch_size,
         epochs=args.epochs,
         learning_rate=args.learning_rate,

@@ -26,4 +26,4 @@ python scripts/train/train_deepship_macnna.py \
 
 ## Important Note
 
-The paper does not publish source code. This implementation matches the explicit paper settings and clearly labels inferred parts in the saved run config.
+The paper does not publish source code. This codebase now exposes a single stable MA-CNN-A training path with fixed `16 kHz` audio preprocessing and a fixed three-branch backbone using kernel sizes `8, 16, 32`.

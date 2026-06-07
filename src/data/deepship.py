@@ -11,6 +11,7 @@ from typing import Iterable
 import soundfile as sf
 import torch
 import torchaudio
+import torchaudio.functional as F
 from torch.utils.data import Dataset
 
 from src.utils.pathing import resolve_path
@@ -142,14 +143,10 @@ def build_paper_split(
             "train_per_class": train_per_class,
             "val_per_class": val_per_class,
             "test_per_class": test_per_class,
-            "sampling_rule": (
-                "recording-level split first, then segment-level sampling from "
-                "non-overlapping 3-second segments within each split"
-            ),
+            "sampling_rule": "segment-level random sampling from all non-overlapping 3-second segments",
         },
         "available_segments_per_class": {},
         "selected_segments_per_class": {},
-        "selected_recordings_per_class": {},
     }
 
     for class_name in CLASS_NAMES:
@@ -160,48 +157,14 @@ def build_paper_split(
                 f"Class {class_name} only has {len(items)} full segments, fewer than requested {samples_per_class}"
             )
         split_stats["available_segments_per_class"][class_name] = len(items)
-
-        by_recording: dict[str, list[SegmentRecord]] = {}
-        for segment in items:
-            by_recording.setdefault(segment.path, []).append(segment)
-
-        recordings = list(by_recording.items())
-        rng.shuffle(recordings)
-
-        test_records = _select_recording_subset(recordings, test_per_class)
-        remaining_records = [item for item in recordings if item[0] not in {path for path, _ in test_records}]
-
-        val_records = _select_recording_subset(remaining_records, val_per_class)
-        remaining_records = [item for item in remaining_records if item[0] not in {path for path, _ in val_records}]
-
-        train_records = _select_recording_subset(remaining_records, train_per_class)
-
-        selected_recordings = {
-            "train": train_records,
-            "val": val_records,
-            "test": test_records,
-        }
-        selected_segments = {
-            split_name: _sample_segments_from_recordings(recording_items, target_count, rng)
-            for split_name, recording_items, target_count in [
-                ("train", train_records, train_per_class),
-                ("val", val_records, val_per_class),
-                ("test", test_records, test_per_class),
-            ]
-        }
-        for split_name, segments in selected_segments.items():
-            split_segments[split_name].extend(segments)
-
+        selected = items[:samples_per_class]
+        split_segments["train"].extend(selected[:train_per_class])
+        split_segments["val"].extend(selected[train_per_class : train_per_class + val_per_class])
+        split_segments["test"].extend(selected[train_per_class + val_per_class : expected_total])
         split_stats["selected_segments_per_class"][class_name] = {
-            split_name: len(segments)
-            for split_name, segments in selected_segments.items()
-        }
-        split_stats["selected_recordings_per_class"][class_name] = {
-            split_name: {
-                "num_recordings": len(recording_items),
-                "available_segments": sum(len(segments) for _, segments in recording_items),
-            }
-            for split_name, recording_items in selected_recordings.items()
+            "train": train_per_class,
+            "val": val_per_class,
+            "test": test_per_class,
         }
 
     for split_name in split_segments:
@@ -210,74 +173,31 @@ def build_paper_split(
     split_stats["train_segments"] = summarize_segments(split_segments["train"])
     split_stats["val_segments"] = summarize_segments(split_segments["val"])
     split_stats["test_segments"] = summarize_segments(split_segments["test"])
-    split_stats["sampled_recording_overlap"] = _summarize_recording_overlap(split_segments)
+    sampled_pool = {
+        class_name: [segment for segment in all_segments if segment.class_name == class_name][:0]
+        for class_name in CLASS_NAMES
+    }
+    for class_name in CLASS_NAMES:
+        sampled_pool[class_name] = [
+            segment
+            for segment in (
+                split_segments["train"] + split_segments["val"] + split_segments["test"]
+            )
+            if segment.class_name == class_name
+        ]
+    split_stats["sampled_recording_overlap"] = _summarize_class_recording_overlap(sampled_pool)
     return split_segments, split_stats
 
 
-def _select_recording_subset(
-    recording_items: list[tuple[str, list[SegmentRecord]]],
-    target_segments: int,
-) -> list[tuple[str, list[SegmentRecord]]]:
-    totals = [len(segments) for _, segments in recording_items]
-    predecessor: dict[int, tuple[int, int] | None] = {0: None}
-
-    for index, total in enumerate(totals):
-        updates: dict[int, tuple[int, int]] = {}
-        for current_sum in list(predecessor):
-            next_sum = current_sum + total
-            if next_sum not in predecessor and next_sum not in updates:
-                updates[next_sum] = (current_sum, index)
-        predecessor.update(updates)
-
-    candidate_sum = next((value for value in sorted(predecessor) if value >= target_segments), None)
-    if candidate_sum is None:
-        raise ValueError(
-            f"Unable to allocate recordings with at least {target_segments} segments "
-            f"(available: {sum(totals)})"
-        )
-
-    chosen_indices: set[int] = set()
-    current_sum = candidate_sum
-    while current_sum != 0:
-        previous_sum, index = predecessor[current_sum]
-        chosen_indices.add(index)
-        current_sum = previous_sum
-
-    return [item for index, item in enumerate(recording_items) if index in chosen_indices]
-
-
-def _sample_segments_from_recordings(
-    recording_items: list[tuple[str, list[SegmentRecord]]],
-    target_segments: int,
-    rng: random.Random,
-) -> list[SegmentRecord]:
-    pool = [segment for _, segments in recording_items for segment in segments]
-    if len(pool) < target_segments:
-        raise ValueError(
-            f"Recording subset only contains {len(pool)} segments, fewer than requested {target_segments}"
-        )
-    rng.shuffle(pool)
-    return pool[:target_segments]
-
-
-def _summarize_recording_overlap(split_segments: dict[str, list[SegmentRecord]]) -> dict[str, object]:
-    by_split = {
-        split_name: Counter(segment.path for segment in segments)
-        for split_name, segments in split_segments.items()
-    }
-    all_paths = set().union(*[set(counter) for counter in by_split.values()])
-    overlapping_paths = {
-        path: sorted(split_name for split_name, counter in by_split.items() if path in counter)
-        for path in all_paths
-        if sum(path in counter for counter in by_split.values()) > 1
-    }
-    return {
-        "num_overlapping_recordings": len(overlapping_paths),
-        "examples": [
-            {"path": path, "splits": splits}
-            for path, splits in list(sorted(overlapping_paths.items()))[:10]
-        ],
-    }
+def _summarize_class_recording_overlap(sampled_pool: dict[str, list[SegmentRecord]]) -> dict[str, object]:
+    overlap: dict[str, object] = {}
+    for class_name, segments in sampled_pool.items():
+        by_recording = Counter(segment.path for segment in segments)
+        overlap[class_name] = {
+            "unique_recordings": len(by_recording),
+            "max_segments_from_one_recording": max(by_recording.values()) if by_recording else 0,
+        }
+    return overlap
 
 
 def save_segment_split_manifest(
@@ -312,10 +232,12 @@ class DeepShipMelSegmentDataset(Dataset):
         hop_length: int = 512,
         win_length: int = 1024,
         n_mels: int = 64,
+        highpass_freq: float | None = None,
     ) -> None:
         self.segments = segments
         self.sample_rate = sample_rate
         self.clip_samples = int(round(sample_rate * clip_duration))
+        self.highpass_freq = highpass_freq
         self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
         self.mel_transform = torchaudio.transforms.MelSpectrogram(
             sample_rate=sample_rate,
@@ -337,6 +259,8 @@ class DeepShipMelSegmentDataset(Dataset):
         if source_sr != self.sample_rate:
             waveform = self._resample(waveform, source_sr)
         waveform = self._fix_length(waveform)
+        if self.highpass_freq is not None and self.highpass_freq > 0:
+            waveform = F.highpass_biquad(waveform, self.sample_rate, self.highpass_freq)
         mel = self.to_db(self.mel_transform(waveform))
         return mel, segment.label_index
 
