@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from pathlib import Path
 import json
 
 import torch
@@ -26,15 +25,20 @@ from src.evaluation.classification import (
     plot_training_curves,
     save_metrics,
 )
-from src.models.waveform_transformer import (
-    STFTTransformerClassifier,
-    load_mae_encoder_weights,
-)
+from src.models.waveform_transformer import STFTTransformerClassifier, load_mae_encoder_weights
 from src.pipelines.mel_ml.train_shipsear_cnn import (
     collect_predictions,
     get_default_device,
     run_epoch,
     set_seed,
+)
+from src.utils.optim import EpochWarmupCosineScheduler
+from src.utils.pathing import resolve_path
+from src.utils.tensorboard import (
+    add_confusion_matrix,
+    add_spectrogram_batch,
+    create_summary_writer,
+    log_config,
 )
 
 
@@ -53,16 +57,15 @@ class TrainConfig:
     learning_rate: float = 5e-4
     weight_decay: float = 1e-4
     label_smoothing: float = 0.05
-    scheduler_factor: float = 0.5
-    scheduler_patience: int = 2
-    scheduler_threshold: float = 1e-3
-    scheduler_min_lr: float = 1e-6
+    warmup_epochs: int = 5
+    warmup_start_factor: float = 0.1
+    min_lr: float = 1e-5
     num_workers: int = 0
     use_augmentation: bool = True
     use_random_crop: bool = True
     max_segments_per_recording: int = 12
     precomputed_root: str | None = "outputs/precomputed/deepship_stft"
-    mae_pretrained_path: str | None = None
+    mae_pretrained_path: str | None = "outputs/deepship_stft_mae_pretrain/models/deepship_stft_mae_best.pt"
     use_weighted_sampler: bool = True
     use_class_weights: bool = True
     random_time_shift: int = 400
@@ -72,8 +75,8 @@ class TrainConfig:
     n_fft: int = 1024
     win_length: int = 1024
     hop_length: int = 256
-    highpass_freq: float = 100.0
-    freq_min: float = 100.0
+    highpass_freq: float = 50.0
+    freq_min: float = 50.0
     freq_max: float = 1500.0
     img_h: int = 128
     img_w: int = 128
@@ -113,7 +116,7 @@ def build_precomputed_dataloaders(
 ) -> tuple[dict[str, DataLoader], dict[str, object]] | None:
     if not config.precomputed_root:
         return None
-    precomputed_root = Path(config.precomputed_root)
+    precomputed_root = resolve_path(config.precomputed_root)
     required_files = {
         split: precomputed_root / f"{split}.pt" for split in ["train", "val", "test"]
     }
@@ -130,41 +133,31 @@ def build_precomputed_dataloaders(
         )
         for split, path in required_files.items()
     }
-    train_sampler = (
-        build_weighted_sampler(datasets["train"])
-        if config.use_weighted_sampler
-        else None
-    )
+    pin_memory = str(config.device).startswith("cuda")
+    loader_kwargs = {
+        "batch_size": config.batch_size,
+        "num_workers": config.num_workers,
+        "pin_memory": pin_memory,
+    }
+    if config.num_workers > 0:
+        loader_kwargs["persistent_workers"] = True
+    train_sampler = build_weighted_sampler(datasets["train"]) if config.use_weighted_sampler else None
     dataloaders = {
         "train": DataLoader(
             datasets["train"],
-            batch_size=config.batch_size,
             shuffle=train_sampler is None,
             sampler=train_sampler,
-            num_workers=config.num_workers,
+            **loader_kwargs,
         ),
-        "val": DataLoader(
-            datasets["val"],
-            batch_size=config.batch_size,
-            shuffle=False,
-            num_workers=config.num_workers,
-        ),
-        "test": DataLoader(
-            datasets["test"],
-            batch_size=config.batch_size,
-            shuffle=False,
-            num_workers=config.num_workers,
-        ),
+        "val": DataLoader(datasets["val"], shuffle=False, **loader_kwargs),
+        "test": DataLoader(datasets["test"], shuffle=False, **loader_kwargs),
     }
 
     stats_path = precomputed_root / "deepship_stft_split_stats.json"
     if stats_path.exists():
         stats = json.loads(stats_path.read_text(encoding="utf-8"))
     else:
-        stats = {
-            split: {"num_samples": len(dataset)}
-            for split, dataset in datasets.items()
-        }
+        stats = {split: {"num_samples": len(dataset)} for split, dataset in datasets.items()}
     print(f"Using precomputed STFT features from {precomputed_root}")
     return dataloaders, stats
 
@@ -253,45 +246,30 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
 
     val_segments = build_segment_records(val_records, clip_duration=config.clip_duration)
     test_segments = build_segment_records(test_records, clip_duration=config.clip_duration)
-    val_dataset = DeepShipSTFTDataset(
-        val_segments,
-        augment=False,
-        **stft_kwargs,
-    )
-    test_dataset = DeepShipSTFTDataset(
-        test_segments,
-        augment=False,
-        **stft_kwargs,
-    )
+    val_dataset = DeepShipSTFTDataset(val_segments, augment=False, **stft_kwargs)
+    test_dataset = DeepShipSTFTDataset(test_segments, augment=False, **stft_kwargs)
 
-    train_sampler = (
-        build_weighted_sampler(train_dataset)
-        if config.use_weighted_sampler
-        else None
-    )
+    pin_memory = str(config.device).startswith("cuda")
+    loader_kwargs = {
+        "batch_size": config.batch_size,
+        "num_workers": config.num_workers,
+        "pin_memory": pin_memory,
+    }
+    if config.num_workers > 0:
+        loader_kwargs["persistent_workers"] = True
+    train_sampler = build_weighted_sampler(train_dataset) if config.use_weighted_sampler else None
     dataloaders = {
         "train": DataLoader(
             train_dataset,
-            batch_size=config.batch_size,
             shuffle=train_sampler is None,
             sampler=train_sampler,
-            num_workers=config.num_workers,
+            **loader_kwargs,
         ),
-        "val": DataLoader(
-            val_dataset,
-            batch_size=config.batch_size,
-            shuffle=False,
-            num_workers=config.num_workers,
-        ),
-        "test": DataLoader(
-            test_dataset,
-            batch_size=config.batch_size,
-            shuffle=False,
-            num_workers=config.num_workers,
-        ),
+        "val": DataLoader(val_dataset, shuffle=False, **loader_kwargs),
+        "test": DataLoader(test_dataset, shuffle=False, **loader_kwargs),
     }
 
-    split_dir = Path(config.output_root) / "reports"
+    split_dir = resolve_path(config.output_root) / "reports"
     save_split_manifest(split_dir, train_records, val_records, test_records)
     all_train_segments = build_segment_records(train_records, clip_duration=config.clip_duration)
     all_val_segments = build_segment_records(val_records, clip_duration=config.clip_duration)
@@ -307,9 +285,7 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
         "train_effective_samples": len(train_dataset),
     }
     if config.use_random_crop:
-        stats["random_crop"] = {
-            "max_segments_per_recording": config.max_segments_per_recording,
-        }
+        stats["random_crop"] = {"max_segments_per_recording": config.max_segments_per_recording}
     (split_dir / "deepship_stft_transformer_split_stats.json").write_text(
         json.dumps(stats, indent=2),
         encoding="utf-8",
@@ -319,23 +295,28 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
 
 def train(config: TrainConfig) -> dict[str, object]:
     set_seed(config.seed)
+    if not config.mae_pretrained_path:
+        raise ValueError("MAE pretrained checkpoint is required for transformer training.")
+
     print("Preparing datasets and dataloaders...")
     dataloaders, stats = build_dataloaders(config)
-    output_root = Path(config.output_root)
+    output_root = resolve_path(config.output_root)
     metrics_dir = output_root / "metrics"
     figures_dir = output_root / "figures"
     models_dir = output_root / "models"
     reports_dir = output_root / "reports"
-    for directory in [metrics_dir, figures_dir, models_dir, reports_dir]:
+    tensorboard_dir = output_root / "tensorboard"
+    for directory in [metrics_dir, figures_dir, models_dir, reports_dir, tensorboard_dir]:
         directory.mkdir(parents=True, exist_ok=True)
+    writer = create_summary_writer(tensorboard_dir)
+    log_config(writer, asdict(config))
     history_path = reports_dir / "deepship_stft_transformer_history.json"
+    sample_inputs, _ = next(iter(dataloaders["train"]))
+    add_spectrogram_batch(writer, "samples/train_inputs", sample_inputs)
 
-    waveform_length = int(config.sample_rate * config.clip_duration)
-    n_freq = config.img_h
-    n_frames = config.img_w
     model = STFTTransformerClassifier(
         num_classes=len(CLASS_NAMES),
-        input_size=(n_freq, n_frames),
+        input_size=(config.img_h, config.img_w),
         patch_size=(config.patch_size_freq, config.patch_size_time),
         embed_dim=config.embed_dim,
         num_layers=config.num_layers,
@@ -345,35 +326,29 @@ def train(config: TrainConfig) -> dict[str, object]:
     ).to(config.device)
     n_params = sum(p.numel() for p in model.parameters())
     print(f"Model: STFT transformer, {n_params:,} parameters")
-    if config.mae_pretrained_path:
-        loaded = load_mae_encoder_weights(model, config.mae_pretrained_path)
-        print(f"Loaded {loaded} MAE encoder parameter groups from {config.mae_pretrained_path}")
 
-    class_weights = (
-        build_class_weights(stats, config.device)
-        if config.use_class_weights
-        else None
-    )
+    mae_pretrained_path = resolve_path(config.mae_pretrained_path)
+    loaded = load_mae_encoder_weights(model, mae_pretrained_path)
+    print(f"Loaded {loaded} MAE encoder parameter groups from {mae_pretrained_path}")
+
+    class_weights = build_class_weights(stats, config.device) if config.use_class_weights else None
     if class_weights is not None:
         print(f"Using class-weighted CrossEntropyLoss with weights={class_weights.tolist()}")
     else:
         print("Using unweighted CrossEntropyLoss")
-    criterion = nn.CrossEntropyLoss(
-        weight=class_weights,
-        label_smoothing=config.label_smoothing,
-    )
+    criterion = nn.CrossEntropyLoss(weight=class_weights, label_smoothing=config.label_smoothing)
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=config.learning_rate,
         weight_decay=config.weight_decay,
     )
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    scaler = torch.amp.GradScaler("cuda", enabled=str(config.device).startswith("cuda"))
+    scheduler = EpochWarmupCosineScheduler(
         optimizer,
-        mode="max",
-        factor=config.scheduler_factor,
-        patience=config.scheduler_patience,
-        threshold=config.scheduler_threshold,
-        min_lr=config.scheduler_min_lr,
+        total_epochs=config.epochs,
+        warmup_epochs=config.warmup_epochs,
+        warmup_start_factor=config.warmup_start_factor,
+        min_lr=config.min_lr,
     )
 
     best_val_macro_f1 = -1.0
@@ -390,6 +365,7 @@ def train(config: TrainConfig) -> dict[str, object]:
 
     print(f"Starting training on device={config.device} for {config.epochs} epochs...")
     for epoch in range(1, config.epochs + 1):
+        current_lr = optimizer.param_groups[0]["lr"]
         train_loss, train_acc = run_epoch(
             model=model,
             dataloader=dataloaders["train"],
@@ -397,6 +373,7 @@ def train(config: TrainConfig) -> dict[str, object]:
             device=config.device,
             desc=f"Epoch {epoch:03d}/{config.epochs:03d} train",
             optimizer=optimizer,
+            scaler=scaler,
         )
         val_loss, val_acc = run_epoch(
             model=model,
@@ -414,20 +391,34 @@ def train(config: TrainConfig) -> dict[str, object]:
         history["train_acc"].append(train_acc)
         history["val_acc"].append(val_acc)
         history["val_macro_f1"].append(val_macro_f1)
+        if writer is not None:
+            writer.add_scalar("loss/train", train_loss, epoch)
+            writer.add_scalar("loss/val", val_loss, epoch)
+            writer.add_scalar("accuracy/train", train_acc, epoch)
+            writer.add_scalar("accuracy/val", val_acc, epoch)
+            writer.add_scalar("f1/val_macro", val_macro_f1, epoch)
+            writer.add_scalar("lr", current_lr, epoch)
+            add_confusion_matrix(
+                writer,
+                "confusion_matrix/val",
+                val_metrics["confusion_matrix"],
+                CLASS_NAMES,
+                epoch,
+            )
         history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
         plot_training_curves(
             history,
             figures_dir / "deepship_stft_transformer_training_curves.png",
             title="DeepShip STFT Transformer Training Curves",
         )
-        scheduler.step(val_macro_f1)
-        current_lr = optimizer.param_groups[0]["lr"]
         print(
             f"Epoch {epoch:03d}/{config.epochs:03d} "
             f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} "
             f"val_loss={val_loss:.4f} val_acc={val_acc:.4f} "
             f"val_macro_f1={val_macro_f1:.4f} lr={current_lr:.6g}"
         )
+        scheduler.step()
+
         improved = val_macro_f1 > (best_val_macro_f1 + config.early_stopping_min_delta)
         if improved:
             best_val_macro_f1 = val_macro_f1
@@ -476,6 +467,16 @@ def train(config: TrainConfig) -> dict[str, object]:
         json.dumps(asdict(config), indent=2),
         encoding="utf-8",
     )
+    add_confusion_matrix(
+        writer,
+        "confusion_matrix/test",
+        metrics["confusion_matrix"],
+        CLASS_NAMES,
+        best_epoch if best_epoch > 0 else len(history["train_loss"]),
+    )
+    if writer is not None:
+        writer.flush()
+        writer.close()
     print(
         f"Final test metrics: accuracy={metrics['accuracy']:.4f}, "
         f"macro_f1={metrics['macro_f1']:.4f}, weighted_f1={metrics['weighted_f1']:.4f}"

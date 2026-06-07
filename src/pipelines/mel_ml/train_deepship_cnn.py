@@ -31,6 +31,8 @@ from src.pipelines.mel_ml.train_shipsear_cnn import (
     run_epoch,
     set_seed,
 )
+from src.utils.optim import EpochWarmupCosineScheduler
+from src.utils.pathing import resolve_path
 import torch
 from torch import nn
 
@@ -39,7 +41,7 @@ from torch import nn
 class TrainConfig:
     data_root: str = "DeepShip"
     output_root: str = "outputs"
-    sample_rate: int = 4000
+    sample_rate: int = 3000
     clip_duration: float = 5.0
     train_ratio: float = 0.70
     val_ratio: float = 0.15
@@ -49,17 +51,16 @@ class TrainConfig:
     hop_length: int = 64
     win_length: int = 256
     n_mels: int = 64
-    f_min: float = 20.0
-    f_max: float = 2000.0
+    f_min: float = 50.0
+    f_max: float = 1500.0
     batch_size: int = 32
     epochs: int = 30
     learning_rate: float = 1e-3
     weight_decay: float = 5e-4
     label_smoothing: float = 0.05
-    scheduler_factor: float = 0.5
-    scheduler_patience: int = 2
-    scheduler_threshold: float = 1e-3
-    scheduler_min_lr: float = 1e-6
+    warmup_epochs: int = 5
+    warmup_start_factor: float = 0.1
+    min_lr: float = 1e-5
     num_workers: int = 0
     use_augmentation: bool = False
     cache_features: bool = False
@@ -97,7 +98,7 @@ def build_precomputed_dataloaders(
 ) -> tuple[dict[str, DataLoader], dict[str, object]] | None:
     if not config.precomputed_root:
         return None
-    precomputed_root = Path(config.precomputed_root)
+    precomputed_root = resolve_path(config.precomputed_root)
     required_files = {
         split: precomputed_root / f"{split}.pt" for split in ["train", "val", "test"]
     }
@@ -226,7 +227,7 @@ def build_dataloaders(config: TrainConfig) -> tuple[dict[str, DataLoader], dict[
         for split, dataset in datasets.items()
     }
 
-    split_dir = Path(config.output_root) / "reports"
+    split_dir = resolve_path(config.output_root) / "reports"
     save_split_manifest(split_dir, train_records, val_records, test_records)
 
     # Build segment records for statistics only (not for training data).
@@ -266,7 +267,7 @@ def _try_precomputed_val_test(
     """Load precomputed val/test bundles if they exist."""
     if not config.precomputed_root:
         return None
-    precomputed_root = Path(config.precomputed_root)
+    precomputed_root = resolve_path(config.precomputed_root)
     val_path = precomputed_root / "val.pt"
     test_path = precomputed_root / "test.pt"
     if not (val_path.exists() and test_path.exists()):
@@ -282,7 +283,7 @@ def train(config: TrainConfig) -> dict[str, object]:
     set_seed(config.seed)
     print("Preparing datasets and dataloaders...")
     dataloaders, stats = build_dataloaders(config)
-    output_root = Path(config.output_root)
+    output_root = resolve_path(config.output_root)
     metrics_dir = output_root / "metrics"
     figures_dir = output_root / "figures"
     models_dir = output_root / "models"
@@ -312,13 +313,12 @@ def train(config: TrainConfig) -> dict[str, object]:
         lr=config.learning_rate,
         weight_decay=config.weight_decay,
     )
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+    scheduler = EpochWarmupCosineScheduler(
         optimizer,
-        mode="max",
-        factor=config.scheduler_factor,
-        patience=config.scheduler_patience,
-        threshold=config.scheduler_threshold,
-        min_lr=config.scheduler_min_lr,
+        total_epochs=config.epochs,
+        warmup_epochs=config.warmup_epochs,
+        warmup_start_factor=config.warmup_start_factor,
+        min_lr=config.min_lr,
     )
 
     best_val_loss = float("inf")
@@ -336,6 +336,7 @@ def train(config: TrainConfig) -> dict[str, object]:
 
     print(f"Starting training on device={config.device} for {config.epochs} epochs...")
     for epoch in range(1, config.epochs + 1):
+        current_lr = optimizer.param_groups[0]["lr"]
         train_loss, train_acc = run_epoch(
             model=model,
             dataloader=dataloaders["train"],
@@ -366,14 +367,13 @@ def train(config: TrainConfig) -> dict[str, object]:
             figures_dir / "deepship_mel_cnn_training_curves.png",
             title="DeepShip Mel+CNN Training Curves",
         )
-        scheduler.step(val_macro_f1)
-        current_lr = optimizer.param_groups[0]["lr"]
         print(
             f"Epoch {epoch:03d}/{config.epochs:03d} "
             f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} "
             f"val_loss={val_loss:.4f} val_acc={val_acc:.4f} "
             f"val_macro_f1={val_macro_f1:.4f} lr={current_lr:.6g}"
         )
+        scheduler.step()
         improved = val_macro_f1 > (best_val_macro_f1 + config.early_stopping_min_delta)
         if improved:
             best_val_loss = val_loss

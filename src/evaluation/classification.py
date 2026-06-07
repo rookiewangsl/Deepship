@@ -4,14 +4,18 @@ from pathlib import Path
 import json
 import os
 
-os.environ.setdefault("MPLCONFIGDIR", "/private/tmp/matplotlib-cache")
-os.environ.setdefault("XDG_CACHE_HOME", "/private/tmp")
+os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib-cache")
+os.environ.setdefault("XDG_CACHE_HOME", "/tmp")
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.metrics import classification_report, confusion_matrix
+
+try:
+    import seaborn as sns
+except ImportError:  # pragma: no cover - optional dependency
+    sns = None
 
 
 def compute_metrics(y_true: list[int], y_pred: list[int], class_names: list[str]) -> dict[str, object]:
@@ -50,17 +54,26 @@ def plot_confusion_matrix(
     path = Path(output_path)
     path.parent.mkdir(parents=True, exist_ok=True)
     plt.figure(figsize=(6, 5))
-    sns.heatmap(
-        conf_mat,
-        annot=True,
-        fmt="d",
-        cmap="Blues",
-        cbar=True,
-        xticklabels=class_names,
-        yticklabels=class_names,
-        linewidths=0.5,
-        linecolor="white",
-    )
+    if sns is not None:
+        sns.heatmap(
+            conf_mat,
+            annot=True,
+            fmt="d",
+            cmap="Blues",
+            cbar=True,
+            xticklabels=class_names,
+            yticklabels=class_names,
+            linewidths=0.5,
+            linecolor="white",
+        )
+    else:
+        plt.imshow(conf_mat, cmap="Blues", aspect="auto")
+        plt.colorbar()
+        plt.xticks(range(len(class_names)), class_names)
+        plt.yticks(range(len(class_names)), class_names)
+        for row_idx, row in enumerate(conf_mat):
+            for col_idx, value in enumerate(row):
+                plt.text(col_idx, row_idx, str(value), ha="center", va="center")
     plt.xlabel("Predicted")
     plt.ylabel("True")
     plt.title(title)

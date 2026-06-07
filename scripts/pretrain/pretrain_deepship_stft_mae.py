@@ -13,17 +13,20 @@ from src.pipelines.waveform_transformer.pretrain_deepship_mae import (
     pretrain,
 )
 from src.pipelines.mel_ml.train_shipsear_cnn import get_default_device
+from src.utils.pathing import default_deepship_root
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Pretrain STFT-MAE on DeepShip wav-derived STFT features.")
-    parser.add_argument("--data-root", default="DeepShip")
+    parser.add_argument("--data-root", default=default_deepship_root())
     parser.add_argument("--output-root", default="outputs")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=1e-3)
     parser.add_argument("--weight-decay", type=float, default=0.05)
-    parser.add_argument("--scheduler-tmax", type=int, default=30)
+    parser.add_argument("--warmup-epochs", type=int, default=5)
+    parser.add_argument("--warmup-start-factor", type=float, default=0.1)
+    parser.add_argument("--min-lr", type=float, default=1e-5)
     parser.add_argument("--sample-rate", type=int, default=3000)
     parser.add_argument("--clip-duration", type=float, default=5.0)
     parser.add_argument("--train-ratio", type=float, default=0.70)
@@ -36,8 +39,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--n-fft", type=int, default=1024)
     parser.add_argument("--win-length", type=int, default=1024)
     parser.add_argument("--hop-length", type=int, default=256)
-    parser.add_argument("--highpass-freq", type=float, default=100.0)
-    parser.add_argument("--freq-min", type=float, default=100.0)
+    parser.add_argument("--highpass-freq", type=float, default=50.0)
+    parser.add_argument("--freq-min", type=float, default=50.0)
     parser.add_argument("--freq-max", type=float, default=1500.0)
     parser.add_argument("--img-h", type=int, default=128)
     parser.add_argument("--img-w", type=int, default=128)
@@ -76,7 +79,9 @@ def main() -> None:
         epochs=args.epochs,
         learning_rate=args.learning_rate,
         weight_decay=args.weight_decay,
-        scheduler_tmax=args.scheduler_tmax,
+        warmup_epochs=args.warmup_epochs,
+        warmup_start_factor=args.warmup_start_factor,
+        min_lr=args.min_lr,
         num_workers=args.num_workers,
         mask_ratio=args.mask_ratio,
         n_fft=args.n_fft,

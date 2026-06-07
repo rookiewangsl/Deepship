@@ -22,13 +22,14 @@ from src.data.deepship import (
     summarize_records,
     summarize_segments,
 )
+from src.utils.pathing import default_deepship_root, resolve_path
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Precompute DeepShip log-Mel features.")
-    parser.add_argument("--data-root", default="DeepShip")
+    parser.add_argument("--data-root", default=default_deepship_root())
     parser.add_argument("--output-root", default="outputs/precomputed/deepship_mel")
-    parser.add_argument("--sample-rate", type=int, default=4000)
+    parser.add_argument("--sample-rate", type=int, default=3000)
     parser.add_argument("--clip-duration", type=float, default=5.0)
     parser.add_argument("--train-ratio", type=float, default=0.70)
     parser.add_argument("--val-ratio", type=float, default=0.15)
@@ -38,8 +39,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--hop-length", type=int, default=64)
     parser.add_argument("--win-length", type=int, default=256)
     parser.add_argument("--n-mels", type=int, default=64)
-    parser.add_argument("--f-min", type=float, default=20.0)
-    parser.add_argument("--f-max", type=float, default=2000.0)
+    parser.add_argument("--f-min", type=float, default=50.0)
+    parser.add_argument("--f-max", type=float, default=1500.0)
     return parser
 
 
@@ -79,7 +80,7 @@ def build_bundle(records, dataset: DeepShipMelDataset, split_name: str) -> dict[
 
 def main() -> None:
     args = build_parser().parse_args()
-    output_root = Path(args.output_root)
+    output_root = resolve_path(args.output_root)
     output_root.mkdir(parents=True, exist_ok=True)
 
     print("Scanning DeepShip and building recording-level stratified train/val/test split...")

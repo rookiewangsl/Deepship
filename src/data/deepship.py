@@ -14,6 +14,8 @@ import torchaudio
 import torchaudio.functional as AF
 from torch.utils.data import Dataset
 
+from src.utils.pathing import resolve_path
+
 
 CLASS_NAMES = ["Cargo", "Passenger", "Tank", "Tug"]
 CLASS_TO_INDEX = {name: idx for idx, name in enumerate(CLASS_NAMES)}
@@ -42,7 +44,7 @@ class SegmentRecord:
 
 
 def scan_deepship(root_dir: str | Path) -> list[AudioRecord]:
-    root = Path(root_dir)
+    root = resolve_path(root_dir)
     records: list[AudioRecord] = []
     for class_name in CLASS_NAMES:
         class_dir = root / class_name
@@ -192,8 +194,8 @@ class DeepShipMelDataset(Dataset):
         hop_length: int = 64,
         win_length: int = 256,
         n_mels: int = 64,
-        f_min: float = 20.0,
-        f_max: float = 2000.0,
+        f_min: float = 50.0,
+        f_max: float = 1500.0,
         augment: bool = False,
         cache_features: bool = False,
         time_shift_frames: int = 8,
@@ -346,14 +348,14 @@ class DeepShipRandomCropDataset(Dataset):
         self,
         records: list[AudioRecord],
         max_segments_per_recording: int = 8,
-        sample_rate: int = 4000,
+        sample_rate: int = 3000,
         clip_duration: float = 5.0,
         n_fft: int = 256,
         hop_length: int = 64,
         win_length: int = 256,
         n_mels: int = 64,
-        f_min: float = 20.0,
-        f_max: float = 2000.0,
+        f_min: float = 50.0,
+        f_max: float = 1500.0,
         augment: bool = True,
         time_shift_frames: int = 8,
         time_mask_param: int = 12,
@@ -491,7 +493,7 @@ class DeepShipWaveformDataset(Dataset):
     def __init__(
         self,
         segments: list[SegmentRecord],
-        sample_rate: int = 4000,
+        sample_rate: int = 3000,
         clip_duration: float = 5.0,
         augment: bool = False,
         random_time_shift: int = 400,
@@ -587,7 +589,7 @@ class DeepShipRandomCropWaveformDataset(Dataset):
         self,
         records: list[AudioRecord],
         max_segments_per_recording: int = 12,
-        sample_rate: int = 4000,
+        sample_rate: int = 3000,
         clip_duration: float = 5.0,
         augment: bool = True,
         random_time_shift: int = 400,
@@ -689,13 +691,13 @@ class DeepShipSTFTDataset(Dataset):
     def __init__(
         self,
         segments: list[SegmentRecord],
-        sample_rate: int = 4000,
+        sample_rate: int = 3000,
         clip_duration: float = 5.0,
         n_fft: int = 1024,
         win_length: int = 1024,
         hop_length: int = 256,
-        highpass_freq: float = 100.0,
-        freq_min: float = 100.0,
+        highpass_freq: float = 50.0,
+        freq_min: float = 50.0,
         freq_max: float = 1500.0,
         img_h: int = 128,
         img_w: int = 128,
@@ -820,8 +822,8 @@ class DeepShipRandomCropSTFTDataset(Dataset):
         n_fft: int = 1024,
         win_length: int = 1024,
         hop_length: int = 256,
-        highpass_freq: float = 100.0,
-        freq_min: float = 100.0,
+        highpass_freq: float = 50.0,
+        freq_min: float = 50.0,
         freq_max: float = 1500.0,
         img_h: int = 128,
         img_w: int = 128,

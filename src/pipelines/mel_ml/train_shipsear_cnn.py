@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 import json
 import random
+from contextlib import nullcontext
 
 import numpy as np
 import torch
@@ -27,6 +28,7 @@ from src.evaluation.classification import (
     save_metrics,
 )
 from src.models.mel_cnn import MelCNNClassifier
+from src.utils.optim import EpochWarmupCosineScheduler
 
 
 def get_default_device() -> str:
@@ -57,6 +59,9 @@ class TrainConfig:
     epochs: int = 30
     learning_rate: float = 1e-3
     weight_decay: float = 1e-4
+    warmup_epochs: int = 5
+    warmup_start_factor: float = 0.1
+    min_lr: float = 1e-5
     num_workers: int = 0
     use_augmentation: bool = False
     cache_features: bool = True
@@ -200,12 +205,19 @@ def run_epoch(
     device: str,
     desc: str,
     optimizer: torch.optim.Optimizer | None = None,
+    scaler: torch.amp.GradScaler | None = None,
 ) -> tuple[float, float]:
     is_train = optimizer is not None
     model.train(is_train)
     total_loss = 0.0
     total_correct = 0
     total_samples = 0
+    use_amp = str(device).startswith("cuda")
+    amp_ctx = (
+        torch.amp.autocast(device_type="cuda")
+        if use_amp
+        else nullcontext()
+    )
 
     progress_bar = tqdm(
         dataloader,
@@ -215,14 +227,20 @@ def run_epoch(
     )
     with torch.set_grad_enabled(is_train):
         for inputs, targets in progress_bar:
-            inputs = inputs.to(device)
-            targets = targets.to(device)
-            logits = model(inputs)
-            loss = criterion(logits, targets)
+            inputs = inputs.to(device, non_blocking=use_amp)
+            targets = targets.to(device, non_blocking=use_amp)
+            with amp_ctx:
+                logits = model(inputs)
+                loss = criterion(logits, targets)
             if is_train:
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
+                optimizer.zero_grad(set_to_none=True)
+                if scaler is not None and use_amp:
+                    scaler.scale(loss).backward()
+                    scaler.step(optimizer)
+                    scaler.update()
+                else:
+                    loss.backward()
+                    optimizer.step()
             total_loss += loss.item() * inputs.size(0)
             total_correct += (logits.argmax(dim=1) == targets).sum().item()
             total_samples += inputs.size(0)
@@ -246,10 +264,17 @@ def collect_predictions(
     model.eval()
     y_true: list[int] = []
     y_pred: list[int] = []
+    use_amp = str(device).startswith("cuda")
+    amp_ctx = (
+        torch.amp.autocast(device_type="cuda")
+        if use_amp
+        else nullcontext()
+    )
     with torch.no_grad():
         for inputs, targets in dataloader:
-            inputs = inputs.to(device)
-            logits = model(inputs)
+            inputs = inputs.to(device, non_blocking=use_amp)
+            with amp_ctx:
+                logits = model(inputs)
             preds = logits.argmax(dim=1).cpu().tolist()
             y_pred.extend(preds)
             y_true.extend(targets.tolist())
@@ -276,6 +301,13 @@ def train(config: TrainConfig) -> dict[str, object]:
         lr=config.learning_rate,
         weight_decay=config.weight_decay,
     )
+    scheduler = EpochWarmupCosineScheduler(
+        optimizer,
+        total_epochs=config.epochs,
+        warmup_epochs=config.warmup_epochs,
+        warmup_start_factor=config.warmup_start_factor,
+        min_lr=config.min_lr,
+    )
 
     best_val_acc = -1.0
     best_val_loss = float("inf")
@@ -286,6 +318,7 @@ def train(config: TrainConfig) -> dict[str, object]:
 
     print(f"Starting training on device={config.device} for {config.epochs} epochs...")
     for epoch in range(1, config.epochs + 1):
+        current_lr = optimizer.param_groups[0]["lr"]
         train_loss, train_acc = run_epoch(
             model=model,
             dataloader=dataloaders["train"],
@@ -315,8 +348,10 @@ def train(config: TrainConfig) -> dict[str, object]:
         print(
             f"Epoch {epoch:03d}/{config.epochs:03d} "
             f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} "
-            f"val_loss={val_loss:.4f} val_acc={val_acc:.4f}"
+            f"val_loss={val_loss:.4f} val_acc={val_acc:.4f} "
+            f"lr={current_lr:.6g}"
         )
+        scheduler.step()
         improved = val_loss < (best_val_loss - config.early_stopping_min_delta)
         if improved:
             best_val_loss = val_loss

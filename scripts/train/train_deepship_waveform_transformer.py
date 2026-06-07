@@ -14,26 +14,29 @@ from src.pipelines.waveform_transformer.train_deepship_transformer import (
     get_default_device,
     train,
 )
+from src.utils.pathing import default_deepship_root
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Train STFT Transformer baseline on DeepShip.")
-    parser.add_argument("--data-root", default="DeepShip")
+    parser.add_argument("--data-root", default=default_deepship_root())
     parser.add_argument("--output-root", default="outputs")
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--learning-rate", type=float, default=5e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-4)
     parser.add_argument("--label-smoothing", type=float, default=0.05)
-    parser.add_argument("--scheduler-factor", type=float, default=0.5)
-    parser.add_argument("--scheduler-patience", type=int, default=2)
-    parser.add_argument("--scheduler-threshold", type=float, default=1e-3)
-    parser.add_argument("--scheduler-min-lr", type=float, default=1e-6)
+    parser.add_argument("--warmup-epochs", type=int, default=5)
+    parser.add_argument("--warmup-start-factor", type=float, default=0.1)
+    parser.add_argument("--min-lr", type=float, default=1e-5)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--device", default=None)
     parser.add_argument("--precomputed-root", default="outputs/precomputed/deepship_stft")
-    parser.add_argument("--mae-pretrained-path", default=None)
+    parser.add_argument(
+        "--mae-pretrained-path",
+        default="outputs/deepship_stft_mae_pretrain/models/deepship_stft_mae_best.pt",
+    )
     parser.add_argument(
         "--use-weighted-sampler", action="store_true", default=True,
         help="Use WeightedRandomSampler for the training split (default: True).",
@@ -64,8 +67,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--n-fft", type=int, default=1024)
     parser.add_argument("--win-length", type=int, default=1024)
     parser.add_argument("--hop-length", type=int, default=256)
-    parser.add_argument("--highpass-freq", type=float, default=100.0)
-    parser.add_argument("--freq-min", type=float, default=100.0)
+    parser.add_argument("--highpass-freq", type=float, default=50.0)
+    parser.add_argument("--freq-min", type=float, default=50.0)
     parser.add_argument("--freq-max", type=float, default=1500.0)
     parser.add_argument("--img-h", type=int, default=128)
     parser.add_argument("--img-w", type=int, default=128)
@@ -91,10 +94,9 @@ def main() -> None:
         learning_rate=args.learning_rate,
         weight_decay=args.weight_decay,
         label_smoothing=args.label_smoothing,
-        scheduler_factor=args.scheduler_factor,
-        scheduler_patience=args.scheduler_patience,
-        scheduler_threshold=args.scheduler_threshold,
-        scheduler_min_lr=args.scheduler_min_lr,
+        warmup_epochs=args.warmup_epochs,
+        warmup_start_factor=args.warmup_start_factor,
+        min_lr=args.min_lr,
         seed=args.seed,
         num_workers=args.num_workers,
         device=args.device or get_default_device(),

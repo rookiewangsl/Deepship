@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+from contextlib import nullcontext
 from dataclasses import asdict, dataclass
-from pathlib import Path
 import json
 import math
 
@@ -25,6 +25,9 @@ from src.data.deepship import (
 )
 from src.models.waveform_transformer import STFTMAEPretrainer
 from src.pipelines.mel_ml.train_shipsear_cnn import get_default_device, set_seed
+from src.utils.optim import EpochWarmupCosineScheduler
+from src.utils.pathing import resolve_path
+from src.utils.tensorboard import add_spectrogram_batch, create_summary_writer, log_config
 
 
 @dataclass
@@ -41,14 +44,16 @@ class PretrainConfig:
     epochs: int = 30
     learning_rate: float = 1e-3
     weight_decay: float = 0.05
-    scheduler_tmax: int = 30
+    warmup_epochs: int = 5
+    warmup_start_factor: float = 0.1
+    min_lr: float = 1e-5
     num_workers: int = 0
     mask_ratio: float = 0.75
     n_fft: int = 1024
     win_length: int = 1024
     hop_length: int = 256
-    highpass_freq: float = 100.0
-    freq_min: float = 100.0
+    highpass_freq: float = 50.0
+    freq_min: float = 50.0
     freq_max: float = 1500.0
     img_h: int = 128
     img_w: int = 128
@@ -81,8 +86,8 @@ class DynamicSTFTMAEDataset(Dataset):
         n_fft: int = 1024,
         win_length: int = 1024,
         hop_length: int = 256,
-        highpass_freq: float = 100.0,
-        freq_min: float = 100.0,
+        highpass_freq: float = 50.0,
+        freq_min: float = 50.0,
         freq_max: float = 1500.0,
         img_h: int = 128,
         img_w: int = 128,
@@ -206,10 +211,7 @@ class DynamicSTFTMAEDataset(Dataset):
         if num_samples > self.clip_samples:
             waveform = waveform[..., :self.clip_samples]
         elif num_samples < self.clip_samples:
-            waveform = torch.nn.functional.pad(
-                waveform,
-                (0, self.clip_samples - num_samples),
-            )
+            waveform = torch.nn.functional.pad(waveform, (0, self.clip_samples - num_samples))
         return waveform
 
     @staticmethod
@@ -225,7 +227,7 @@ class DynamicSTFTMAEDataset(Dataset):
         return (spec - mean) / std
 
 
-def pretrain(config: PretrainConfig) -> Path:
+def pretrain(config: PretrainConfig) -> str:
     set_seed(config.seed)
     records = scan_deepship(config.data_root)
     train_records, val_records, test_records = stratified_split(
@@ -235,17 +237,18 @@ def pretrain(config: PretrainConfig) -> Path:
         test_ratio=config.test_ratio,
         seed=config.seed,
     )
-    train_segments = build_segment_records(
-        train_records,
-        clip_duration=config.clip_duration,
-    )
+    train_segments = build_segment_records(train_records, clip_duration=config.clip_duration)
+    val_segments = build_segment_records(val_records, clip_duration=config.clip_duration)
 
-    output_root = Path(config.output_root)
+    output_root = resolve_path(config.output_root)
     models_dir = output_root / "models"
     figures_dir = output_root / "figures"
     reports_dir = output_root / "reports"
-    for directory in [models_dir, figures_dir, reports_dir]:
+    tensorboard_dir = output_root / "tensorboard"
+    for directory in [models_dir, figures_dir, reports_dir, tensorboard_dir]:
         directory.mkdir(parents=True, exist_ok=True)
+    writer = create_summary_writer(tensorboard_dir)
+    log_config(writer, asdict(config))
 
     save_split_manifest(reports_dir, train_records, val_records, test_records)
     split_stats = {
@@ -254,9 +257,7 @@ def pretrain(config: PretrainConfig) -> Path:
         "val_recordings": summarize_records(val_records),
         "test_recordings": summarize_records(test_records),
         "train_segments": summarize_segments(train_segments),
-        "val_segments": summarize_segments(
-            build_segment_records(val_records, clip_duration=config.clip_duration)
-        ),
+        "val_segments": summarize_segments(val_segments),
         "test_segments": summarize_segments(
             build_segment_records(test_records, clip_duration=config.clip_duration)
         ),
@@ -266,7 +267,7 @@ def pretrain(config: PretrainConfig) -> Path:
         encoding="utf-8",
     )
 
-    dataset = DynamicSTFTMAEDataset(
+    train_dataset = DynamicSTFTMAEDataset(
         segments=train_segments,
         sample_rate=config.sample_rate,
         clip_duration=config.clip_duration,
@@ -286,16 +287,48 @@ def pretrain(config: PretrainConfig) -> Path:
         color_noise_std_max=config.color_noise_std_max,
         stripe_prob=config.stripe_prob,
     )
+    val_dataset = DynamicSTFTMAEDataset(
+        segments=val_segments,
+        sample_rate=config.sample_rate,
+        clip_duration=config.clip_duration,
+        n_fft=config.n_fft,
+        win_length=config.win_length,
+        hop_length=config.hop_length,
+        highpass_freq=config.highpass_freq,
+        freq_min=config.freq_min,
+        freq_max=config.freq_max,
+        img_h=config.img_h,
+        img_w=config.img_w,
+        time_mask_param=0,
+        freq_mask_param=0,
+        noise_std_min=0.0,
+        noise_std_max=0.0,
+        color_noise_std_min=0.0,
+        color_noise_std_max=0.0,
+        stripe_prob=0.0,
+    )
     dataloader = DataLoader(
-        dataset,
+        train_dataset,
         batch_size=config.batch_size,
         shuffle=True,
         num_workers=config.num_workers,
+        pin_memory=str(config.device).startswith("cuda"),
+        persistent_workers=(config.num_workers > 0),
     )
+    val_dataloader = DataLoader(
+        val_dataset,
+        batch_size=config.batch_size,
+        shuffle=False,
+        num_workers=config.num_workers,
+        pin_memory=str(config.device).startswith("cuda"),
+        persistent_workers=(config.num_workers > 0),
+    )
+    sample_noisy, sample_clean = next(iter(dataloader))
+    add_spectrogram_batch(writer, "samples/noisy", sample_noisy)
+    add_spectrogram_batch(writer, "samples/clean", sample_clean)
 
-    input_size = (config.img_h, config.img_w)
     model = STFTMAEPretrainer(
-        input_size=input_size,
+        input_size=(config.img_h, config.img_w),
         patch_size=(config.patch_size_freq, config.patch_size_time),
         embed_dim=config.embed_dim,
         num_layers=config.num_layers,
@@ -314,20 +347,27 @@ def pretrain(config: PretrainConfig) -> Path:
         lr=config.learning_rate,
         weight_decay=config.weight_decay,
     )
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+    use_amp = str(config.device).startswith("cuda")
+    scaler = torch.amp.GradScaler("cuda", enabled=use_amp)
+    amp_ctx = torch.amp.autocast(device_type="cuda") if use_amp else nullcontext()
+    scheduler = EpochWarmupCosineScheduler(
         optimizer,
-        T_max=max(1, config.scheduler_tmax or config.epochs),
+        total_epochs=config.epochs,
+        warmup_epochs=config.warmup_epochs,
+        warmup_start_factor=config.warmup_start_factor,
+        min_lr=config.min_lr,
     )
 
-    history = {"train_loss": []}
+    history = {"train_loss": [], "val_loss": []}
     best_loss = math.inf
-    best_path = models_dir / "deepship_stft_mae_pretrained.pt"
+    best_path = models_dir / "deepship_stft_mae_best.pt"
 
     print(
         f"Starting MAE pretraining from wav-derived STFT on device={config.device} "
         f"for {config.epochs} epochs..."
     )
     for epoch in range(1, config.epochs + 1):
+        current_lr = optimizer.param_groups[0]["lr"]
         model.train()
         total_loss = 0.0
         total_batches = 0
@@ -337,23 +377,47 @@ def pretrain(config: PretrainConfig) -> Path:
             dynamic_ncols=True,
         )
         for noisy, clean in progress:
-            noisy = noisy.to(config.device)
-            clean = clean.to(config.device)
+            noisy = noisy.to(config.device, non_blocking=use_amp)
+            clean = clean.to(config.device, non_blocking=use_amp)
             optimizer.zero_grad(set_to_none=True)
-            loss, _, _ = model(noisy, clean, mask_ratio=config.mask_ratio)
-            loss.backward()
-            optimizer.step()
+            with amp_ctx:
+                loss, _, _ = model(noisy, clean, mask_ratio=config.mask_ratio)
+            if use_amp:
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
             total_loss += float(loss.item())
             total_batches += 1
             progress.set_postfix(loss=f"{loss.item():.4f}")
 
-        scheduler.step()
         avg_loss = total_loss / max(1, total_batches)
         history["train_loss"].append(avg_loss)
+
+        model.eval()
+        val_total_loss = 0.0
+        val_total_batches = 0
+        with torch.no_grad():
+            for noisy, clean in val_dataloader:
+                noisy = noisy.to(config.device, non_blocking=use_amp)
+                clean = clean.to(config.device, non_blocking=use_amp)
+                with amp_ctx:
+                    val_loss, _, _ = model(noisy, clean, mask_ratio=config.mask_ratio)
+                val_total_loss += float(val_loss.item())
+                val_total_batches += 1
+        avg_val_loss = val_total_loss / max(1, val_total_batches)
+        history["val_loss"].append(avg_val_loss)
+        if writer is not None:
+            writer.add_scalar("loss/train", avg_loss, epoch)
+            writer.add_scalar("loss/val", avg_val_loss, epoch)
+            writer.add_scalar("lr", current_lr, epoch)
         print(
             f"Epoch {epoch:03d}/{config.epochs:03d} "
-            f"train_loss={avg_loss:.4f} lr={optimizer.param_groups[0]['lr']:.6f}"
+            f"train_loss={avg_loss:.4f} val_loss={avg_val_loss:.4f} lr={current_lr:.6f}"
         )
+        scheduler.step()
 
         if avg_loss < best_loss:
             best_loss = avg_loss
@@ -364,11 +428,13 @@ def pretrain(config: PretrainConfig) -> Path:
                     if not k.startswith("decoder_") and k != "mask_token"
                 },
                 "config": asdict(config),
-                "input_size": input_size,
+                "input_size": (config.img_h, config.img_w),
                 "best_loss": best_loss,
                 "model_family": "deepship_stft_mae",
             }
             torch.save(state, best_path)
+            if writer is not None:
+                writer.add_scalar("loss/best", best_loss, epoch)
             print(f"New best MAE checkpoint saved with loss={best_loss:.4f}")
 
     (reports_dir / "deepship_stft_mae_history.json").write_text(
@@ -379,6 +445,7 @@ def pretrain(config: PretrainConfig) -> Path:
     epochs = list(range(1, len(history["train_loss"]) + 1))
     plt.figure(figsize=(6, 4))
     plt.plot(epochs, history["train_loss"], label="train")
+    plt.plot(epochs, history["val_loss"], label="val")
     plt.xlabel("Epoch")
     plt.ylabel("Loss")
     plt.title("DeepShip STFT-MAE Pretraining Loss")
@@ -386,5 +453,8 @@ def pretrain(config: PretrainConfig) -> Path:
     plt.tight_layout()
     plt.savefig(curve_path, dpi=200)
     plt.close()
+    if writer is not None:
+        writer.flush()
+        writer.close()
     print(f"Saved MAE checkpoint to {best_path}")
-    return best_path
+    return str(best_path)

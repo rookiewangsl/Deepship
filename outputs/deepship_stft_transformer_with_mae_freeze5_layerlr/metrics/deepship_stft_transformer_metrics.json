@@ -1,0 +1,196 @@
+{
+  "accuracy": 0.6227863046044865,
+  "macro_f1": 0.6240199835385669,
+  "weighted_f1": 0.6266738556379424,
+  "classification_report": {
+    "Cargo": {
+      "precision": 0.5137096774193548,
+      "recall": 0.5416666666666666,
+      "f1-score": 0.527317880794702,
+      "support": 1176.0
+    },
+    "Passenger": {
+      "precision": 0.600259571706684,
+      "recall": 0.5734655920644761,
+      "f1-score": 0.586556753329106,
+      "support": 1613.0
+    },
+    "Tank": {
+      "precision": 0.5429553264604811,
+      "recall": 0.6448979591836734,
+      "f1-score": 0.5895522388059702,
+      "support": 980.0
+    },
+    "Tug": {
+      "precision": 0.8540017590149517,
+      "recall": 0.7395277989337395,
+      "f1-score": 0.7926530612244898,
+      "support": 1313.0
+    },
+    "accuracy": 0.6227863046044865,
+    "macro avg": {
+      "precision": 0.6277315836503679,
+      "recall": 0.624889504212139,
+      "f1-score": 0.6240199835385669,
+      "support": 5082.0
+    },
+    "weighted avg": {
+      "precision": 0.6347386460696468,
+      "recall": 0.6227863046044865,
+      "f1-score": 0.6266738556379424,
+      "support": 5082.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      637,
+      130,
+      363,
+      46
+    ],
+    [
+      417,
+      925,
+      159,
+      112
+    ],
+    [
+      110,
+      230,
+      632,
+      8
+    ],
+    [
+      76,
+      256,
+      10,
+      971
+    ]
+  ],
+  "split_stats": {
+    "full_recordings": {
+      "num_recordings": 609,
+      "class_counts": {
+        "Cargo": 109,
+        "Passenger": 191,
+        "Tank": 240,
+        "Tug": 69
+      },
+      "total_duration_seconds": 169995.0,
+      "avg_duration_seconds": 279.13793103448273
+    },
+    "train_recordings": {
+      "num_recordings": 426,
+      "class_counts": {
+        "Cargo": 76,
+        "Passenger": 134,
+        "Tank": 168,
+        "Tug": 48
+      },
+      "total_duration_seconds": 117573.0,
+      "avg_duration_seconds": 275.99295774647885
+    },
+    "val_recordings": {
+      "num_recordings": 91,
+      "class_counts": {
+        "Cargo": 16,
+        "Passenger": 29,
+        "Tank": 36,
+        "Tug": 10
+      },
+      "total_duration_seconds": 27176.0,
+      "avg_duration_seconds": 298.6373626373626
+    },
+    "test_recordings": {
+      "num_recordings": 92,
+      "class_counts": {
+        "Cargo": 17,
+        "Passenger": 28,
+        "Tank": 36,
+        "Tug": 11
+      },
+      "total_duration_seconds": 25246.0,
+      "avg_duration_seconds": 274.4130434782609
+    },
+    "train_segments": {
+      "num_segments": 23673,
+      "class_counts": {
+        "Cargo": 5197,
+        "Passenger": 6405,
+        "Tank": 6564,
+        "Tug": 5507
+      }
+    },
+    "val_segments": {
+      "num_segments": 5472,
+      "class_counts": {
+        "Cargo": 1370,
+        "Passenger": 1333,
+        "Tank": 1452,
+        "Tug": 1317
+      }
+    },
+    "test_segments": {
+      "num_segments": 5082,
+      "class_counts": {
+        "Cargo": 1176,
+        "Passenger": 1613,
+        "Tank": 980,
+        "Tug": 1313
+      }
+    }
+  },
+  "config": {
+    "data_root": "/home/shilongwang/Transformer/DeepShip",
+    "output_root": "outputs/deepship_stft_transformer_with_mae_freeze5_layerlr",
+    "sample_rate": 3000,
+    "clip_duration": 5.0,
+    "train_ratio": 0.7,
+    "val_ratio": 0.15,
+    "test_ratio": 0.15,
+    "seed": 42,
+    "batch_size": 128,
+    "epochs": 30,
+    "learning_rate": 0.0005,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.05,
+    "warmup_epochs": 5,
+    "warmup_start_factor": 0.1,
+    "min_lr": 1e-05,
+    "num_workers": 8,
+    "use_augmentation": true,
+    "use_random_crop": false,
+    "max_segments_per_recording": 12,
+    "precomputed_root": "outputs/precomputed/deepship_stft",
+    "mae_pretrained_path": "outputs/deepship_stft_mae_pretrain/models/deepship_stft_mae_best.pt",
+    "use_weighted_sampler": true,
+    "use_class_weights": true,
+    "random_time_shift": 400,
+    "gain_min": 0.85,
+    "gain_max": 1.15,
+    "noise_std": 0.003,
+    "n_fft": 1024,
+    "win_length": 1024,
+    "hop_length": 256,
+    "highpass_freq": 50.0,
+    "freq_min": 50.0,
+    "freq_max": 1500.0,
+    "img_h": 128,
+    "img_w": 128,
+    "time_mask_param": 30,
+    "freq_mask_param": 8,
+    "patch_size_freq": 8,
+    "patch_size_time": 8,
+    "embed_dim": 128,
+    "num_layers": 4,
+    "num_heads": 8,
+    "mlp_ratio": 2.0,
+    "dropout": 0.1,
+    "freeze_encoder_epochs": 5,
+    "encoder_learning_rate": 0.0001,
+    "head_learning_rate": 0.0005,
+    "early_stopping_patience": 10,
+    "early_stopping_min_delta": 0.001,
+    "device": "cuda"
+  }
+}
