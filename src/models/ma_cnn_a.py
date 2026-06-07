@@ -6,37 +6,13 @@ import torch
 from torch import nn
 
 
-class ECABlock(nn.Module):
-    """Efficient channel attention with adaptive 1D kernel size."""
-
-    def __init__(self, channels: int, gamma: float = 2.0, b: float = 1.0) -> None:
-        super().__init__()
-        t = int(abs((math.log2(channels) + b) / gamma))
-        kernel_size = t if t % 2 == 1 else t + 1
-        kernel_size = max(kernel_size, 3)
-        self.pool = nn.AdaptiveAvgPool2d(1)
-        self.conv = nn.Conv1d(
-            1,
-            1,
-            kernel_size=kernel_size,
-            padding=(kernel_size - 1) // 2,
-            bias=False,
-        )
-        self.activation = nn.Sigmoid()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        weights = self.pool(x).squeeze(-1).transpose(-1, -2)
-        weights = self.conv(weights)
-        weights = self.activation(weights).transpose(-1, -2).unsqueeze(-1)
-        return x * weights
-
-
-class ConvNormAct(nn.Module):
+class ConvBNReLU(nn.Module):
     def __init__(
         self,
         in_channels: int,
         out_channels: int,
         kernel_size: tuple[int, int],
+        stride: tuple[int, int],
         padding: tuple[int, int],
     ) -> None:
         super().__init__()
@@ -45,6 +21,7 @@ class ConvNormAct(nn.Module):
                 in_channels,
                 out_channels,
                 kernel_size=kernel_size,
+                stride=stride,
                 padding=padding,
                 bias=False,
             ),
@@ -56,125 +33,124 @@ class ConvNormAct(nn.Module):
         return self.block(x)
 
 
-class AsymmetricConvBranch(nn.Module):
-    """Approximate kxk receptive fields with 1xk then kx1 convolutions."""
-
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int) -> None:
+class AsymmetricBranch(nn.Module):
+    def __init__(self, channels: int, kernel_size: int) -> None:
         super().__init__()
         pad = kernel_size // 2
-        self.branch = nn.Sequential(
-            ConvNormAct(
-                in_channels,
-                out_channels,
-                kernel_size=(1, kernel_size),
-                padding=(0, pad),
-            ),
-            ConvNormAct(
-                out_channels,
-                out_channels,
-                kernel_size=(kernel_size, 1),
-                padding=(pad, 0),
-            ),
+        self.conv_time = ConvBNReLU(
+            1,
+            channels,
+            kernel_size=(1, kernel_size),
+            stride=(1, 2),
+            padding=(0, pad),
+        )
+        self.conv_freq = ConvBNReLU(
+            channels,
+            channels,
+            kernel_size=(kernel_size, 1),
+            stride=(2, 1),
+            padding=(pad, 0),
         )
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.branch(x)
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        time_features = self.conv_time(x)
+        branch_output = self.conv_freq(time_features)
+        return time_features, branch_output, branch_output
 
 
-class MultiScaleAsymmetricBlock(nn.Module):
-    def __init__(
-        self,
-        in_channels: int,
-        branch_channels: int,
-        kernel_sizes: tuple[int, ...] = (3, 7, 11),
-        fused_channels: int = 96,
-        dropout: float = 0.1,
-    ) -> None:
+class PaperAttentionFusion(nn.Module):
+    """Approximation of the paper's improved ECA weighting.
+
+    The paper states that eight distinct convolution blocks each produce a channel
+    weight vector and that these weight vectors are added together before reweighting
+    the fused multi-branch features. Using eight independent 1D convs with kernel
+    size 3 matches the paper's reported +24 parameters over the 0.996 M MA-CNN
+    backbone.
+    """
+
+    def __init__(self, num_blocks: int = 8) -> None:
         super().__init__()
-        self.branches = nn.ModuleList(
-            [
-                AsymmetricConvBranch(in_channels, branch_channels, kernel_size)
-                for kernel_size in kernel_sizes
-            ]
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.weight_generators = nn.ModuleList(
+            [nn.Conv1d(1, 1, kernel_size=3, padding=1, bias=False) for _ in range(num_blocks)]
         )
-        fused_in = branch_channels * len(kernel_sizes)
-        self.fusion = nn.Sequential(
-            nn.Conv2d(fused_in, fused_channels, kernel_size=1, bias=False),
-            nn.BatchNorm2d(fused_channels),
-            nn.ReLU(inplace=True),
-            nn.Dropout2d(p=dropout),
-        )
+        self.activation = nn.Sigmoid()
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        multi_scale = [branch(x) for branch in self.branches]
-        return self.fusion(torch.cat(multi_scale, dim=1))
+    def forward(self, feature_maps: list[torch.Tensor], fused_features: torch.Tensor) -> torch.Tensor:
+        if len(feature_maps) != len(self.weight_generators):
+            raise ValueError("feature_maps and weight_generators must have the same length")
+
+        combined_weights: torch.Tensor | None = None
+        for generator, feature_map in zip(self.weight_generators, feature_maps, strict=True):
+            weights = self.pool(feature_map).squeeze(-1).transpose(-1, -2)
+            weights = self.activation(generator(weights)).transpose(-1, -2).unsqueeze(-1)
+            combined_weights = weights if combined_weights is None else combined_weights + weights
+        return fused_features * combined_weights
 
 
 class MACNNAClassifier(nn.Module):
-    """Lightweight multi-scale asymmetric CNN with ECA for DeepShip."""
+    """Paper-oriented MA-CNN-A reproduction."""
 
     def __init__(
         self,
         num_classes: int,
-        kernel_sizes: tuple[int, ...] = (3, 7, 11),
-        stem_channels: int = 32,
-        branch_channels: int = 24,
-        fused_channels: int = 96,
-        classifier_hidden: int = 64,
-        dropout: float = 0.2,
+        branch_channels: int = 88,
+        kernel_sizes: tuple[int, ...] = (8, 16, 32, 64),
     ) -> None:
         super().__init__()
-        self.stem = nn.Sequential(
-            ConvNormAct(1, stem_channels, kernel_size=(3, 3), padding=(1, 1)),
-            ConvNormAct(stem_channels, stem_channels, kernel_size=(3, 3), padding=(1, 1)),
-            nn.MaxPool2d(kernel_size=2),
+        self.branches = nn.ModuleList(
+            [AsymmetricBranch(branch_channels, kernel_size) for kernel_size in kernel_sizes]
         )
-        self.multi_scale = MultiScaleAsymmetricBlock(
-            in_channels=stem_channels,
-            branch_channels=branch_channels,
-            kernel_sizes=kernel_sizes,
-            fused_channels=fused_channels,
-            dropout=dropout,
+        self.attention = PaperAttentionFusion(num_blocks=len(kernel_sizes) * 2)
+        self.refine_time = ConvBNReLU(
+            branch_channels,
+            branch_channels,
+            kernel_size=(1, 3),
+            stride=(1, 1),
+            padding=(0, 1),
         )
-        self.refine = nn.Sequential(
-            ConvNormAct(fused_channels, fused_channels, kernel_size=(3, 3), padding=(1, 1)),
-            nn.MaxPool2d(kernel_size=2),
+        self.refine_freq = ConvBNReLU(
+            branch_channels,
+            branch_channels,
+            kernel_size=(3, 1),
+            stride=(1, 1),
+            padding=(1, 0),
         )
-        self.eca = ECABlock(fused_channels)
-        self.pool = nn.AdaptiveAvgPool2d((1, 1))
-        self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Dropout(p=dropout),
-            nn.Linear(fused_channels, classifier_hidden),
-            nn.ReLU(inplace=True),
-            nn.Dropout(p=dropout),
-            nn.Linear(classifier_hidden, num_classes),
-        )
-
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.classifier = nn.Linear(branch_channels, num_classes)
         self._init_weights()
 
     def _init_weights(self) -> None:
         for module in self.modules():
             if isinstance(module, nn.Conv2d):
-                nn.init.kaiming_normal_(module.weight, nonlinearity="relu")
-                if module.bias is not None:
-                    nn.init.zeros_(module.bias)
+                nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            elif isinstance(module, nn.Conv1d):
+                nn.init.normal_(module.weight, mean=0.0, std=0.02)
             elif isinstance(module, nn.BatchNorm2d):
                 nn.init.ones_(module.weight)
                 nn.init.zeros_(module.bias)
             elif isinstance(module, nn.Linear):
-                nn.init.kaiming_uniform_(module.weight, a=math.sqrt(5))
-                if module.bias is not None:
-                    fan_in, _ = nn.init._calculate_fan_in_and_fan_out(module.weight)
-                    bound = 1 / math.sqrt(fan_in)
-                    nn.init.uniform_(module.bias, -bound, bound)
+                nn.init.normal_(module.weight, mean=0.0, std=0.02)
+                nn.init.zeros_(module.bias)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if x.dim() == 3:
             x = x.unsqueeze(1)
-        x = self.stem(x)
-        x = self.multi_scale(x)
-        x = self.refine(x)
-        x = self.eca(x)
-        x = self.pool(x)
-        return self.classifier(x)
+
+        branch_outputs: list[torch.Tensor] = []
+        attention_sources: list[torch.Tensor] = []
+        for branch in self.branches:
+            time_features, freq_features, output = branch(x)
+            attention_sources.extend([time_features, freq_features])
+            branch_outputs.append(output)
+
+        fused = torch.stack(branch_outputs, dim=0).sum(dim=0)
+        fused = self.attention(attention_sources, fused)
+        fused = self.refine_time(fused)
+        fused = self.refine_freq(fused)
+        fused = self.pool(fused).flatten(1)
+        return self.classifier(fused)
+
+    @property
+    def num_parameters(self) -> int:
+        return sum(parameter.numel() for parameter in self.parameters())
