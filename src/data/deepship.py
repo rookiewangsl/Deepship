@@ -196,6 +196,8 @@ class DeepShipMelDataset(Dataset):
         n_mels: int = 64,
         f_min: float = 50.0,
         f_max: float = 1500.0,
+        highpass_freq: float | None = None,
+        lowpass_freq: float | None = None,
         augment: bool = False,
         cache_features: bool = False,
         time_shift_frames: int = 8,
@@ -205,6 +207,8 @@ class DeepShipMelDataset(Dataset):
         self.segments = segments
         self.sample_rate = sample_rate
         self.clip_samples = int(sample_rate * clip_duration)
+        self.highpass_freq = highpass_freq
+        self.lowpass_freq = lowpass_freq
         self.augment = augment
         self.cache_features = cache_features
         self.time_shift_frames = time_shift_frames
@@ -243,6 +247,7 @@ class DeepShipMelDataset(Dataset):
         if sr != self.sample_rate:
             waveform = self._resample(waveform, sr)
         waveform = self._fix_length(waveform)
+        waveform = self._bandpass_filter(waveform)
         if self.augment:
             waveform = self._augment_waveform(waveform)
         mel_spec = self.mel_transform(waveform)
@@ -268,6 +273,21 @@ class DeepShipMelDataset(Dataset):
             waveform = torch.nn.functional.pad(
                 waveform,
                 (0, self.clip_samples - num_samples),
+            )
+        return waveform
+
+    def _bandpass_filter(self, waveform: torch.Tensor) -> torch.Tensor:
+        if self.highpass_freq is not None and self.highpass_freq > 0.0:
+            waveform = AF.highpass_biquad(
+                waveform,
+                sample_rate=self.sample_rate,
+                cutoff_freq=self.highpass_freq,
+            )
+        if self.lowpass_freq is not None and self.lowpass_freq < (self.sample_rate / 2.0):
+            waveform = AF.lowpass_biquad(
+                waveform,
+                sample_rate=self.sample_rate,
+                cutoff_freq=self.lowpass_freq,
             )
         return waveform
 
@@ -356,6 +376,8 @@ class DeepShipRandomCropDataset(Dataset):
         n_mels: int = 64,
         f_min: float = 50.0,
         f_max: float = 1500.0,
+        highpass_freq: float | None = None,
+        lowpass_freq: float | None = None,
         augment: bool = True,
         time_shift_frames: int = 8,
         time_mask_param: int = 12,
@@ -366,6 +388,8 @@ class DeepShipRandomCropDataset(Dataset):
         self.sample_rate = sample_rate
         self.clip_duration = clip_duration
         self.clip_samples = int(sample_rate * clip_duration)
+        self.highpass_freq = highpass_freq
+        self.lowpass_freq = lowpass_freq
         self.augment = augment
         self.time_shift_frames = time_shift_frames
 
@@ -407,6 +431,7 @@ class DeepShipRandomCropDataset(Dataset):
         if sr != self.sample_rate:
             waveform = self._resample(waveform, sr)
         waveform = self._fix_length(waveform)
+        waveform = self._bandpass_filter(waveform)
         if self.augment:
             waveform = self._augment_waveform(waveform)
         mel_spec = self.mel_transform(waveform)
@@ -454,6 +479,21 @@ class DeepShipRandomCropDataset(Dataset):
             waveform = torch.nn.functional.pad(
                 waveform,
                 (0, self.clip_samples - num_samples),
+            )
+        return waveform
+
+    def _bandpass_filter(self, waveform: torch.Tensor) -> torch.Tensor:
+        if self.highpass_freq is not None and self.highpass_freq > 0.0:
+            waveform = AF.highpass_biquad(
+                waveform,
+                sample_rate=self.sample_rate,
+                cutoff_freq=self.highpass_freq,
+            )
+        if self.lowpass_freq is not None and self.lowpass_freq < (self.sample_rate / 2.0):
+            waveform = AF.lowpass_biquad(
+                waveform,
+                sample_rate=self.sample_rate,
+                cutoff_freq=self.lowpass_freq,
             )
         return waveform
 
