@@ -1,0 +1,70 @@
+{
+  "accuracy": 0.9515,
+  "macro_f1": 0.951569592872174,
+  "weighted_f1": 0.951569592872174,
+  "classification_report": {
+    "Cargo": {
+      "precision": 0.9193857965451055,
+      "recall": 0.958,
+      "f1-score": 0.9382957884427032,
+      "support": 500.0
+    },
+    "Passenger": {
+      "precision": 0.9809725158562368,
+      "recall": 0.928,
+      "f1-score": 0.9537512846865365,
+      "support": 500.0
+    },
+    "Tank": {
+      "precision": 0.9422310756972112,
+      "recall": 0.946,
+      "f1-score": 0.9441117764471058,
+      "support": 500.0
+    },
+    "Tug": {
+      "precision": 0.9662698412698413,
+      "recall": 0.974,
+      "f1-score": 0.9701195219123506,
+      "support": 500.0
+    },
+    "accuracy": 0.9515,
+    "macro avg": {
+      "precision": 0.9522148073420987,
+      "recall": 0.9515,
+      "f1-score": 0.951569592872174,
+      "support": 2000.0
+    },
+    "weighted avg": {
+      "precision": 0.9522148073420987,
+      "recall": 0.9515,
+      "f1-score": 0.951569592872174,
+      "support": 2000.0
+    }
+  },
+  "confusion_matrix": [
+    [
+      479,
+      0,
+      18,
+      3
+    ],
+    [
+      14,
+      464,
+      9,
+      13
+    ],
+    [
+      21,
+      5,
+      473,
+      1
+    ],
+    [
+      7,
+      4,
+      2,
+      487
+    ]
+  ]
+}

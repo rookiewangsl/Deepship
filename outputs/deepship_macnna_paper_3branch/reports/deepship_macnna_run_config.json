@@ -1,0 +1,49 @@
+{
+  "data_root": "DeepShip",
+  "output_root": "outputs/deepship_macnna_paper_3branch",
+  "sample_rate": 16000,
+  "clip_duration": 3.0,
+  "samples_per_class": 5000,
+  "train_per_class": 3500,
+  "val_per_class": 1000,
+  "test_per_class": 500,
+  "seed": 42,
+  "n_fft": 1024,
+  "hop_length": 512,
+  "win_length": 1024,
+  "n_mels": 64,
+  "highpass_freq": null,
+  "batch_size": 16,
+  "epochs": 100,
+  "learning_rate": 0.01,
+  "early_stopping_patience": 10,
+  "branch_channels": 88,
+  "kernel_sizes": [
+    8,
+    16,
+    32
+  ],
+  "device": "cuda",
+  "num_parameters": 486838,
+  "best_val_acc": 0.94425,
+  "best_epoch": 66,
+  "paper_alignment": {
+    "matches_paper": [
+      "16 kHz resampling",
+      "3-second non-overlapping segments",
+      "20,000 total segments",
+      "per-class split: 3500/1000/500",
+      "64x94 Mel spectrogram input",
+      "batch size 16",
+      "initial learning rate 1e-2",
+      "cross-entropy loss",
+      "early stopping patience 10",
+      "no data augmentation"
+    ],
+    "inferred_from_paper_text": [
+      "segment-level random sampling is used to emulate the paper's 20,000-sample subset",
+      "branch channel width is set to 88 to match the reported ~1.00M parameters",
+      "eight independent 1D conv attention heads are used to match the paper's reported +24 parameters"
+    ]
+  }
+}
