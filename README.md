@@ -1,15 +1,13 @@
-# DeepShip MA-CNN-A Paper Reproduction
+# DeepShip CNN Baseline
 
-This repository is reduced to the code path needed to reproduce the paper `jmse-12-00130.pdf`:
+This repository keeps the DeepShip `MA-CNN-A` baseline:
 
-- `16 kHz` resampling
+- `16 kHz`
 - `3 s` non-overlapping segments
-- `20,000` total samples
-- per-class split `3500 / 1000 / 500`
 - `64 x 94` log-Mel input
-- MA-CNN-A style multi-branch asymmetric CNN
+- `5000` samples per class with split `3500 / 1000 / 500`
 
-## Train
+## Train MA-CNN-A
 
 ```bash
 python scripts/train/train_deepship_macnna.py \
@@ -19,11 +17,7 @@ python scripts/train/train_deepship_macnna.py \
 
 ## Main Files
 
-- `src/data/deepship.py`: DeepShip scan, segment generation, paper split protocol
-- `src/models/ma_cnn_a.py`: paper-oriented MA-CNN-A implementation
+- `src/data/deepship.py`: DeepShip scan, segment generation, and paper split protocol
+- `src/models/ma_cnn_a.py`: MA-CNN-A implementation
 - `src/pipelines/mel_ml/train_deepship_macnna.py`: training and evaluation
-- `docs/paper_reproduction_analysis.md`: paper vs previous implementation comparison
-
-## Important Note
-
-The paper does not publish source code. This codebase now exposes a single stable MA-CNN-A training path with fixed `16 kHz` audio preprocessing and a fixed three-branch backbone using kernel sizes `8, 16, 32`.
+- `scripts/train/train_deepship_macnna.py`: command-line entrypoint

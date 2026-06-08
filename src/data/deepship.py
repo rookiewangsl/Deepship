@@ -10,6 +10,7 @@ from typing import Iterable
 
 import soundfile as sf
 import torch
+import torch.nn.functional as nnf
 import torchaudio
 import torchaudio.functional as F
 from torch.utils.data import Dataset
@@ -41,6 +42,19 @@ class SegmentRecord:
     sample_rate: int
     segment_index: int
     total_segments: int
+
+
+def segment_record_from_dict(data: dict[str, object]) -> SegmentRecord:
+    return SegmentRecord(
+        path=str(data["path"]),
+        class_name=str(data["class_name"]),
+        label_index=int(data["label_index"]),
+        start_frame=int(data["start_frame"]),
+        num_frames=int(data["num_frames"]),
+        sample_rate=int(data["sample_rate"]),
+        segment_index=int(data["segment_index"]),
+        total_segments=int(data["total_segments"]),
+    )
 
 
 def scan_deepship(root_dir: str | Path) -> list[AudioRecord]:
@@ -277,7 +291,7 @@ class DeepShipMelSegmentDataset(Dataset):
         if num_samples > self.clip_samples:
             return waveform[..., : self.clip_samples]
         if num_samples < self.clip_samples:
-            return torch.nn.functional.pad(waveform, (0, self.clip_samples - num_samples))
+            return nnf.pad(waveform, (0, self.clip_samples - num_samples))
         return waveform
 
     @staticmethod
@@ -293,3 +307,4 @@ class DeepShipMelSegmentDataset(Dataset):
             audio = audio.mean(axis=1, keepdims=True)
         waveform = torch.from_numpy(audio[:, 0]).unsqueeze(0)
         return waveform, sample_rate
+

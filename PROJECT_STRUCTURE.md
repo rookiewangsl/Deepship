@@ -1,9 +1,7 @@
 # Project Structure
 
-This project focuses on single-channel ship audio classification using two routes:
-
-1. Mel-spectrogram or cepstral-style acoustic features with traditional machine learning
-2. Raw waveform classification with a Transformer-based model
+This project focuses on single-channel ship audio classification using a CNN route
+built on mel-spectrogram inputs.
 
 The current dataset folders remain in place:
 
@@ -18,8 +16,7 @@ Transformer/
 ├── ShipsEar/                     # existing raw dataset
 ├── configs/
 │   ├── datasets/
-│   ├── mel_ml/
-│   └── waveform_transformer/
+│   └── mel_ml/
 ├── docs/
 ├── notebooks/
 ├── outputs/
@@ -37,10 +34,8 @@ Transformer/
 │   ├── features/
 │   │   └── mel_ml/
 │   ├── models/
-│   │   └── waveform_transformer/
 │   ├── pipelines/
-│   │   ├── mel_ml/
-│   │   └── waveform_transformer/
+│   │   └── mel_ml/
 │   └── utils/
 └── tests/
 ```
@@ -48,11 +43,5 @@ Transformer/
 Design choice:
 
 - Share dataset indexing, label mapping, splitting, metrics, and visualization.
-- Separate the two routes at feature extraction, model definition, and experiment pipeline.
-- Keep outputs separated by route so comparisons stay clear and reproducible.
-
-Why both routes are worth keeping:
-
-- `mel_ml` is a strong and interpretable baseline, easier to explain in interviews.
-- `waveform_transformer` reflects a modern end-to-end deep learning route and gives the project stronger AI depth.
-- Using both creates a clean "baseline vs advanced model" narrative for resumes and project storytelling.
+- Keep the mel-based data path, model definition, and experiment pipeline simple and reproducible.
+- Keep outputs organized by experiment name under `outputs/`.
