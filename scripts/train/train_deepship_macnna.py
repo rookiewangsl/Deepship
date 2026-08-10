@@ -23,9 +23,12 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--data-root", default=default_deepship_root())
     parser.add_argument("--output-root", default="outputs/deepship_macnna_paper")
+    parser.add_argument("--cache-root", default=None)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--learning-rate", type=float, default=1e-2)
+    parser.add_argument("--min-learning-rate", type=float, default=1e-5)
+    parser.add_argument("--warmup-epochs", type=int, default=10)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default=None)
     parser.add_argument("--clip-duration", type=float, default=3.0)
@@ -39,7 +42,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--n-mels", type=int, default=64)
     parser.add_argument("--highpass-freq", type=float, default=None)
     parser.add_argument("--early-stopping-patience", type=int, default=10)
-    parser.add_argument("--branch-channels", type=int, default=88)
     return parser
 
 
@@ -48,6 +50,7 @@ def main() -> None:
     config = TrainConfig(
         data_root=args.data_root,
         output_root=args.output_root,
+        cache_root=args.cache_root,
         clip_duration=args.clip_duration,
         samples_per_class=args.samples_per_class,
         train_per_class=args.train_per_class,
@@ -62,8 +65,9 @@ def main() -> None:
         batch_size=args.batch_size,
         epochs=args.epochs,
         learning_rate=args.learning_rate,
+        min_learning_rate=args.min_learning_rate,
+        warmup_epochs=args.warmup_epochs,
         early_stopping_patience=args.early_stopping_patience,
-        branch_channels=args.branch_channels,
         device=args.device or get_default_device(),
     )
     metrics = train(config)

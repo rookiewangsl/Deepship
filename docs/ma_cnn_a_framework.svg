@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="980" viewBox="0 0 1400 980">
+  <defs>
+    <style>
+      .title { font: 700 28px Arial, sans-serif; fill: #183153; }
+      .label { font: 600 18px Arial, sans-serif; fill: #183153; }
+      .text { font: 16px Arial, sans-serif; fill: #233142; }
+      .small { font: 14px Arial, sans-serif; fill: #41566e; }
+      .box { fill: #eef4fb; stroke: #3d5a80; stroke-width: 2; rx: 18; ry: 18; }
+      .box2 { fill: #f8fbef; stroke: #6a994e; stroke-width: 2; rx: 18; ry: 18; }
+      .box3 { fill: #fff4e6; stroke: #bc6c25; stroke-width: 2; rx: 18; ry: 18; }
+      .branch { fill: #f3eefc; stroke: #6d597a; stroke-width: 2; rx: 16; ry: 16; }
+      .attn { fill: #fdeef4; stroke: #b56576; stroke-width: 2; rx: 16; ry: 16; }
+      .arrow { stroke: #183153; stroke-width: 2.5; fill: none; marker-end: url(#m); }
+      .dash { stroke: #7a8ca5; stroke-width: 2; fill: none; stroke-dasharray: 8 6; marker-end: url(#m2); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#183153"/>
+    </marker>
+    <marker id="m2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#7a8ca5"/>
+    </marker>
+  </defs>
+
+  <rect width="1400" height="980" fill="#ffffff"/>
+  <text x="700" y="50" text-anchor="middle" class="title">MA-CNN-A Framework for Ship-Radiated Noise Classification</text>
+
+  <rect x="70" y="100" width="260" height="90" class="box"/>
+  <text x="200" y="135" text-anchor="middle" class="label">Raw Ship-Radiated Noise</text>
+  <text x="200" y="163" text-anchor="middle" class="text">Long recordings from DeepShip</text>
+
+  <rect x="70" y="235" width="260" height="110" class="box2"/>
+  <text x="200" y="270" text-anchor="middle" class="label">Data Processing</text>
+  <text x="200" y="298" text-anchor="middle" class="text">3 s segmentation</text>
+  <text x="200" y="322" text-anchor="middle" class="text">Resample to 16 kHz</text>
+
+  <rect x="70" y="390" width="260" height="140" class="box2"/>
+  <text x="200" y="425" text-anchor="middle" class="label">Feature Extraction</text>
+  <text x="200" y="455" text-anchor="middle" class="text">STFT (1024 / 512)</text>
+  <text x="200" y="480" text-anchor="middle" class="text">Mel filter bank</text>
+  <text x="200" y="505" text-anchor="middle" class="text">Log-Mel spectrogram (64 x 94)</text>
+
+  <path d="M200 190 L200 235" class="arrow"/>
+  <path d="M200 345 L200 390" class="arrow"/>
+
+  <rect x="410" y="95" width="900" height="640" fill="#fbfcfe" stroke="#cbd5e1" stroke-width="2" rx="22" ry="22"/>
+  <text x="860" y="130" text-anchor="middle" class="label">MA-CNN-A Backbone</text>
+
+  <rect x="450" y="170" width="220" height="220" class="branch"/>
+  <text x="560" y="205" text-anchor="middle" class="label">Branch 1</text>
+  <text x="560" y="233" text-anchor="middle" class="text">Scale = 8</text>
+  <rect x="490" y="255" width="140" height="44" class="box"/>
+  <text x="560" y="283" text-anchor="middle" class="text">1 x 8 Conv</text>
+  <rect x="490" y="320" width="140" height="44" class="box"/>
+  <text x="560" y="348" text-anchor="middle" class="text">8 x 1 Conv</text>
+
+  <rect x="700" y="170" width="220" height="220" class="branch"/>
+  <text x="810" y="205" text-anchor="middle" class="label">Branch 2</text>
+  <text x="810" y="233" text-anchor="middle" class="text">Scale = 16</text>
+  <rect x="740" y="255" width="140" height="44" class="box"/>
+  <text x="810" y="283" text-anchor="middle" class="text">1 x 16 Conv</text>
+  <rect x="740" y="320" width="140" height="44" class="box"/>
+  <text x="810" y="348" text-anchor="middle" class="text">16 x 1 Conv</text>
+
+  <rect x="950" y="170" width="220" height="220" class="branch"/>
+  <text x="1060" y="205" text-anchor="middle" class="label">Branch 3</text>
+  <text x="1060" y="233" text-anchor="middle" class="text">Scale = 32</text>
+  <rect x="990" y="255" width="140" height="44" class="box"/>
+  <text x="1060" y="283" text-anchor="middle" class="text">1 x 32 Conv</text>
+  <rect x="990" y="320" width="140" height="44" class="box"/>
+  <text x="1060" y="348" text-anchor="middle" class="text">32 x 1 Conv</text>
+
+  <rect x="620" y="450" width="360" height="80" class="box3"/>
+  <text x="800" y="482" text-anchor="middle" class="label">Multi-Scale Feature Fusion</text>
+  <text x="800" y="510" text-anchor="middle" class="text">Element-wise Add, not Concat</text>
+
+  <rect x="480" y="570" width="640" height="120" class="attn"/>
+  <text x="800" y="604" text-anchor="middle" class="label">Lightweight Channel Attention</text>
+  <text x="800" y="632" text-anchor="middle" class="text">8 asymmetric conv blocks -&gt; GAP -&gt; 1D Conv -&gt; Sigmoid</text>
+  <text x="800" y="658" text-anchor="middle" class="text">Channel weights are added, then used to reweight fused features</text>
+
+  <path d="M330 460 L450 460 L450 280 L490 280" class="arrow"/>
+  <path d="M330 460 L420 460 L420 280 L740 280" class="arrow"/>
+  <path d="M330 460 L400 460 L400 280 L990 280" class="arrow"/>
+
+  <path d="M560 364 L560 450 L730 450" class="arrow"/>
+  <path d="M810 364 L810 450" class="arrow"/>
+  <path d="M1060 364 L1060 450 L870 450" class="arrow"/>
+
+  <path d="M560 364 L560 570" class="dash"/>
+  <path d="M810 364 L810 570" class="dash"/>
+  <path d="M1060 364 L1060 570" class="dash"/>
+
+  <rect x="620" y="770" width="360" height="60" class="box"/>
+  <text x="800" y="807" text-anchor="middle" class="label">Refinement Conv</text>
+  <text x="800" y="826" text-anchor="middle" class="small">1 x 3 Conv -&gt; 3 x 1 Conv</text>
+
+  <rect x="620" y="860" width="360" height="70" class="box3"/>
+  <text x="800" y="892" text-anchor="middle" class="label">Global Pooling + Classifier</text>
+  <text x="800" y="918" text-anchor="middle" class="text">GAP -&gt; FC -&gt; Softmax -&gt; Cargo / Passenger / Tank / Tug</text>
+
+  <path d="M800 530 L800 570" class="arrow"/>
+  <path d="M800 690 L800 770" class="arrow"/>
+  <path d="M800 830 L800 860" class="arrow"/>
+
+  <text x="1140" y="460" class="small">Why add?</text>
+  <text x="1140" y="482" class="small">Keeps channel count fixed</text>
+  <text x="1140" y="504" class="small">Lower params / FLOPs / memory</text>
+
+  <text x="1110" y="606" class="small">Why this attention?</text>
+  <text x="1110" y="628" class="small">No SE-style channel compression</text>
+  <text x="1110" y="650" class="small">Better for fine-grained time-frequency cues</text>
+
+  <text x="90" y="620" class="label">Key Idea</text>
+  <text x="90" y="650" class="text">Log-Mel input</text>
+  <text x="90" y="675" class="text">+ multi-scale asymmetric conv</text>
+  <text x="90" y="700" class="text">+ lightweight channel attention</text>
+  <text x="90" y="725" class="text">= accurate and compact ship-noise classifier</text>
+</svg>

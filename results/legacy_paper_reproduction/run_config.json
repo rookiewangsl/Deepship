@@ -1,7 +1,6 @@
 {
   "data_root": "DeepShip",
-  "output_root": "outputs/deepship_macnna_paper_3branch",
-  "sample_rate": 16000,
+  "output_root": "outputs/deepship_macnna_paper",
   "clip_duration": 3.0,
   "samples_per_class": 5000,
   "train_per_class": 3500,
@@ -18,11 +17,6 @@
   "learning_rate": 0.01,
   "early_stopping_patience": 10,
   "branch_channels": 88,
-  "kernel_sizes": [
-    8,
-    16,
-    32
-  ],
   "device": "cuda",
   "num_parameters": 486838,
   "best_val_acc": 0.94425,
@@ -42,8 +36,15 @@
     ],
     "inferred_from_paper_text": [
       "segment-level random sampling is used to emulate the paper's 20,000-sample subset",
-      "branch channel width is set to 88 to match the reported ~1.00M parameters",
-      "eight independent 1D conv attention heads are used to match the paper's reported +24 parameters"
-    ]
+      "branch channel width is set to 88 for the fixed three-branch MA-CNN-A variant"
+    ],
+    "fixed_architecture": {
+      "sample_rate": 16000,
+      "kernel_sizes": [
+        8,
+        16,
+        32
+      ]
+    }
   }
 }

@@ -65,6 +65,10 @@ def scan_deepship(root_dir: str | Path) -> list[AudioRecord]:
         if not class_dir.exists():
             continue
         for wav_path in sorted(class_dir.rglob("*.wav")):
+            # exFAT may expose macOS AppleDouble metadata as ``._*.wav``.
+            # Those files are not audio and must never enter a dataset split.
+            if wav_path.name.startswith("._"):
+                continue
             info = sf.info(str(wav_path))
             records.append(
                 AudioRecord(
@@ -307,4 +311,3 @@ class DeepShipMelSegmentDataset(Dataset):
             audio = audio.mean(axis=1, keepdims=True)
         waveform = torch.from_numpy(audio[:, 0]).unsqueeze(0)
         return waveform, sample_rate
-

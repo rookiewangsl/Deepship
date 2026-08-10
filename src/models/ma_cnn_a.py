@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import math
+
 import torch
 from torch import nn
 
 THREE_BRANCH_KERNEL_SIZES = (8, 16, 32)
+BRANCH_INTERMEDIATE_CHANNELS = 32
+BRANCH_OUTPUT_CHANNELS = 64
+HEAD_CHANNELS = 98
 
 
 class ConvBNReLU(nn.Module):
@@ -34,40 +39,77 @@ class ConvBNReLU(nn.Module):
 
 
 class AsymmetricBranch(nn.Module):
-    def __init__(self, channels: int, kernel_size: int) -> None:
+    def __init__(
+        self,
+        intermediate_channels: int,
+        output_channels: int,
+        kernel_size: int,
+    ) -> None:
         super().__init__()
         pad = kernel_size // 2
-        self.conv_time = ConvBNReLU(
+        self.conv_time_32 = ConvBNReLU(
             1,
-            channels,
+            intermediate_channels,
             kernel_size=(1, kernel_size),
             stride=(1, 2),
             padding=(0, pad),
         )
-        self.conv_freq = ConvBNReLU(
-            channels,
-            channels,
+        self.conv_freq_32 = ConvBNReLU(
+            intermediate_channels,
+            intermediate_channels,
             kernel_size=(kernel_size, 1),
             stride=(2, 1),
             padding=(pad, 0),
         )
+        self.conv_time_64 = ConvBNReLU(
+            intermediate_channels,
+            output_channels,
+            kernel_size=(1, kernel_size),
+            stride=(1, 1),
+            padding=(0, pad),
+        )
+        self.conv_freq_64 = ConvBNReLU(
+            output_channels,
+            output_channels,
+            kernel_size=(kernel_size, 1),
+            stride=(1, 1),
+            padding=(pad, 0),
+        )
 
     def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-        time_features = self.conv_time(x)
-        branch_output = self.conv_freq(time_features)
-        return time_features, branch_output, branch_output
+        features_32_time = self.conv_time_32(x)
+        features_32_freq = self.conv_freq_32(features_32_time)
+        features_64_time = self.conv_time_64(features_32_freq)
+        features_64_freq = self.conv_freq_64(features_64_time)
+        return features_64_time, features_64_freq, features_64_freq
+
+
+def eca_kernel_size(num_channels: int, gamma: int = 2, b: int = 1) -> int:
+    # ECA uses a small odd kernel that grows slowly with channel width.
+    value = int(abs((math.log2(num_channels) + b) / gamma))
+    return value if value % 2 == 1 else value + 1
 
 
 class PaperAttentionFusion(nn.Module):
     """Channel reweighting over the fused three-branch feature maps."""
 
-    def __init__(self, num_blocks: int = len(THREE_BRANCH_KERNEL_SIZES) * 2) -> None:
+    def __init__(
+        self,
+        num_channels: int,
+        num_blocks: int = len(THREE_BRANCH_KERNEL_SIZES) * 2,
+    ) -> None:
         super().__init__()
         self.pool = nn.AdaptiveAvgPool2d(1)
+        kernel_size = eca_kernel_size(num_channels)
+        padding = kernel_size // 2
         self.weight_generators = nn.ModuleList(
-            [nn.Conv1d(1, 1, kernel_size=3, padding=1, bias=False) for _ in range(num_blocks)]
+            [
+                nn.Conv1d(1, 1, kernel_size=kernel_size, padding=padding, bias=False)
+                for _ in range(num_blocks)
+            ]
         )
         self.activation = nn.Sigmoid()
+        self.kernel_size = kernel_size
 
     def forward(self, feature_maps: list[torch.Tensor], fused_features: torch.Tensor) -> torch.Tensor:
         if len(feature_maps) != len(self.weight_generators):
@@ -84,35 +126,38 @@ class PaperAttentionFusion(nn.Module):
 class MACNNAClassifier(nn.Module):
     """Three-branch MA-CNN-A classifier."""
 
-    def __init__(
-        self,
-        num_classes: int,
-        branch_channels: int = 88,
-    ) -> None:
+    def __init__(self, num_classes: int) -> None:
         super().__init__()
         self.branches = nn.ModuleList(
             [
-                AsymmetricBranch(branch_channels, kernel_size)
+                AsymmetricBranch(
+                    BRANCH_INTERMEDIATE_CHANNELS,
+                    BRANCH_OUTPUT_CHANNELS,
+                    kernel_size,
+                )
                 for kernel_size in THREE_BRANCH_KERNEL_SIZES
             ]
         )
-        self.attention = PaperAttentionFusion(num_blocks=len(THREE_BRANCH_KERNEL_SIZES) * 2)
+        self.attention = PaperAttentionFusion(
+            BRANCH_OUTPUT_CHANNELS,
+            num_blocks=len(THREE_BRANCH_KERNEL_SIZES) * 2,
+        )
         self.refine_time = ConvBNReLU(
-            branch_channels,
-            branch_channels,
-            kernel_size=(1, 3),
+            BRANCH_OUTPUT_CHANNELS,
+            HEAD_CHANNELS,
+            kernel_size=(1, 8),
             stride=(1, 1),
-            padding=(0, 1),
+            padding=(0, 4),
         )
         self.refine_freq = ConvBNReLU(
-            branch_channels,
-            branch_channels,
-            kernel_size=(3, 1),
+            HEAD_CHANNELS,
+            HEAD_CHANNELS,
+            kernel_size=(8, 1),
             stride=(1, 1),
-            padding=(1, 0),
+            padding=(4, 0),
         )
         self.pool = nn.AdaptiveAvgPool2d(1)
-        self.classifier = nn.Linear(branch_channels, num_classes)
+        self.classifier = nn.Linear(HEAD_CHANNELS, num_classes)
         self._init_weights()
 
     def _init_weights(self) -> None:

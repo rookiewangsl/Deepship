@@ -8,6 +8,7 @@ import random
 import numpy as np
 import torch
 from torch import nn
+from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from torch.utils.data import DataLoader
 from tqdm.auto import tqdm
 
@@ -51,6 +52,7 @@ def set_seed(seed: int) -> None:
 class TrainConfig:
     data_root: str = "DeepShip"
     output_root: str = "outputs/deepship_macnna_paper"
+    cache_root: str | None = None
     clip_duration: float = 3.0
     samples_per_class: int = 5000
     train_per_class: int = 3500
@@ -65,8 +67,9 @@ class TrainConfig:
     batch_size: int = 16
     epochs: int = 100
     learning_rate: float = 1e-2
+    min_learning_rate: float = 1e-5
+    warmup_epochs: int = 10
     early_stopping_patience: int = 10
-    branch_channels: int = 88
     device: str = get_default_device()
 
 
@@ -172,24 +175,61 @@ def collect_predictions(
     return y_true, y_pred
 
 
+def build_scheduler(
+    optimizer: torch.optim.Optimizer,
+    config: TrainConfig,
+) -> SequentialLR | CosineAnnealingLR | None:
+    if config.epochs <= 1:
+        return None
+
+    warmup_epochs = max(0, min(config.warmup_epochs, config.epochs - 1))
+    cosine_epochs = config.epochs - warmup_epochs
+    if warmup_epochs == 0:
+        return CosineAnnealingLR(
+            optimizer,
+            T_max=max(1, cosine_epochs),
+            eta_min=config.min_learning_rate,
+        )
+
+    warmup_scheduler = LinearLR(
+        optimizer,
+        start_factor=0.1,
+        end_factor=1.0,
+        total_iters=warmup_epochs,
+    )
+    cosine_scheduler = CosineAnnealingLR(
+        optimizer,
+        T_max=max(1, cosine_epochs),
+        eta_min=config.min_learning_rate,
+    )
+    return SequentialLR(
+        optimizer,
+        schedulers=[warmup_scheduler, cosine_scheduler],
+        milestones=[warmup_epochs],
+    )
+
+
 def train(config: TrainConfig) -> dict[str, object]:
     set_seed(config.seed)
     output_root = resolve_path(config.output_root)
+    cache_root = resolve_path(config.cache_root) if config.cache_root is not None else None
     metrics_dir = output_root / "metrics"
     figures_dir = output_root / "figures"
     models_dir = output_root / "models"
     reports_dir = output_root / "reports"
     for directory in [metrics_dir, figures_dir, models_dir, reports_dir]:
         directory.mkdir(parents=True, exist_ok=True)
+    if cache_root is not None:
+        cache_root.mkdir(parents=True, exist_ok=True)
 
     dataloaders, split_stats = build_dataloaders(config)
     model = MACNNAClassifier(
         num_classes=len(CLASS_NAMES),
-        branch_channels=config.branch_channels,
     ).to(config.device)
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=config.learning_rate, momentum=0.9)
-    history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
+    scheduler = build_scheduler(optimizer, config)
+    history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": [], "learning_rate": []}
     history_path = reports_dir / "deepship_macnna_history.json"
     best_model_path = models_dir / "deepship_macnna_best.pt"
     best_val_acc = -1.0
@@ -197,6 +237,7 @@ def train(config: TrainConfig) -> dict[str, object]:
 
     for epoch in range(1, config.epochs + 1):
         print(f"Epoch {epoch}/{config.epochs}")
+        current_lr = optimizer.param_groups[0]["lr"]
         train_loss, train_acc = run_epoch(
             model,
             dataloaders["train"],
@@ -216,9 +257,11 @@ def train(config: TrainConfig) -> dict[str, object]:
         history["val_loss"].append(val_loss)
         history["train_acc"].append(train_acc)
         history["val_acc"].append(val_acc)
+        history["learning_rate"].append(current_lr)
         history_path.write_text(json.dumps(history, indent=2), encoding="utf-8")
 
         print(
+            f"lr={current_lr:.6g} "
             f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} "
             f"val_loss={val_loss:.4f} val_acc={val_acc:.4f} "
             f"best_val_acc={best_val_acc:.4f}"
@@ -240,6 +283,9 @@ def train(config: TrainConfig) -> dict[str, object]:
         elif epoch - best_epoch >= config.early_stopping_patience:
             print(f"Early stopping at epoch {epoch} (best epoch: {best_epoch})")
             break
+
+        if scheduler is not None:
+            scheduler.step()
 
     checkpoint = torch.load(best_model_path, map_location=config.device, weights_only=False)
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -278,7 +324,10 @@ def train(config: TrainConfig) -> dict[str, object]:
         ],
         "inferred_from_paper_text": [
             "segment-level random sampling is used to emulate the paper's 20,000-sample subset",
-            "branch channel width is set to 88 for the fixed three-branch MA-CNN-A variant",
+            "the current model keeps the paper-style 32->64 branch widening and 98-channel head while retaining only three branches",
+        ],
+        "project_adjustments": [
+            "learning-rate schedule uses linear warmup followed by cosine annealing",
         ],
         "fixed_architecture": {
             "sample_rate": TARGET_SAMPLE_RATE,

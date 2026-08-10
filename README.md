@@ -10,10 +10,24 @@ This repository keeps the DeepShip `MA-CNN-A` baseline:
 ## Train MA-CNN-A
 
 ```bash
+export DEEPSHIP_DATA_ROOT=/Volumes/T7/ProjectData/Deepship/datasets/DeepShip
+
 python scripts/train/train_deepship_macnna.py \
-  --data-root DeepShip \
-  --output-root outputs/deepship_macnna_paper
+  --data-root "$DEEPSHIP_DATA_ROOT" \
+  --output-root /Volumes/T7/ProjectData/Deepship/runs/deepship_macnna_paper
 ```
+
+The CNN baseline now uses a `linear warmup + cosine annealing` learning-rate schedule by default.
+
+Before training, validate that T7 is mounted and the dataset is readable:
+
+```bash
+python scripts/check_storage.py
+```
+
+Storage layout and migration details are documented in
+[`docs/storage_layout.md`](docs/storage_layout.md). Small legacy metrics and
+figures are retained under `results/`; checkpoints and full runs remain on T7.
 
 ## Main Files
 

@@ -1,6 +1,19 @@
-Deepship/*
-ShipsEar/*
-outputs/precomputed/*
+# Machine-local dataset links and generated experiment data.
+/DeepShip
+/Deepship
+/ShipsEar
+/outputs/
+/precomputed/
+/checkpoints/
+/runs/
+
+# Model and cache artifacts.
+*.pt
+*.pth
+*.ckpt
+.venv/
+
+# Python and macOS generated files.
 .DS_Store
 ._*
 __pycache__/

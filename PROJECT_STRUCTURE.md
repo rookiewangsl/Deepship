@@ -3,7 +3,7 @@
 This project focuses on single-channel ship audio classification using a CNN route
 built on mel-spectrogram inputs.
 
-The current dataset folders remain in place:
+The project exposes machine-local links for the datasets:
 
 - `DeepShip/`
 - `ShipsEar/`
@@ -11,7 +11,7 @@ The current dataset folders remain in place:
 Recommended structure:
 
 ```text
-Transformer/
+Deepship/
 ├── DeepShip/                     # existing raw dataset
 ├── ShipsEar/                     # existing raw dataset
 ├── configs/
@@ -19,11 +19,7 @@ Transformer/
 │   └── mel_ml/
 ├── docs/
 ├── notebooks/
-├── outputs/
-│   ├── figures/
-│   ├── metrics/
-│   ├── models/
-│   └── reports/
+├── results/                      # small, reviewable metrics and figures
 ├── scripts/
 │   ├── prepare/
 │   ├── train/
@@ -44,4 +40,6 @@ Design choice:
 
 - Share dataset indexing, label mapping, splitting, metrics, and visualization.
 - Keep the mel-based data path, model definition, and experiment pipeline simple and reproducible.
-- Keep outputs organized by experiment name under `outputs/`.
+- Keep source code, Git, documentation, and small result evidence in Dropbox.
+- Keep raw data, checkpoints, caches, and complete runs under
+  `/Volumes/T7/ProjectData/Deepship/`.
