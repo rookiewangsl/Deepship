@@ -22,11 +22,12 @@ def compute_metrics(y_true: list[int], y_pred: list[int], class_names: list[str]
     report = classification_report(
         y_true,
         y_pred,
+        labels=list(range(len(class_names))),
         target_names=class_names,
         output_dict=True,
         zero_division=0,
     )
-    conf_mat = confusion_matrix(y_true, y_pred)
+    conf_mat = confusion_matrix(y_true, y_pred, labels=list(range(len(class_names))))
     accuracy = report["accuracy"]
     macro_f1 = report["macro avg"]["f1-score"]
     weighted_f1 = report["weighted avg"]["f1-score"]

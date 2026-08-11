@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "experiment_id": "isolation_comparison_v1",
+  "protocol": "vessel_name_disjoint",
+  "status": "passed",
+  "manifest_sha256": "67aea271aa227acb58b45a96868207ac5fabebfe5ae63fe3ee59bf6be28c803d",
+  "selected_segments": 20000,
+  "selected_segments_by_split_and_class": {
+    "train": {
+      "Cargo": 3500,
+      "Passenger": 3500,
+      "Tank": 3500,
+      "Tug": 3500
+    },
+    "val": {
+      "Cargo": 1000,
+      "Passenger": 1000,
+      "Tank": 1000,
+      "Tug": 1000
+    },
+    "test": {
+      "Cargo": 500,
+      "Passenger": 500,
+      "Tank": 500,
+      "Tug": 500
+    }
+  },
+  "selected_recordings": 581,
+  "selected_vessel_name_groups": 244,
+  "recordings_crossing_partitions": [],
+  "vessel_name_groups_crossing_partitions": [],
+  "group_assignments": 247,
+  "unused_groups": 0,
+  "validation": {
+    "segment_ids_unique": true,
+    "exact_target_segments_per_class": true,
+    "recording_disjoint": true,
+    "vessel_name_disjoint": true
+  },
+  "required_validation_checks": [
+    "segment_ids_unique",
+    "exact_target_segments_per_class",
+    "recording_disjoint",
+    "vessel_name_disjoint"
+  ]
+}

@@ -24,7 +24,7 @@ CLASS_TO_INDEX = {name: idx for idx, name in enumerate(CLASS_NAMES)}
 
 @dataclass(frozen=True)
 class AudioRecord:
-    path: str
+    relative_path: str
     class_name: str
     label_index: int
     sample_rate: int
@@ -34,7 +34,7 @@ class AudioRecord:
 
 @dataclass(frozen=True)
 class SegmentRecord:
-    path: str
+    relative_path: str
     class_name: str
     label_index: int
     start_frame: int
@@ -42,11 +42,18 @@ class SegmentRecord:
     sample_rate: int
     segment_index: int
     total_segments: int
+    group_key: str = ""
+    vessel_key: str = ""
 
 
 def segment_record_from_dict(data: dict[str, object]) -> SegmentRecord:
+    relative_path = data.get("relative_path", data.get("path"))
+    if relative_path is None:
+        raise ValueError("Segment record must contain relative_path")
+    from src.utils.pathing import validate_manifest_relative_path
+
     return SegmentRecord(
-        path=str(data["path"]),
+        relative_path=validate_manifest_relative_path(str(relative_path)).as_posix(),
         class_name=str(data["class_name"]),
         label_index=int(data["label_index"]),
         start_frame=int(data["start_frame"]),
@@ -54,6 +61,8 @@ def segment_record_from_dict(data: dict[str, object]) -> SegmentRecord:
         sample_rate=int(data["sample_rate"]),
         segment_index=int(data["segment_index"]),
         total_segments=int(data["total_segments"]),
+        group_key=str(data.get("group_key", "")),
+        vessel_key=str(data.get("vessel_key", "")),
     )
 
 
@@ -72,7 +81,7 @@ def scan_deepship(root_dir: str | Path) -> list[AudioRecord]:
             info = sf.info(str(wav_path))
             records.append(
                 AudioRecord(
-                    path=str(wav_path),
+                    relative_path=wav_path.relative_to(root).as_posix(),
                     class_name=class_name,
                     label_index=CLASS_TO_INDEX[class_name],
                     sample_rate=info.samplerate,
@@ -118,7 +127,7 @@ def build_segment_records(
             start_frame = segment_index * clip_frames
             segments.append(
                 SegmentRecord(
-                    path=record.path,
+                    relative_path=record.relative_path,
                     class_name=record.class_name,
                     label_index=record.label_index,
                     start_frame=start_frame,
@@ -210,7 +219,7 @@ def build_paper_split(
 def _summarize_class_recording_overlap(sampled_pool: dict[str, list[SegmentRecord]]) -> dict[str, object]:
     overlap: dict[str, object] = {}
     for class_name, segments in sampled_pool.items():
-        by_recording = Counter(segment.path for segment in segments)
+        by_recording = Counter(segment.relative_path for segment in segments)
         overlap[class_name] = {
             "unique_recordings": len(by_recording),
             "max_segments_from_one_recording": max(by_recording.values()) if by_recording else 0,
@@ -244,6 +253,7 @@ class DeepShipMelSegmentDataset(Dataset):
         self,
         segments: list[SegmentRecord],
         *,
+        data_root: str | Path,
         sample_rate: int = 16000,
         clip_duration: float = 3.0,
         n_fft: int = 1024,
@@ -251,11 +261,14 @@ class DeepShipMelSegmentDataset(Dataset):
         win_length: int = 1024,
         n_mels: int = 64,
         highpass_freq: float | None = None,
+        return_index: bool = False,
     ) -> None:
         self.segments = segments
+        self.data_root = resolve_path(data_root)
         self.sample_rate = sample_rate
         self.clip_samples = int(round(sample_rate * clip_duration))
         self.highpass_freq = highpass_freq
+        self.return_index = return_index
         self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
         self.mel_transform = torchaudio.transforms.MelSpectrogram(
             sample_rate=sample_rate,
@@ -271,7 +284,7 @@ class DeepShipMelSegmentDataset(Dataset):
     def __len__(self) -> int:
         return len(self.segments)
 
-    def __getitem__(self, index: int) -> tuple[torch.Tensor, int]:
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, int] | tuple[torch.Tensor, int, int]:
         segment = self.segments[index]
         waveform, source_sr = self._load_segment(segment)
         if source_sr != self.sample_rate:
@@ -280,6 +293,8 @@ class DeepShipMelSegmentDataset(Dataset):
         if self.highpass_freq is not None and self.highpass_freq > 0:
             waveform = F.highpass_biquad(waveform, self.sample_rate, self.highpass_freq)
         mel = self.to_db(self.mel_transform(waveform))
+        if self.return_index:
+            return mel, segment.label_index, index
         return mel, segment.label_index
 
     def _resample(self, waveform: torch.Tensor, source_sr: int) -> torch.Tensor:
@@ -298,10 +313,12 @@ class DeepShipMelSegmentDataset(Dataset):
             return nnf.pad(waveform, (0, self.clip_samples - num_samples))
         return waveform
 
-    @staticmethod
-    def _load_segment(segment: SegmentRecord) -> tuple[torch.Tensor, int]:
+    def _load_segment(self, segment: SegmentRecord) -> tuple[torch.Tensor, int]:
+        from src.utils.pathing import resolve_manifest_path
+
+        audio_path = resolve_manifest_path(self.data_root, segment.relative_path)
         audio, sample_rate = sf.read(
-            segment.path,
+            audio_path,
             start=segment.start_frame,
             frames=segment.num_frames,
             dtype="float32",

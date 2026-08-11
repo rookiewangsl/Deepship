@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "experiment_id": "isolation_comparison_v1",
+  "protocol": "vessel_name_disjoint",
+  "status": "passed",
+  "manifest_sha256": "67aea271aa227acb58b45a96868207ac5fabebfe5ae63fe3ee59bf6be28c803d",
+  "calculated_manifest_sha256": "67aea271aa227acb58b45a96868207ac5fabebfe5ae63fe3ee59bf6be28c803d",
+  "segments": 20000,
+  "recordings": 581,
+  "groups": 244,
+  "selected_segments_by_split_and_class": {
+    "train": {
+      "Cargo": 3500,
+      "Passenger": 3500,
+      "Tank": 3500,
+      "Tug": 3500
+    },
+    "val": {
+      "Cargo": 1000,
+      "Passenger": 1000,
+      "Tank": 1000,
+      "Tug": 1000
+    },
+    "test": {
+      "Cargo": 500,
+      "Passenger": 500,
+      "Tank": 500,
+      "Tug": 500
+    }
+  },
+  "checks": {
+    "schema_version_matches": true,
+    "experiment_id_matches": true,
+    "split_seed_matches": true,
+    "target_budget_matches": true,
+    "manifest_hash_matches": true,
+    "source_inventory_hash_matches": true,
+    "source_identity_hash_matches": true,
+    "paths_are_portable": true,
+    "segment_ids_unique": true,
+    "exact_target_segments_per_class": true,
+    "group_keys_are_disjoint": true,
+    "recordings_are_disjoint": true,
+    "source_files_exist": true,
+    "audio_metadata_matches": true,
+    "segment_bounds_valid": true
+  },
+  "required_checks": [
+    "schema_version_matches",
+    "experiment_id_matches",
+    "split_seed_matches",
+    "target_budget_matches",
+    "manifest_hash_matches",
+    "source_inventory_hash_matches",
+    "source_identity_hash_matches",
+    "paths_are_portable",
+    "segment_ids_unique",
+    "exact_target_segments_per_class",
+    "group_keys_are_disjoint",
+    "source_files_exist",
+    "audio_metadata_matches",
+    "segment_bounds_valid",
+    "recordings_are_disjoint"
+  ],
+  "diagnostics": {
+    "invalid_paths_count": 0,
+    "invalid_paths_examples": [],
+    "recording_overlap_count": 0,
+    "recording_overlap_examples": [],
+    "group_overlap_count": 0,
+    "group_overlap_examples": [],
+    "missing_files_count": 0,
+    "missing_files_examples": [],
+    "audio_metadata_mismatch_count": 0,
+    "audio_metadata_mismatch_examples": [],
+    "invalid_segment_bounds_count": 0,
+    "invalid_segment_bounds_examples": []
+  }
+}

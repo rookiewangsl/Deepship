@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import re
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 
 _WINDOWS_DRIVE_RE = re.compile(r"^(?P<drive>[A-Za-z]):[\\/](?P<rest>.*)$")
@@ -41,6 +41,36 @@ def resolve_path(
 
     anchor = Path(base_dir) if base_dir is not None else project_root()
     return (anchor / path).resolve()
+
+
+def validate_manifest_relative_path(raw_path: str | os.PathLike[str]) -> PurePosixPath:
+    """Validate the portable POSIX path stored in a dataset manifest."""
+    text = os.fspath(raw_path)
+    raw_parts = text.split("/")
+    if (
+        not text
+        or "\\" in text
+        or _WINDOWS_DRIVE_RE.match(text)
+        or text.startswith("/")
+        or any(part in {"", ".", ".."} for part in raw_parts)
+    ):
+        raise ValueError(f"Unsafe manifest relative path: {text!r}")
+    return PurePosixPath(text)
+
+
+def resolve_manifest_path(
+    data_root: str | os.PathLike[str],
+    relative_path: str | os.PathLike[str],
+) -> Path:
+    """Resolve a portable manifest path under a machine-local dataset root."""
+    root = resolve_path(data_root).resolve()
+    relative = validate_manifest_relative_path(relative_path)
+    candidate = root.joinpath(*relative.parts).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError as error:
+        raise ValueError(f"Manifest path escapes data root: {relative.as_posix()!r}") from error
+    return candidate
 
 
 def default_deepship_root() -> str:

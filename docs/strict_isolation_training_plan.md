@@ -4,9 +4,23 @@
 
 现有 `95.15%` 是片段级随机划分的结果，不作为新录音或新船只泛化的结论。本路线新增两种
 隔离评测，并把“数据协议生成”和“GPU 训练”解耦：本地负责审核并冻结数据协议，远程
-Windows/Linux 主机只读取协议训练。
+Windows/Linux 主机只读取协议训练。本文同时记录原始路线和当前实施状态；本地准备代码已经
+实现，但尚未启动九次正式 GPU 训练。
 
-本文件仅记录方案，不代表相关代码已经实现，也不触发训练。
+## 当前实施状态（2026-08-11）
+
+- 已冻结 `configs/experiments/isolation_comparison_v1.json`；三种协议均为每类
+  `3500/1000/500`，即 70%/20%/10%，正式 model seed 为 `42/43/44`。
+- 已审计 T7 的 609 条 WAV，并完成全部音频内容 SHA-256；发现 6 对完全重复录音，录音级协议
+  按内容哈希共同分组，避免副本跨集合。
+- 船名映射中 603 条录音可纳入，6 条未解析 Tank 录音排除；得到 247 个船名组。当前第三组
+  仍严格命名为 `vessel_name_disjoint`，不声称 MMSI/IMO 物理船只隔离。
+- 已生成并验证三个各含 20,000 个片段的冻结 manifest；所有路径均为 POSIX 风格相对路径，
+  不包含 macOS 挂载点或 Windows 盘符。
+- 已实现 manifest 驱动训练、checkpoint/resume、分层评估、Windows PowerShell 操作脚本和
+  九次正式 run 的一致性检查/汇总脚本。
+- 不依赖 PyTorch 的本地单元测试已通过。本地没有安装 PyTorch，因此 GPU 前向、反向与恢复
+  链路要在 Windows 上先通过三组 smoke test 后，才能开始正式训练。
 
 ## 三种协议
 
@@ -14,7 +28,7 @@ Windows/Linux 主机只读取协议训练。
 |---|---|---|---|
 | `segment_level` | 片段 | 当前完整数据 | 片段级基线复现；不代表独立录音泛化 |
 | `recording_disjoint` | `relative_path`（每条 WAV） | 609 条 WAV | 对未见录音的泛化 |
-| `vessel_name_disjoint` | 经审核的 `vessel_key` | 已可靠映射的录音，当前预计 603 条 | 对未见规范船名组的泛化 |
+| `vessel_name_disjoint` | 经审核的 `vessel_key` | 已可靠映射的 603 条录音 | 对未见规范船名组的泛化 |
 | `physical_vessel_disjoint` | MMSI / IMO / 发布方确认的物理船只 ID | 身份核验完成后确定 | 对未见物理船只的严格泛化 |
 
 `vessel_name_disjoint` 不是 `physical_vessel_disjoint` 的同义词。没有可核验的 MMSI、IMO 或
@@ -58,8 +72,8 @@ Windows/Linux 主机只读取协议训练。
 
 1. `recording_disjoint`：每条 WAV 是一个 group，使用全部 609 条录音。
 2. `vessel_name_disjoint`：同一 `vessel_key` 下所有录音强制进入同一个 partition。
-3. 按类别做 group-aware 的 train/validation/test 划分；默认比例拟定为 70/15/15，最终比例
-   在实现前确认。组不可拆分，因此只要求尽量接近目标比例，并完整记录实际比例。
+3. 按类别做 group-aware 的 train/validation/test 候选容量分配，固定目标为 70%/20%/10%。
+   组不可拆分；完成 group 分配后，在各集合内部确定性抽取每类 `3500/1000/500` 个片段。
 4. 在组分配后才从录音产生 3 秒片段，确保同一 WAV 的任何片段绝不跨 partition。
 5. 输出不可变 `split_manifest.json`、统计报告、排除清单和输入/输出 SHA-256。
 
@@ -75,7 +89,8 @@ Windows/Linux 主机只读取协议训练。
 3. 每个入选 recording 恰好有一个类别和一个有效 group；
 4. 每类在各集合均有样本；
 5. 对船只级协议，所有未解析、低置信度或冲突记录都有明确的纳入/排除理由；
-6. 可选增加音频哈希/近重复检查，防止不同路径的重复音频跨集合。
+6. 必须使用完整音频内容 SHA-256 检查不同路径下的完全重复音频；录音级协议按相同内容哈希
+   共同分组，防止副本跨集合。
 
 验证失败时不生成可供训练使用的协议。
 
@@ -112,17 +127,21 @@ PyTorch/CUDA 环境、最佳模型、训练历史、片段级指标、录音级�
    生成并赋予新的协议版本/哈希。
 4. 远程先运行 CPU 或少量 epoch 的 smoke run，再开始正式多 seed 训练。
 
-Windows 示例（待实现对应 CLI 后）：
+Windows 示例：
+
+当前 T7 的数据集相对盘根目录为 `DeepShip\\DeepShip`。Windows 分配的盘符可能变化，因此命令
+中的 `E:` 只是示例；应在每次训练前确认实际盘符。协议文件不记录盘符。
 
 ```powershell
-python scripts/train/train_deepship_macnna.py `
-  --data-root "D:\\datasets\\DeepShip" `
-  --split-manifest "protocols\\recording_seed42\\split_manifest.json" `
-  --output-root "D:\\runs\\macnna_recording_seed42" `
-  --device cuda `
-  --num-workers 4 `
-  --seed 42
+.\scripts\windows\run_formal.ps1 `
+  -DataRoot "E:\DeepShip\DeepShip" `
+  -OutputRoot "D:\Runs\Deepship\isolation_comparison_v1" `
+  -Seeds 42 `
+  -NumWorkers 0
 ```
+
+这里的 `E:` 仅为示例。T7 的盘符变化时只修改 `-DataRoot`；三个冻结 manifest 不需要修改。
+完整步骤见 `docs/windows_training_guide.md`。
 
 ## 完成标准
 
@@ -145,7 +164,8 @@ python scripts/train/train_deepship_macnna.py `
 
 - 网络：当前新的 MA-CNN-A 三分支结构；
 - 输入：16 kHz、3 秒、不重叠、64 个 Mel bins；
-- 三组协议的目标片段预算：每类 train/validation/test 为 `3500/1000/500`；
+- 三组协议的目标片段预算：每类 train/validation/test 为 `3500/1000/500`，对应
+  70%/20%/10%；
 - split seed：固定为 `42`；
 - 正式训练 model seed：`42/43/44`；
 - 优化器、学习率调度、batch size、epoch 上限和 early stopping 在三种协议间一致；
@@ -174,8 +194,8 @@ python scripts/train/train_deepship_macnna.py `
 3. 检查重复相对路径、缺失文件、无法读取的 WAV、AppleDouble 文件、类别不一致和同组跨类。
 4. 汇总 high/medium/none 置信度、截断船名、别名合并和 6 条未解析录音。
 5. 计算每类、每录音、每 vessel group 的可用片段数，验证三组目标预算是否可行。
-6. 对音频建立轻量指纹（文件大小、音频元数据；必要时 SHA-256），检查不同路径下的完全重复
-   文件，避免副本跨集合。
+6. 对全部音频计算内容 SHA-256，检查不同路径下的完全重复文件；已发现的 6 对 Passenger
+   重复录音在录音级协议中按内容哈希共同分组，避免副本跨集合。
 
 产物：
 
@@ -261,7 +281,7 @@ python scripts/train/train_deepship_macnna.py `
 4. 每条预测记录相对路径、group key、真实标签、预测标签和概率，便于回溯错误。
 5. 测试集只在最佳验证模型确定后评估一次。
 
-产物：`segment_metrics.json`、`recording_metrics.json`、可选的 `vessel_metrics.json`、预测 CSV
+产物：`segment_metrics.json`、`recording_metrics.json`、`vessel_metrics.json`、预测 CSV
 和对应图表。
 
 验收：聚合指标能由保存的预测文件重新计算得到，且测试 DataLoader 不打乱记录对应关系。
@@ -316,7 +336,8 @@ python scripts/train/train_deepship_macnna.py `
 
 工作项：
 
-1. 新增汇总脚本，检查九个 run 的模型结构、特征、优化配置、commit 和 manifest 是否一致。
+1. 使用 `scripts/eval/summarize_isolation_runs.py` 检查九个 run 的模型结构、特征、优化配置、
+   commit 和 manifest 是否一致；缺少 run、发现 smoke override 或跨 commit 时立即失败。
 2. 分协议统计三 seed 的均值、标准差和单次结果。
 3. 对比 segment、recording、vessel-group 三个层级的 Accuracy 与 macro-F1。
 4. 生成统一表格、混淆矩阵和训练曲线；保留失败类别与典型误判的可追溯记录。
@@ -324,6 +345,16 @@ python scripts/train/train_deepship_macnna.py `
    物理船只严格隔离结论。
 
 验收：汇总报告中的每个数字都能追溯到某个 run、manifest 哈希和预测文件。
+
+结果复制回本地后的命令：
+
+```bash
+python scripts/eval/summarize_isolation_runs.py \
+  --runs-root /path/to/isolation_comparison_v1
+```
+
+输出位于 `<runs-root>/summary/`，包含逐 run CSV、分协议均值/样本标准差 CSV、JSON、聚合混淆
+矩阵和 Markdown 对比表。
 
 ## 建议的逐次实施顺序
 

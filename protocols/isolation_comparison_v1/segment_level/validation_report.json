@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "experiment_id": "isolation_comparison_v1",
+  "protocol": "segment_level",
+  "status": "passed",
+  "manifest_sha256": "0d5286c797784ef09c8c83898807bdfc941fe50faf53b9a58c041a1f7eeda626",
+  "calculated_manifest_sha256": "0d5286c797784ef09c8c83898807bdfc941fe50faf53b9a58c041a1f7eeda626",
+  "segments": 20000,
+  "recordings": 596,
+  "groups": 20000,
+  "selected_segments_by_split_and_class": {
+    "train": {
+      "Cargo": 3500,
+      "Passenger": 3500,
+      "Tank": 3500,
+      "Tug": 3500
+    },
+    "val": {
+      "Cargo": 1000,
+      "Passenger": 1000,
+      "Tank": 1000,
+      "Tug": 1000
+    },
+    "test": {
+      "Cargo": 500,
+      "Passenger": 500,
+      "Tank": 500,
+      "Tug": 500
+    }
+  },
+  "checks": {
+    "schema_version_matches": true,
+    "experiment_id_matches": true,
+    "split_seed_matches": true,
+    "target_budget_matches": true,
+    "manifest_hash_matches": true,
+    "source_inventory_hash_matches": true,
+    "source_identity_hash_matches": true,
+    "paths_are_portable": true,
+    "segment_ids_unique": true,
+    "exact_target_segments_per_class": true,
+    "group_keys_are_disjoint": true,
+    "recordings_are_disjoint": false,
+    "source_files_exist": true,
+    "audio_metadata_matches": true,
+    "segment_bounds_valid": true
+  },
+  "required_checks": [
+    "schema_version_matches",
+    "experiment_id_matches",
+    "split_seed_matches",
+    "target_budget_matches",
+    "manifest_hash_matches",
+    "source_inventory_hash_matches",
+    "source_identity_hash_matches",
+    "paths_are_portable",
+    "segment_ids_unique",
+    "exact_target_segments_per_class",
+    "group_keys_are_disjoint",
+    "source_files_exist",
+    "audio_metadata_matches",
+    "segment_bounds_valid"
+  ],
+  "diagnostics": {
+    "invalid_paths_count": 0,
+    "invalid_paths_examples": [],
+    "recording_overlap_count": 518,
+    "recording_overlap_examples": [
+      "Cargo/20171104-1/1.wav",
+      "Cargo/20171104a-2/2.wav",
+      "Cargo/20171105a-3/3.wav",
+      "Cargo/20171106-4/4.wav",
+      "Cargo/20171107-5/5.wav",
+      "Cargo/20171107b-6/6.wav",
+      "Cargo/20171110-7/7.wav",
+      "Cargo/20171111-8/8.wav",
+      "Cargo/20171111e-9/9.wav",
+      "Cargo/20171111f-10/10.wav",
+      "Cargo/20171111g-11/11.wav",
+      "Cargo/20171112-12/12.wav",
+      "Cargo/20171113-13/13.wav",
+      "Cargo/20171114a-14/14.wav",
+      "Cargo/20171114b-15/15.wav",
+      "Cargo/20171114c-16/16.wav",
+      "Cargo/20171114d-17/17.wav",
+      "Cargo/20171115a-18/18.wav",
+      "Cargo/20171115b-19/19.wav",
+      "Cargo/20171115d-20/20.wav"
+    ],
+    "group_overlap_count": 0,
+    "group_overlap_examples": [],
+    "missing_files_count": 0,
+    "missing_files_examples": [],
+    "audio_metadata_mismatch_count": 0,
+    "audio_metadata_mismatch_examples": [],
+    "invalid_segment_bounds_count": 0,
+    "invalid_segment_bounds_examples": []
+  }
+}

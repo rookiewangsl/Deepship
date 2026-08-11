@@ -22,20 +22,30 @@ but still requires a full training run before a quality metric can be reported.
 ## Train MA-CNN-A
 
 ```bash
-export DEEPSHIP_DATA_ROOT=/Volumes/T7/ProjectData/Deepship/datasets/DeepShip
+export DEEPSHIP_DATA_ROOT=/Volumes/T7/DeepShip/DeepShip
 
 python scripts/train/train_deepship_macnna.py \
   --data-root "$DEEPSHIP_DATA_ROOT" \
-  --output-root /Volumes/T7/ProjectData/Deepship/runs/deepship_macnna_paper
+  --output-root ./runs/deepship_macnna_paper
 ```
 
 The CNN baseline now uses a `linear warmup + cosine annealing` learning-rate schedule by default.
 
-Before training, validate that T7 is mounted and the dataset is readable:
+The frozen three-protocol isolation comparison and Windows GPU workflow are documented in
+[`docs/windows_training_guide.md`](docs/windows_training_guide.md).
+
+Before a frozen three-protocol run, validate the mounted T7 against all committed manifests. On macOS,
+the current dataset root is:
 
 ```bash
-python scripts/check_storage.py
+python scripts/prepare/validate_deepship_protocols.py \
+  --data-root /Volumes/T7/DeepShip/DeepShip \
+  --protocol all \
+  --no-write-reports
 ```
+
+On Windows, use `scripts\windows\check_environment.ps1` and pass the actual T7 drive letter. The manifest
+files contain no drive letter or absolute data path.
 
 Storage layout and migration details are documented in
 [`docs/storage_layout.md`](docs/storage_layout.md). Small legacy metrics and
@@ -47,3 +57,4 @@ figures are retained under `results/`; checkpoints and full runs remain on T7.
 - `src/models/ma_cnn_a.py`: MA-CNN-A implementation
 - `src/pipelines/mel_ml/train_deepship_macnna.py`: training and evaluation
 - `scripts/train/train_deepship_macnna.py`: command-line entrypoint
+- `scripts/eval/summarize_isolation_runs.py`: validate and summarize the nine formal isolation runs
