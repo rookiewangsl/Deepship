@@ -23,6 +23,7 @@ try {
         $Manifest = Join-Path $RepoRoot "protocols\isolation_comparison_v1\$Protocol\split_manifest.json"
         $LogPath = Join-Path $LogRoot "smoke_$Protocol.log"
         $Arguments = @(
+            "-u",
             "scripts/train/train_deepship_macnna.py",
             "--data-root", $ResolvedDataRoot,
             "--split-manifest", $Manifest,
@@ -37,8 +38,21 @@ try {
             "--seed", "42"
         )
         Write-Host "Starting smoke run: $Protocol"
-        & python @Arguments 2>&1 | Tee-Object -FilePath $LogPath
-        if ($LASTEXITCODE -ne 0) {
+        # Windows PowerShell 5 wraps native stderr (including tqdm progress) in
+        # NativeCommandError. Temporarily continue, stringify merged output,
+        # and rely on the Python process exit code for real failure detection.
+        $PreviousErrorActionPreference = $ErrorActionPreference
+        try {
+            $ErrorActionPreference = "Continue"
+            & python @Arguments 2>&1 |
+                ForEach-Object { $_.ToString() } |
+                Tee-Object -FilePath $LogPath
+            $PythonExitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $PreviousErrorActionPreference
+        }
+        if ($PythonExitCode -ne 0) {
             throw "Smoke run failed: $Protocol. See $LogPath"
         }
     }

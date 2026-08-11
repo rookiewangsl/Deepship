@@ -31,6 +31,7 @@ try {
             $Manifest = Join-Path $RepoRoot "protocols\isolation_comparison_v1\$Protocol\split_manifest.json"
             $LogPath = Join-Path $LogRoot "$RunName.log"
             $Arguments = @(
+                "-u",
                 "scripts/train/train_deepship_macnna.py",
                 "--data-root", $ResolvedDataRoot,
                 "--split-manifest", $Manifest,
@@ -44,13 +45,27 @@ try {
                 $Arguments += "--resume"
             }
             Write-Host "Starting formal run: $RunName"
-            if ($Resume) {
-                & python @Arguments 2>&1 | Tee-Object -FilePath $LogPath -Append
+            # tqdm writes progress to stderr. Windows PowerShell 5 otherwise
+            # promotes that harmless output to a terminating NativeCommandError.
+            $PreviousErrorActionPreference = $ErrorActionPreference
+            try {
+                $ErrorActionPreference = "Continue"
+                if ($Resume) {
+                    & python @Arguments 2>&1 |
+                        ForEach-Object { $_.ToString() } |
+                        Tee-Object -FilePath $LogPath -Append
+                }
+                else {
+                    & python @Arguments 2>&1 |
+                        ForEach-Object { $_.ToString() } |
+                        Tee-Object -FilePath $LogPath
+                }
+                $PythonExitCode = $LASTEXITCODE
             }
-            else {
-                & python @Arguments 2>&1 | Tee-Object -FilePath $LogPath
+            finally {
+                $ErrorActionPreference = $PreviousErrorActionPreference
             }
-            if ($LASTEXITCODE -ne 0) {
+            if ($PythonExitCode -ne 0) {
                 throw "Formal run failed: $RunName. See $LogPath"
             }
         }
