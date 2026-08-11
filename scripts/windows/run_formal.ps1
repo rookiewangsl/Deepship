@@ -45,8 +45,8 @@ try {
                 $Arguments += "--resume"
             }
             Write-Host "Starting formal run: $RunName"
-            # tqdm writes progress to stderr. Windows PowerShell 5 otherwise
-            # promotes that harmless output to a terminating NativeCommandError.
+            # Windows PowerShell 5 can promote native stderr to a terminating
+            # NativeCommandError. Use the Python exit code as the failure signal.
             $PreviousErrorActionPreference = $ErrorActionPreference
             try {
                 $ErrorActionPreference = "Continue"

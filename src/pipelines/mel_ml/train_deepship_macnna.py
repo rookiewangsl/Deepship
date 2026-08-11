@@ -14,7 +14,6 @@ import torch
 from torch import nn
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from torch.utils.data import DataLoader
-from tqdm.auto import tqdm
 
 from src.data.deepship import (
     CLASS_NAMES,
@@ -260,7 +259,6 @@ def run_epoch(
     dataloader: DataLoader,
     criterion: nn.Module,
     device: str,
-    desc: str,
     optimizer: torch.optim.Optimizer | None = None,
     max_batches: int | None = None,
 ) -> tuple[float, float]:
@@ -271,10 +269,8 @@ def run_epoch(
     total_samples = 0
     use_amp = str(device).startswith("cuda")
     amp_ctx = torch.amp.autocast(device_type="cuda") if use_amp else nullcontext()
-
-    progress = tqdm(dataloader, desc=desc, leave=False, dynamic_ncols=True)
     with torch.set_grad_enabled(is_train):
-        for batch_index, (inputs, targets) in enumerate(progress):
+        for batch_index, (inputs, targets) in enumerate(dataloader):
             if max_batches is not None and batch_index >= max_batches:
                 break
             inputs = inputs.to(device, non_blocking=use_amp)
@@ -292,12 +288,6 @@ def run_epoch(
             total_loss += loss.item() * inputs.size(0)
             total_correct += (logits.argmax(dim=1) == targets).sum().item()
             total_samples += inputs.size(0)
-            progress.set_postfix(
-                loss=f"{total_loss / total_samples:.4f}",
-                acc=f"{total_correct / total_samples:.4f}",
-            )
-
-    progress.close()
     return total_loss / total_samples, total_correct / total_samples
 
 
@@ -315,12 +305,7 @@ def collect_prediction_rows(
     use_amp = str(device).startswith("cuda")
     amp_ctx = torch.amp.autocast(device_type="cuda") if use_amp else nullcontext()
     with torch.no_grad():
-        for batch_index, (inputs, targets, indexes) in enumerate(tqdm(
-            dataloader,
-            desc="test",
-            leave=False,
-            dynamic_ncols=True,
-        )):
+        for batch_index, (inputs, targets, indexes) in enumerate(dataloader):
             if max_batches is not None and batch_index >= max_batches:
                 break
             inputs = inputs.to(device, non_blocking=use_amp)
@@ -481,14 +466,12 @@ def train(config: TrainConfig) -> dict[str, object]:
         print(f"Resuming from epoch {start_epoch}")
 
     for epoch in range(start_epoch, config.epochs + 1):
-        print(f"Epoch {epoch}/{config.epochs}")
         current_lr = optimizer.param_groups[0]["lr"]
         train_loss, train_acc = run_epoch(
             model,
             dataloaders["train"],
             criterion,
             config.device,
-            desc="train",
             optimizer=optimizer,
             max_batches=config.max_train_batches,
         )
@@ -497,7 +480,6 @@ def train(config: TrainConfig) -> dict[str, object]:
             dataloaders["val"],
             criterion,
             config.device,
-            desc="val",
             max_batches=config.max_eval_batches,
         )
         history["train_loss"].append(train_loss)
@@ -540,11 +522,14 @@ def train(config: TrainConfig) -> dict[str, object]:
             },
             last_model_path,
         )
+        progress_percent = 100.0 * epoch / config.epochs
         print(
-            f"lr={current_lr:.6g} "
-            f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} "
-            f"val_loss={val_loss:.4f} val_acc={val_acc:.4f} "
-            f"best_val_acc={best_val_acc:.4f}"
+            f"Epoch {epoch}/{config.epochs} ({progress_percent:.0f}%) | "
+            f"lr={current_lr:.6g} | "
+            f"train_loss={train_loss:.4f} train_acc={train_acc:.4f} | "
+            f"val_loss={val_loss:.4f} val_acc={val_acc:.4f} | "
+            f"best_val_acc={best_val_acc:.4f}",
+            flush=True,
         )
         if should_stop:
             print(f"Early stopping at epoch {epoch} (best epoch: {best_epoch})")
@@ -555,6 +540,7 @@ def train(config: TrainConfig) -> dict[str, object]:
     checkpoint = torch.load(best_model_path, map_location=config.device, weights_only=False)
     model.load_state_dict(checkpoint["model_state_dict"])
 
+    print("Evaluating the best checkpoint on the test split...", flush=True)
     segment_predictions = collect_prediction_rows(
         model,
         dataloaders["test"],

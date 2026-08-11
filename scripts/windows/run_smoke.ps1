@@ -38,9 +38,9 @@ try {
             "--seed", "42"
         )
         Write-Host "Starting smoke run: $Protocol"
-        # Windows PowerShell 5 wraps native stderr (including tqdm progress) in
-        # NativeCommandError. Temporarily continue, stringify merged output,
-        # and rely on the Python process exit code for real failure detection.
+        # Windows PowerShell 5 wraps native stderr in NativeCommandError.
+        # Temporarily continue, stringify merged output, and rely on the Python
+        # process exit code for real failure detection.
         $PreviousErrorActionPreference = $ErrorActionPreference
         try {
             $ErrorActionPreference = "Continue"
