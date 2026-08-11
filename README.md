@@ -7,6 +7,18 @@ This repository keeps the DeepShip `MA-CNN-A` baseline:
 - `64 x 94` log-Mel input
 - `5000` samples per class with split `3500 / 1000 / 500`
 
+## Project Handbook
+
+The Chinese project handbook covers the dataset protocol, model architecture,
+training pipeline, experiment history, result boundaries, run commands, and
+interview questions:
+
+- [`docs/handbook/README.md`](docs/handbook/README.md)
+
+The archived `95.15%` result belongs to the earlier 486,838-parameter model.
+The current 532,166-parameter architecture has passed end-to-end smoke checks
+but still requires a full training run before a quality metric can be reported.
+
 ## Train MA-CNN-A
 
 ```bash
