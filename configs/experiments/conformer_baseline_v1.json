@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "experiment_id": "conformer_baseline_v1",
+  "status": "implementation_baseline_not_yet_trained",
+  "description": "Pretrained raw-waveform Wav2Vec2-Conformer baseline on frozen DeepShip isolation manifests.",
+  "classes": [
+    "Cargo",
+    "Passenger",
+    "Tank",
+    "Tug"
+  ],
+  "source_protocol": {
+    "experiment_config": "configs/experiments/isolation_comparison_v1.json",
+    "primary_manifest": "protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json",
+    "secondary_manifest": "protocols/isolation_comparison_v1/recording_disjoint/split_manifest.json",
+    "modify_source_manifest": false
+  },
+  "input": {
+    "sample_rate": 16000,
+    "channels": 1,
+    "clip_duration_seconds": 20.0,
+    "context_ablation_seconds": [
+      3.0,
+      10.0,
+      20.0,
+      30.0
+    ],
+    "window_rule": "center requested context on each frozen three-second segment anchor",
+    "remove_dc": true,
+    "normalize_waveform": true,
+    "highpass_freq": null,
+    "speech_denoising": false
+  },
+  "model": {
+    "class": "src.models.wav2vec2_conformer.Wav2Vec2ConformerClassifier",
+    "pretrained_model": "facebook/wav2vec2-conformer-rel-pos-large",
+    "pretrained_revision": null,
+    "load_pretrained": true,
+    "pooling": "attentive_statistics_pooling",
+    "pooling_attention_size": 256,
+    "classifier_hidden_size": 256,
+    "dropout": 0.2,
+    "apply_spec_augment": false,
+    "layerdrop": 0.0,
+    "gradient_checkpointing": true
+  },
+  "finetuning": {
+    "mode": "last_n",
+    "train_last_n_layers": 4,
+    "random_init_control": true,
+    "frozen_encoder_control": true,
+    "full_finetuning_control": true
+  },
+  "training": {
+    "model_seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "batch_size": 1,
+    "gradient_accumulation_steps": 8,
+    "epochs": 50,
+    "optimizer": "AdamW",
+    "encoder_learning_rate": 0.00001,
+    "head_learning_rate": 0.0003,
+    "weight_decay": 0.01,
+    "warmup_epochs": 5,
+    "scheduler": "linear_warmup_then_cosine_annealing",
+    "precision": "fp16",
+    "max_grad_norm": 1.0,
+    "early_stopping_patience": 8
+  },
+  "evaluation": {
+    "levels": [
+      "segment_anchor",
+      "recording",
+      "vessel_name_group"
+    ],
+    "primary_internal_level": "vessel_name_group",
+    "external_evaluation": [
+      "PORTIA-4 MMSI-level",
+      "held-out Oceanship/ONC-4 passage and MMSI-level"
+    ]
+  }
+}
