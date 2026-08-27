@@ -95,6 +95,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--precision", choices=["fp32", "fp16", "bf16"], default="bf16")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument(
+        "--log-interval",
+        type=int,
+        default=100,
+        help="Report cumulative training/validation progress every N batches.",
+    )
     parser.add_argument("--device", default=None)
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--max-train-batches", type=int, default=None)
@@ -132,6 +138,7 @@ def main() -> None:
         precision=args.precision,
         seed=args.seed,
         num_workers=args.num_workers,
+        log_interval=args.log_interval,
         resume=args.resume,
         max_train_batches=args.max_train_batches,
         max_eval_batches=args.max_eval_batches,

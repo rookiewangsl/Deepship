@@ -8,6 +8,7 @@ import random
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -157,6 +158,7 @@ class ConformerTrainConfig:
     precision: str = "bf16"
     seed: int = 42
     num_workers: int = 4
+    log_interval: int = 100
     resume: bool = False
     max_train_batches: int | None = None
     max_eval_batches: int | None = None
@@ -174,6 +176,8 @@ def validate_config(config: ConformerTrainConfig) -> None:
         raise ValueError("batch_size and gradient_accumulation_steps must be positive")
     if config.epochs <= 0:
         raise ValueError("epochs must be positive")
+    if config.log_interval <= 0:
+        raise ValueError("log_interval must be positive")
     if config.max_train_batches is not None and config.max_train_batches <= 0:
         raise ValueError("max_train_batches must be positive when provided")
     if config.max_eval_batches is not None and config.max_eval_batches <= 0:
@@ -379,12 +383,58 @@ def validate_trainable_gradients(model: nn.Module) -> None:
         )
 
 
+def _cuda_device(device: str) -> torch.device | None:
+    if not str(device).startswith("cuda") or not torch.cuda.is_available():
+        return None
+    return torch.device(device)
+
+
+def _start_phase_timer(device: str) -> tuple[float, torch.device | None]:
+    cuda_device = _cuda_device(device)
+    if cuda_device is not None:
+        torch.cuda.synchronize(cuda_device)
+        torch.cuda.reset_peak_memory_stats(cuda_device)
+    return time.perf_counter(), cuda_device
+
+
+def _progress_line(
+    *,
+    epoch: int,
+    epochs: int,
+    phase: str,
+    batch: int,
+    batches: int,
+    samples: int,
+    total_loss: float,
+    total_correct: int,
+    started_at: float,
+    cuda_device: torch.device | None,
+) -> str:
+    if cuda_device is not None:
+        torch.cuda.synchronize(cuda_device)
+        peak_gib = torch.cuda.max_memory_allocated(cuda_device) / (1024**3)
+        gpu_peak = f"{peak_gib:.2f} GiB"
+    else:
+        gpu_peak = "n/a"
+    elapsed_seconds = max(time.perf_counter() - started_at, 1e-12)
+    progress = 100.0 * batch / batches
+    return (
+        f"Epoch {epoch}/{epochs} | {phase} | batch={batch}/{batches} "
+        f"({progress:.1f}%) | samples={samples} | avg_loss={total_loss / samples:.4f} "
+        f"| avg_acc={total_correct / samples:.4f} "
+        f"| samples_per_sec={samples / elapsed_seconds:.2f} "
+        f"| gpu_peak_allocated={gpu_peak}"
+    )
+
+
 def run_epoch(
     model: Wav2Vec2ConformerClassifier,
     dataloader: DataLoader,
     criterion: nn.Module,
     config: ConformerTrainConfig,
     *,
+    epoch: int,
+    phase: str,
     optimizer: torch.optim.Optimizer | None = None,
     scaler: torch.amp.GradScaler | None = None,
     max_batches: int | None = None,
@@ -399,9 +449,17 @@ def run_epoch(
     )
     if effective_batches == 0:
         raise ValueError("Dataloader produced no batches")
+    if phase not in {"train", "val"}:
+        raise ValueError("phase must be train or val")
     if is_train:
         optimizer.zero_grad(set_to_none=True)
     gradients_validated = False
+    started_at, cuda_device = _start_phase_timer(config.device)
+    print(
+        f"Epoch {epoch}/{config.epochs} | {phase} | start "
+        f"| batches={effective_batches} | batch_size={config.batch_size}",
+        flush=True,
+    )
 
     with torch.set_grad_enabled(is_train):
         for batch_index, batch in enumerate(dataloader):
@@ -439,6 +497,26 @@ def run_epoch(
             total_loss += loss.item() * input_values.size(0)
             total_correct += (logits.argmax(dim=1) == targets).sum().item()
             total_samples += input_values.size(0)
+            completed_batches = batch_index + 1
+            if (
+                completed_batches % config.log_interval == 0
+                or completed_batches == effective_batches
+            ):
+                print(
+                    _progress_line(
+                        epoch=epoch,
+                        epochs=config.epochs,
+                        phase=phase,
+                        batch=completed_batches,
+                        batches=effective_batches,
+                        samples=total_samples,
+                        total_loss=total_loss,
+                        total_correct=total_correct,
+                        started_at=started_at,
+                        cuda_device=cuda_device,
+                    ),
+                    flush=True,
+                )
     return total_loss / total_samples, total_correct / total_samples
 
 
@@ -604,6 +682,8 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             dataloaders["train"],
             criterion,
             config,
+            epoch=epoch,
+            phase="train",
             optimizer=optimizer,
             scaler=scaler,
             max_batches=config.max_train_batches,
@@ -613,6 +693,8 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             dataloaders["val"],
             criterion,
             config,
+            epoch=epoch,
+            phase="val",
             max_batches=config.max_eval_batches,
         )
         learning_rates = {
@@ -665,7 +747,7 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             last_model_path,
         )
         print(
-            f"Epoch {epoch}/{config.epochs} | encoder_lr={encoder_lr:.3g} "
+            f"Epoch {epoch}/{config.epochs} | summary | encoder_lr={encoder_lr:.3g} "
             f"head_lr={head_lr:.3g} | train_loss={train_loss:.4f} "
             f"train_acc={train_acc:.4f} | val_loss={val_loss:.4f} "
             f"val_acc={val_acc:.4f} | best_val_acc={best_val_acc:.4f}",

@@ -70,7 +70,8 @@
     "scheduler": "linear_warmup_then_cosine_annealing",
     "precision": "bf16",
     "max_grad_norm": 1.0,
-    "early_stopping_patience": 8
+    "early_stopping_patience": 8,
+    "log_interval_batches": 100
   },
   "evaluation": {
     "levels": [

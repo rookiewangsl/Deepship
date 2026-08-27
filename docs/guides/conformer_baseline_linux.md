@@ -30,6 +30,10 @@ DeepShip frozen split manifest
 减少不必要的反向图和显存占用。当前 12 GB RTX 4070 基线默认使用 BF16 并关闭 gradient
 checkpointing；显式启用时使用非重入实现，以保证冻结前缀之后的可训练层仍能收到梯度。
 
+训练默认每 100 个 batch 报告一次进度。可以用 `--log-interval N` 修改间隔，`N` 必须为正整数。
+训练和验证都会输出累计 loss、累计 accuracy、样本吞吐率和 CUDA 峰值已分配显存；不足一个间隔
+的最后一批也一定输出，因此短 smoke run 同样有进度信息。
+
 所选官方预训练 checkpoint 是在 960 h、16 kHz LibriSpeech 上自监督预训练的 24 层、hidden
 size 1024、16 头 relative-position large 版本。当前分类系统共 619,353,477 个参数，`last-4`
 模式有 101,701,381 个可训练参数。选择它是为了建立公开可复现的强通用迁移基线，不因为它是
@@ -164,6 +168,35 @@ pooling 和分类头均有有限梯度，encoder 学习参数按约 `1e-5` 幅�
 `20 s/last-2 → 10 s/last-4 → 10 s/last-2` 的顺序排查，并把可运行配置与原计划的差异写入报告。
 
 ## 6. 首轮正式运行顺序
+
+### 每个 epoch 的日志
+
+每轮首先立即打印训练阶段开始信息，随后每 100 batch 打印一次进度：
+
+```text
+Epoch 1/50 | train | start | batches=14000 | batch_size=1
+Epoch 1/50 | train | batch=100/14000 (0.7%) | samples=100 | avg_loss=1.4321 | avg_acc=0.2900 | samples_per_sec=2.35 | gpu_peak_allocated=6.71 GiB
+...
+Epoch 1/50 | train | batch=14000/14000 (100.0%) | samples=14000 | avg_loss=0.8421 | avg_acc=0.6812 | samples_per_sec=2.38 | gpu_peak_allocated=6.72 GiB
+```
+
+训练结束后对验证集执行同样的输出：
+
+```text
+Epoch 1/50 | val | start | batches=4000 | batch_size=1
+Epoch 1/50 | val | batch=100/4000 (2.5%) | samples=100 | avg_loss=1.1034 | avg_acc=0.5600 | samples_per_sec=3.41 | gpu_peak_allocated=2.94 GiB
+...
+Epoch 1/50 | val | batch=4000/4000 (100.0%) | samples=4000 | avg_loss=0.9912 | avg_acc=0.5905 | samples_per_sec=3.45 | gpu_peak_allocated=2.95 GiB
+```
+
+保存 history 和 best/last checkpoint 后输出本轮汇总：
+
+```text
+Epoch 1/50 | summary | encoder_lr=0 head_lr=3e-05 | train_loss=0.8421 train_acc=0.6812 | val_loss=0.9912 val_acc=0.5905 | best_val_acc=0.5905
+```
+
+上述数字仅用于展示格式，不是实际实验结果。F0 的 encoder 完全冻结，因此汇总中的
+`encoder_lr=0`；F1b 会显示 encoder 参数组的实际学习率。
 
 1. F0：20 s，encoder frozen，seed 42；
 2. F1b：20 s，last 4 blocks，seed 42；

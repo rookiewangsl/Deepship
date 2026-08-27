@@ -1,7 +1,8 @@
 # Project Structure
 
-This project focuses on single-channel ship audio classification using a CNN route
-built on mel-spectrogram inputs.
+This project focuses on single-channel ship audio classification using two controlled
+routes: a CNN built on log-Mel inputs and a pretrained Wav2Vec2-Conformer built on
+raw waveforms.
 
 The project exposes machine-local links for the datasets:
 
@@ -31,21 +32,20 @@ Deepship/
 │   ├── train/
 │   └── eval/
 ├── src/
-│   ├── data/
-│   ├── evaluation/
-│   ├── features/
-│   │   └── mel_ml/
-│   ├── models/
+│   ├── data/                     # manifests, waveform and Mel datasets
+│   ├── evaluation/               # segment/recording/vessel metrics
+│   ├── models/                   # MA-CNN-A and Wav2Vec2-Conformer
 │   ├── pipelines/
-│   │   └── mel_ml/
+│   │   ├── mel_ml/
+│   │   └── waveform_conformer/
 │   └── utils/
 └── tests/
 ```
 
 Design choice:
 
-- Share dataset indexing, label mapping, splitting, metrics, and visualization.
-- Keep the mel-based data path, model definition, and experiment pipeline simple and reproducible.
+- Share dataset indexing, label mapping, frozen splits, metrics, and aggregation.
+- Keep the Mel-CNN and raw-waveform Conformer pipelines separate and reproducible.
 - Keep source code, Git, documentation, and small result evidence in Dropbox.
 - Keep raw data, checkpoints, caches, and complete runs under
   `/Volumes/T7/ProjectData/Deepship/`.

@@ -26,6 +26,7 @@ class ConformerBaselineConfigTests(unittest.TestCase):
         self.assertEqual(config["model"]["layerdrop"], 0.0)
         self.assertFalse(config["model"]["gradient_checkpointing"])
         self.assertEqual(config["training"]["precision"], "bf16")
+        self.assertEqual(config["training"]["log_interval_batches"], 100)
 
     def test_cli_defaults_to_verified_4070_precision_and_memory_mode(self) -> None:
         arguments = build_parser().parse_args(
@@ -33,6 +34,7 @@ class ConformerBaselineConfigTests(unittest.TestCase):
         )
         self.assertEqual(arguments.precision, "bf16")
         self.assertFalse(arguments.gradient_checkpointing)
+        self.assertEqual(arguments.log_interval, 100)
 
         enabled = build_parser().parse_args(
             [

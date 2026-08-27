@@ -1,6 +1,11 @@
-# DeepShip CNN Baseline
+# DeepShip CNN and Wav2Vec2-Conformer Baselines
 
-This repository keeps the DeepShip `MA-CNN-A` baseline:
+This repository keeps two reproducible DeepShip four-class routes:
+
+- the `MA-CNN-A` log-Mel CNN baseline;
+- the raw-waveform pretrained `Wav2Vec2-Conformer` baseline.
+
+The established CNN baseline uses:
 
 - `16 kHz`
 - `3 s` non-overlapping segments
@@ -70,7 +75,11 @@ artifacts remain on T7.
 ## Main Files
 
 - `src/data/deepship.py`: DeepShip scan, segment generation, and paper split protocol
+- `src/data/deepship_waveform.py`: variable-context raw-waveform loading and normalization
 - `src/models/ma_cnn_a.py`: MA-CNN-A implementation
+- `src/models/wav2vec2_conformer.py`: pretrained encoder, attentive pooling, and classifier
 - `src/pipelines/mel_ml/train_deepship_macnna.py`: training and evaluation
+- `src/pipelines/waveform_conformer/train_deepship_conformer.py`: Conformer training and evaluation
 - `scripts/train/train_deepship_macnna.py`: command-line entrypoint
+- `scripts/train/train_deepship_conformer.py`: Conformer command-line entrypoint
 - `scripts/eval/summarize_isolation_runs.py`: strict validator/summarizer for the configured three-seed run matrix
