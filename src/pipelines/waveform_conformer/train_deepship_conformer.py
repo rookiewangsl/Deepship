@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import TextIO
 
 import numpy as np
 import torch
@@ -397,6 +398,76 @@ def _start_phase_timer(device: str) -> tuple[float, torch.device | None]:
     return time.perf_counter(), cuda_device
 
 
+class TrainingProgress:
+    """Render one live terminal line while keeping piped logs readable."""
+
+    def __init__(
+        self,
+        interactive_stream: TextIO | None,
+        *,
+        owns_stream: bool = False,
+    ) -> None:
+        self.interactive_stream = interactive_stream
+        self.owns_stream = owns_stream
+        self.rendered_width = 0
+
+    @classmethod
+    def auto(cls) -> TrainingProgress:
+        for stream in (sys.stdout, sys.stderr):
+            if stream.isatty():
+                return cls(stream)
+
+        terminal_path = "CONOUT$" if platform.system() == "Windows" else "/dev/tty"
+        try:
+            terminal_stream = open(terminal_path, "w", encoding="utf-8", buffering=1)
+        except OSError:
+            return cls(None)
+        return cls(terminal_stream, owns_stream=True)
+
+    def update(self, line: str) -> None:
+        if self.interactive_stream is None:
+            print(line, flush=True)
+            return
+        padding = " " * max(0, self.rendered_width - len(line))
+        self.interactive_stream.write(f"\r{line}{padding}")
+        self.interactive_stream.flush()
+        self.rendered_width = len(line)
+
+    def clear(self) -> None:
+        if self.interactive_stream is None or self.rendered_width == 0:
+            return
+        self.interactive_stream.write(f"\r{' ' * self.rendered_width}\r")
+        self.interactive_stream.flush()
+        self.rendered_width = 0
+
+    def finish_epoch(self, summary: str) -> None:
+        self.clear()
+        print(summary, flush=True)
+
+    def close(self) -> None:
+        self.clear()
+        if self.owns_stream and self.interactive_stream is not None:
+            self.interactive_stream.close()
+        self.interactive_stream = None
+
+
+def _learning_rate_text(optimizer: torch.optim.Optimizer) -> str:
+    parts = []
+    for index, group in enumerate(optimizer.param_groups):
+        name = str(group.get("name", index))
+        if name == "encoder":
+            name = "enc"
+        parts.append(f"{name}:{float(group['lr']):.2e}")
+    return ",".join(parts)
+
+
+def _format_duration(seconds: float) -> str:
+    total_seconds = max(0, round(seconds))
+    hours, remainder = divmod(total_seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+
 def _progress_line(
     *,
     epoch: int,
@@ -409,21 +480,29 @@ def _progress_line(
     total_correct: int,
     started_at: float,
     cuda_device: torch.device | None,
+    learning_rates: str,
 ) -> str:
     if cuda_device is not None:
         torch.cuda.synchronize(cuda_device)
         peak_gib = torch.cuda.max_memory_allocated(cuda_device) / (1024**3)
-        gpu_peak = f"{peak_gib:.2f} GiB"
+        gpu_peak = f"{peak_gib:.2f}GiB"
     else:
         gpu_peak = "n/a"
-    elapsed_seconds = max(time.perf_counter() - started_at, 1e-12)
     progress = 100.0 * batch / batches
+    if samples:
+        elapsed_seconds = max(time.perf_counter() - started_at, 1e-12)
+        average_loss = f"{total_loss / samples:.4f}"
+        average_accuracy = f"{total_correct / samples:.4f}"
+        samples_per_second = f"{samples / elapsed_seconds:.2f}"
+    else:
+        average_loss = "--"
+        average_accuracy = "--"
+        samples_per_second = "--"
     return (
         f"Epoch {epoch}/{epochs} | {phase} | batch={batch}/{batches} "
-        f"({progress:.1f}%) | samples={samples} | avg_loss={total_loss / samples:.4f} "
-        f"| avg_acc={total_correct / samples:.4f} "
-        f"| samples_per_sec={samples / elapsed_seconds:.2f} "
-        f"| gpu_peak_allocated={gpu_peak}"
+        f"({progress:.1f}%) | avg_loss={average_loss} | avg_acc={average_accuracy} "
+        f"| lr={learning_rates} | samples_per_sec={samples_per_second} "
+        f"| gpu_peak={gpu_peak}"
     )
 
 
@@ -435,6 +514,8 @@ def run_epoch(
     *,
     epoch: int,
     phase: str,
+    progress: TrainingProgress,
+    learning_rates: str,
     optimizer: torch.optim.Optimizer | None = None,
     scaler: torch.amp.GradScaler | None = None,
     max_batches: int | None = None,
@@ -451,14 +532,26 @@ def run_epoch(
         raise ValueError("Dataloader produced no batches")
     if phase not in {"train", "val"}:
         raise ValueError("phase must be train or val")
+    if (phase == "train") != is_train:
+        raise ValueError("train phase requires an optimizer; val phase must not receive one")
     if is_train:
         optimizer.zero_grad(set_to_none=True)
     gradients_validated = False
     started_at, cuda_device = _start_phase_timer(config.device)
-    print(
-        f"Epoch {epoch}/{config.epochs} | {phase} | start "
-        f"| batches={effective_batches} | batch_size={config.batch_size}",
-        flush=True,
+    progress.update(
+        _progress_line(
+            epoch=epoch,
+            epochs=config.epochs,
+            phase=phase,
+            batch=0,
+            batches=effective_batches,
+            samples=0,
+            total_loss=0.0,
+            total_correct=0,
+            started_at=started_at,
+            cuda_device=cuda_device,
+            learning_rates=learning_rates,
+        )
     )
 
     with torch.set_grad_enabled(is_train):
@@ -502,7 +595,7 @@ def run_epoch(
                 completed_batches % config.log_interval == 0
                 or completed_batches == effective_batches
             ):
-                print(
+                progress.update(
                     _progress_line(
                         epoch=epoch,
                         epochs=config.epochs,
@@ -514,8 +607,8 @@ def run_epoch(
                         total_correct=total_correct,
                         started_at=started_at,
                         cuda_device=cuda_device,
+                        learning_rates=learning_rates,
                     ),
-                    flush=True,
                 )
     return total_loss / total_samples, total_correct / total_samples
 
@@ -676,7 +769,10 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         start_epoch = int(checkpoint["epoch"]) + 1
         restore_rng_state(checkpoint["rng_state"])
 
+    progress = TrainingProgress.auto()
     for epoch in range(start_epoch, config.epochs + 1):
+        epoch_started_at = time.perf_counter()
+        progress_learning_rates = _learning_rate_text(optimizer)
         train_loss, train_acc = run_epoch(
             model,
             dataloaders["train"],
@@ -684,6 +780,8 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             config,
             epoch=epoch,
             phase="train",
+            progress=progress,
+            learning_rates=progress_learning_rates,
             optimizer=optimizer,
             scaler=scaler,
             max_batches=config.max_train_batches,
@@ -695,6 +793,8 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             config,
             epoch=epoch,
             phase="val",
+            progress=progress,
+            learning_rates=progress_learning_rates,
             max_batches=config.max_eval_batches,
         )
         learning_rates = {
@@ -746,16 +846,18 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             },
             last_model_path,
         )
-        print(
-            f"Epoch {epoch}/{config.epochs} | summary | encoder_lr={encoder_lr:.3g} "
-            f"head_lr={head_lr:.3g} | train_loss={train_loss:.4f} "
-            f"train_acc={train_acc:.4f} | val_loss={val_loss:.4f} "
-            f"val_acc={val_acc:.4f} | best_val_acc={best_val_acc:.4f}",
-            flush=True,
+        summary = (
+            f"Epoch {epoch}/{config.epochs} | done | train_loss={train_loss:.4f} "
+            f"| train_acc={train_acc:.4f} | val_loss={val_loss:.4f} "
+            f"| val_acc={val_acc:.4f} | best_val_acc={best_val_acc:.4f} "
+            f"| time={_format_duration(time.perf_counter() - epoch_started_at)}"
         )
         if should_stop:
-            print(f"Early stopping at epoch {epoch} (best epoch: {best_epoch})", flush=True)
+            summary += f" | early_stop=true | best_epoch={best_epoch}"
+        progress.finish_epoch(summary)
+        if should_stop:
             break
+    progress.close()
 
     checkpoint = torch.load(best_model_path, map_location=config.device, weights_only=False)
     model.load_state_dict(checkpoint["model_state_dict"])

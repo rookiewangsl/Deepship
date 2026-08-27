@@ -30,9 +30,10 @@ DeepShip frozen split manifest
 减少不必要的反向图和显存占用。当前 12 GB RTX 4070 基线默认使用 BF16 并关闭 gradient
 checkpointing；显式启用时使用非重入实现，以保证冻结前缀之后的可训练层仍能收到梯度。
 
-训练默认每 100 个 batch 报告一次进度。可以用 `--log-interval N` 修改间隔，`N` 必须为正整数。
-训练和验证都会输出累计 loss、累计 accuracy、样本吞吐率和 CUDA 峰值已分配显存；不足一个间隔
-的最后一批也一定输出，因此短 smoke run 同样有进度信息。
+训练默认每 100 个 batch 更新一次进度。可以用 `--log-interval N` 修改间隔，`N` 必须为正整数。
+交互式终端在同一行覆盖显示 train/val 的累计 loss、accuracy、学习率、样本吞吐率和 CUDA 峰值
+已分配显存，每个 epoch 完成后才固定一行摘要。使用 `2>&1 | tee` 时，动态进度直接写到控制终端，
+日志文件只保存 epoch 摘要；若在没有控制终端的后台环境运行，则自动退化为周期性普通日志。
 
 所选官方预训练 checkpoint 是在 960 h、16 kHz LibriSpeech 上自监督预训练的 24 层、hidden
 size 1024、16 头 relative-position large 版本。当前分类系统共 619,353,477 个参数，`last-4`
@@ -171,32 +172,33 @@ pooling 和分类头均有有限梯度，encoder 学习参数按约 `1e-5` 幅�
 
 ### 每个 epoch 的日志
 
-每轮首先立即打印训练阶段开始信息，随后每 100 batch 打印一次进度：
+每轮开始时立即显示 `batch=0`，随后每 100 batch 在同一个终端行上覆盖更新。下面三行表示同一
+物理行在不同时刻的内容，实际不会纵向累积：
 
 ```text
-Epoch 1/50 | train | start | batches=14000 | batch_size=1
-Epoch 1/50 | train | batch=100/14000 (0.7%) | samples=100 | avg_loss=1.4321 | avg_acc=0.2900 | samples_per_sec=2.35 | gpu_peak_allocated=6.71 GiB
+Epoch 1/50 | train | batch=0/14000 (0.0%) | avg_loss=-- | avg_acc=-- | lr=head:3.00e-05 | samples_per_sec=-- | gpu_peak=2.34GiB
+Epoch 1/50 | train | batch=100/14000 (0.7%) | avg_loss=1.4321 | avg_acc=0.2900 | lr=head:3.00e-05 | samples_per_sec=2.35 | gpu_peak=6.71GiB
 ...
-Epoch 1/50 | train | batch=14000/14000 (100.0%) | samples=14000 | avg_loss=0.8421 | avg_acc=0.6812 | samples_per_sec=2.38 | gpu_peak_allocated=6.72 GiB
+Epoch 1/50 | train | batch=14000/14000 (100.0%) | avg_loss=0.8421 | avg_acc=0.6812 | lr=head:3.00e-05 | samples_per_sec=2.38 | gpu_peak=6.72GiB
 ```
 
-训练结束后对验证集执行同样的输出：
+训练结束后，同一物理行切换到验证进度：
 
 ```text
-Epoch 1/50 | val | start | batches=4000 | batch_size=1
-Epoch 1/50 | val | batch=100/4000 (2.5%) | samples=100 | avg_loss=1.1034 | avg_acc=0.5600 | samples_per_sec=3.41 | gpu_peak_allocated=2.94 GiB
+Epoch 1/50 | val | batch=100/4000 (2.5%) | avg_loss=1.1034 | avg_acc=0.5600 | lr=head:3.00e-05 | samples_per_sec=3.41 | gpu_peak=2.94GiB
 ...
-Epoch 1/50 | val | batch=4000/4000 (100.0%) | samples=4000 | avg_loss=0.9912 | avg_acc=0.5905 | samples_per_sec=3.45 | gpu_peak_allocated=2.95 GiB
+Epoch 1/50 | val | batch=4000/4000 (100.0%) | avg_loss=0.9912 | avg_acc=0.5905 | lr=head:3.00e-05 | samples_per_sec=3.45 | gpu_peak=2.95GiB
 ```
 
-保存 history 和 best/last checkpoint 后输出本轮汇总：
+保存 history 和 best/last checkpoint 后，清除动态行并固定本轮唯一的最终输出：
 
 ```text
-Epoch 1/50 | summary | encoder_lr=0 head_lr=3e-05 | train_loss=0.8421 train_acc=0.6812 | val_loss=0.9912 val_acc=0.5905 | best_val_acc=0.5905
+Epoch 1/50 | done | train_loss=0.8421 | train_acc=0.6812 | val_loss=0.9912 | val_acc=0.5905 | best_val_acc=0.5905 | time=02:08:31
 ```
 
 上述数字仅用于展示格式，不是实际实验结果。F0 的 encoder 完全冻结，因此汇总中的
-`encoder_lr=0`；F1b 会显示 encoder 参数组的实际学习率。
+动态行显示 `lr=head:...`；F1b 会显示 `lr=enc:...,head:...`。如果触发早停，最终摘要会追加
+`early_stop=true` 和 `best_epoch`，不会额外占用一行。
 
 1. F0：20 s，encoder frozen，seed 42；
 2. F1b：20 s，last 4 blocks，seed 42；
