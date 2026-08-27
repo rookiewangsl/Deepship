@@ -1,7 +1,7 @@
 # DeepShip Wav2Vec2-Conformer 基线：Linux/RTX 4070 运行说明
 
-最后更新：2026-08-27
-状态：代码、服务器环境、权重缓存和真实 20 s 无梯度前向已验证；尚未执行反向传播或训练
+最后更新：2026-08-28
+状态：代码、服务器环境、权重缓存、真实 20 s 前向和两批次反向 smoke 已验证；尚未正式训练
 
 ## 1. 基线定义
 
@@ -27,7 +27,8 @@ DeepShip frozen split manifest
 干净基线显式关闭 checkpoint 内部默认的 latent SpecAugment 和 LayerDrop，避免在 B3 中提前混入
 额外随机变量；只有后续增强消融才使用 `--apply-spec-augment` 或非零 `--layerdrop`。当 encoder
 全冻结或仅解冻最后若干层时，冻结部分保持 evaluation mode，避免 dropout 改变冻结特征，也
-减少不必要的反向图和显存占用；最后若干可训练层仍启用 gradient checkpointing。
+减少不必要的反向图和显存占用。当前 12 GB RTX 4070 基线默认使用 BF16 并关闭 gradient
+checkpointing；显式启用时使用非重入实现，以保证冻结前缀之后的可训练层仍能收到梯度。
 
 所选官方预训练 checkpoint 是在 960 h、16 kHz LibriSpeech 上自监督预训练的 24 层、hidden
 size 1024、16 头 relative-position large 版本。当前分类系统共 619,353,477 个参数，`last-4`
@@ -121,6 +122,7 @@ python scripts/train/train_deepship_conformer.py \
   --data-root "$DEEPSHIP_DATA_ROOT" \
   --split-manifest protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json \
   --protocol-name vessel_name_disjoint \
+  --pretrained-revision 1afaab48b41d924fbbcae05d8c5d88836c4a5719 \
   --output-root /home/slwang/deepship/runs/conformer_baseline_v1/smoke_frozen_3s_seed42 \
   --clip-duration 3 \
   --finetuning-mode frozen \
@@ -137,21 +139,28 @@ python scripts/train/train_deepship_conformer.py \
   --data-root "$DEEPSHIP_DATA_ROOT" \
   --split-manifest protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json \
   --protocol-name vessel_name_disjoint \
-  --output-root /home/slwang/deepship/runs/conformer_baseline_v1/smoke_last4_20s_seed42 \
+  --pretrained-revision 1afaab48b41d924fbbcae05d8c5d88836c4a5719 \
+  --output-root /home/slwang/deepship/runs/conformer_baseline_v1/smoke_last4_20s_bf16_no_gc_seed42_v2 \
   --clip-duration 20 \
   --finetuning-mode last_n \
   --train-last-n-layers 4 \
   --batch-size 1 \
   --gradient-accumulation-steps 8 \
+  --precision bf16 \
   --epochs 1 \
   --max-train-batches 2 \
   --max-eval-batches 2 \
   --num-workers 0
 ```
 
-RTX 4070 默认使用 FP16、batch size 1、梯度累积 8 和 gradient checkpointing。是否需要调整最后
-解冻层数、上下文或 batch，只根据 smoke 的实测峰值显存决定。4070 可能是 8 GB、12 GB 或其他
-显存配置，不能只凭型号假设 20 s/last-4 一定可运行；若第二个 smoke 显存不足，按
+2026-08-28 的服务器验证发现，旧的 FP16＋重入 gradient checkpointing 组合会让最后 4 层没有
+梯度；FP16 首批梯度也可能非有限。当前代码因此默认使用 BF16、batch size 1、梯度累积 8，并
+关闭 checkpointing。两批次 20 s/last-4 smoke 的 `nvidia-smi` 采样峰值约 6.7 GiB，最后 4 层、
+pooling 和分类头均有有限梯度，encoder 学习参数按约 `1e-5` 幅度更新。
+
+只有显存不足时才显式加入 `--gradient-checkpointing`；该选项使用非重入 checkpointing，启用后
+必须重新通过梯度回归检查和 smoke。4070 可能是 8 GB、12 GB 或其他显存配置，不能只凭型号
+假设 20 s/last-4 一定可运行；若第二个 smoke 显存不足，按
 `20 s/last-2 → 10 s/last-4 → 10 s/last-2` 的顺序排查，并把可运行配置与原计划的差异写入报告。
 
 ## 6. 首轮正式运行顺序

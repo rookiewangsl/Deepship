@@ -1,22 +1,25 @@
 # DeepShip Conformer 实验、数据与外部评测计划
 
-最后更新：2026-08-27
-状态：B3 工程基线、服务器环境、预训练权重和无梯度真实前向均已验证；尚未执行反向传播或训练，
-不代表已有性能结果
+最后更新：2026-08-28
+状态：B3 工程基线、服务器环境、预训练权重、真实前向和两批次反向 smoke 均已验证；尚未执行
+正式训练，不代表已有性能结果
 
 ## 0. 当前实施状态
 
 第一版可运行基线已经落地，Linux/RTX 4070 的环境准备、预检、smoke 和正式运行顺序见
 [`conformer_baseline_linux.md`](../guides/conformer_baseline_linux.md)。服务器已缓存约 2.4 GB 的
 `facebook/wav2vec2-conformer-rel-pos-large`，并在一条真实 20 s DeepShip 波形上完成无梯度前向：
-输入为 `[1, 320000]`，输出为 `[1, 4]`，FP16 峰值显存约 2.8 GiB。尚未运行反向、优化器更新或
-正式训练。
+输入为 `[1, 320000]`，输出为 `[1, 4]`，FP16 无梯度峰值显存约 2.8 GiB。随后完成 20 s、
+last-4、BF16、关闭 checkpointing 的两批次反向 smoke；`nvidia-smi` 采样峰值约 6.7 GiB，最后
+4 层和任务头均有有限梯度并发生合理幅度更新。尚未正式训练。
 
 已实现范围：
 
 - 使用原有冻结隔离 manifest，不在训练时重新划分数据；
 - 以 3 s anchor 中心扩展 3/10/20/30 s 原始波形上下文；
 - 官方预训练 Wav2Vec2-Conformer large、ASP 四分类头和分阶段解冻；
+- 当前 12 GB RTX 4070 基线默认 BF16 并关闭 gradient checkpointing；可选 checkpointing 使用
+  非重入实现，训练首个 optimizer step 强制验证所有可训练参数均有有限梯度；
 - checkpoint/resume、segment/recording/vessel-group 三级评测和可复现实验记录；
 - 服务器 Python/CUDA/RTX 4070、DeepShip 路径、冻结 manifest 和 Hugging Face 缓存预检；
 - PORTIA 官方四类原始标注包含 18,599 个窗口；排除缺失/无效 MMSI 或距离字段后，冻结

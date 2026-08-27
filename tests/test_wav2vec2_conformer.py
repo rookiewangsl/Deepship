@@ -5,6 +5,7 @@ import unittest
 
 import torch
 from torch import nn
+from torch.utils.checkpoint import checkpoint
 
 from src.models.wav2vec2_conformer import (
     AttentiveStatisticsPooling,
@@ -34,6 +35,31 @@ class FakeBackbone(nn.Module):
     def forward(self, input_values, attention_mask=None, return_dict=True):
         del attention_mask, return_dict
         features = input_values[:, ::2].unsqueeze(-1).repeat(1, 1, 4)
+        return SimpleNamespace(last_hidden_state=features)
+
+
+class FakeCheckpointingBackbone(FakeBackbone):
+    def __init__(self) -> None:
+        super().__init__()
+        self.gradient_checkpointing = False
+        self.gradient_checkpointing_kwargs: dict[str, object] = {}
+
+    def gradient_checkpointing_enable(self, gradient_checkpointing_kwargs=None) -> None:
+        self.gradient_checkpointing = True
+        self.gradient_checkpointing_kwargs = gradient_checkpointing_kwargs or {}
+
+    def forward(self, input_values, attention_mask=None, return_dict=True):
+        del attention_mask, return_dict
+        features = input_values[:, ::2].unsqueeze(-1).repeat(1, 1, 4)
+        for layer in self.encoder.layers:
+            if self.gradient_checkpointing and self.encoder.training:
+                features = checkpoint(
+                    layer,
+                    features,
+                    **self.gradient_checkpointing_kwargs,
+                )
+            else:
+                features = layer(features)
         return SimpleNamespace(last_hidden_state=features)
 
 
@@ -107,6 +133,29 @@ class Wav2Vec2ConformerTests(unittest.TestCase):
         self.assertFalse(model.backbone.encoder.layers[0].training)
         self.assertTrue(model.backbone.encoder.layers[-1].training)
         self.assertTrue(model.backbone.encoder.layer_norm.training)
+
+    def test_non_reentrant_checkpointing_preserves_last_n_gradients(self) -> None:
+        backbone = FakeCheckpointingBackbone()
+        model = Wav2Vec2ConformerClassifier(
+            num_classes=4,
+            backbone=backbone,
+            gradient_checkpointing=True,
+            finetuning_mode="last_n",
+            train_last_n_layers=1,
+            classifier_hidden_size=8,
+            pooling_attention_size=4,
+        )
+        model.train()
+        logits = model(torch.randn(2, 8), attention_mask=torch.ones(2, 8, dtype=torch.long))
+        logits.square().mean().backward()
+
+        self.assertEqual(backbone.gradient_checkpointing_kwargs, {"use_reentrant": False})
+        self.assertTrue(model.gradient_checkpointing_enabled)
+        for layer in backbone.encoder.layers[:-1]:
+            self.assertTrue(all(parameter.grad is None for parameter in layer.parameters()))
+        for parameter in backbone.encoder.layers[-1].parameters():
+            self.assertIsNotNone(parameter.grad)
+            self.assertTrue(bool(torch.isfinite(parameter.grad).all()))
 
 
 if __name__ == "__main__":

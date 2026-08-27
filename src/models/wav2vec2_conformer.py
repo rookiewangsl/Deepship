@@ -73,7 +73,7 @@ class Wav2Vec2ConformerClassifier(nn.Module):
         dropout: float = 0.2,
         apply_spec_augment: bool = False,
         layerdrop: float = 0.0,
-        gradient_checkpointing: bool = True,
+        gradient_checkpointing: bool = False,
         finetuning_mode: str = "last_n",
         train_last_n_layers: int = 4,
         backbone: nn.Module | None = None,
@@ -140,23 +140,17 @@ class Wav2Vec2ConformerClassifier(nn.Module):
             and finetuning_mode != "frozen"
             and hasattr(self.backbone, "gradient_checkpointing_enable")
         ):
-            self.backbone.gradient_checkpointing_enable()
-            if finetuning_mode == "last_n":
-                # Re-entrant checkpointing requires a grad-carrying input. Start
-                # that graph only at the frozen/trainable boundary so gradients
-                # are not retained through every frozen encoder block.
-                first_trainable_layer = self.backbone.encoder.layers[-train_last_n_layers]
-                self._gradient_boundary_hook = first_trainable_layer.register_forward_pre_hook(
-                    self._require_input_gradient
-                )
-
-    @staticmethod
-    def _require_input_gradient(
-        _module: nn.Module,
-        inputs: tuple[torch.Tensor, ...],
-    ) -> None:
-        if inputs and torch.is_tensor(inputs[0]) and not inputs[0].requires_grad:
-            inputs[0].requires_grad_(True)
+            # Re-entrant checkpointing drops the graph when the frozen prefix
+            # produces inputs without ``requires_grad``. Non-reentrant
+            # checkpointing supports that partial-finetuning boundary and lets
+            # the selected late encoder blocks receive gradients.
+            self.backbone.gradient_checkpointing_enable(
+                gradient_checkpointing_kwargs={"use_reentrant": False}
+            )
+            self.gradient_checkpointing_enabled = True
+        else:
+            self.gradient_checkpointing_enabled = False
+        self.gradient_checkpointing_use_reentrant = False
 
     def set_finetuning_mode(self, mode: str, *, train_last_n_layers: int = 4) -> None:
         allowed = {"frozen", "feature_encoder", "last_n", "full"}

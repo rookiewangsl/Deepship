@@ -143,7 +143,7 @@ class ConformerTrainConfig:
     layerdrop: float = 0.0
     finetuning_mode: str = "last_n"
     train_last_n_layers: int = 4
-    gradient_checkpointing: bool = True
+    gradient_checkpointing: bool = False
     batch_size: int = 1
     gradient_accumulation_steps: int = 8
     epochs: int = 50
@@ -154,7 +154,7 @@ class ConformerTrainConfig:
     warmup_epochs: int = 5
     max_grad_norm: float = 1.0
     early_stopping_patience: int = 8
-    precision: str = "fp16"
+    precision: str = "bf16"
     seed: int = 42
     num_workers: int = 4
     resume: bool = False
@@ -350,6 +350,35 @@ def _move_batch(batch, device: str):
     )
 
 
+def validate_trainable_gradients(model: nn.Module) -> None:
+    """Fail fast when a nominally trainable parameter has no usable gradient."""
+
+    trainable = [
+        (name, parameter)
+        for name, parameter in model.named_parameters()
+        if parameter.requires_grad
+    ]
+    missing = [name for name, parameter in trainable if parameter.grad is None]
+    if missing:
+        examples = ", ".join(missing[:5])
+        raise RuntimeError(
+            "Trainable parameters did not receive gradients. "
+            f"Examples: {examples}. Check the frozen/checkpointing boundary."
+        )
+
+    nonfinite = [
+        name
+        for name, parameter in trainable
+        if not bool(torch.isfinite(parameter.grad).all())
+    ]
+    if nonfinite:
+        examples = ", ".join(nonfinite[:5])
+        raise FloatingPointError(
+            "Non-finite gradients detected after precision unscaling. "
+            f"Examples: {examples}. Prefer BF16 on supported CUDA devices."
+        )
+
+
 def run_epoch(
     model: Wav2Vec2ConformerClassifier,
     dataloader: DataLoader,
@@ -372,6 +401,7 @@ def run_epoch(
         raise ValueError("Dataloader produced no batches")
     if is_train:
         optimizer.zero_grad(set_to_none=True)
+    gradients_validated = False
 
     with torch.set_grad_enabled(is_train):
         for batch_index, batch in enumerate(dataloader):
@@ -395,6 +425,9 @@ def run_epoch(
                 if should_step:
                     if scaler is not None:
                         scaler.unscale_(optimizer)
+                    if not gradients_validated:
+                        validate_trainable_gradients(model)
+                        gradients_validated = True
                     torch.nn.utils.clip_grad_norm_(model.parameters(), config.max_grad_norm)
                     if scaler is not None:
                         scaler.step(optimizer)
@@ -514,6 +547,12 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         "train_last_n_layers": config.train_last_n_layers,
         "apply_spec_augment": config.apply_spec_augment,
         "layerdrop": config.layerdrop,
+        "gradient_checkpointing": model.gradient_checkpointing_enabled,
+        "gradient_checkpointing_use_reentrant": (
+            model.gradient_checkpointing_use_reentrant
+            if model.gradient_checkpointing_enabled
+            else None
+        ),
         "backbone_config": backbone_config,
     }
     (reports_dir / "model_report.json").write_text(

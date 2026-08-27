@@ -42,7 +42,7 @@
     "dropout": 0.2,
     "apply_spec_augment": false,
     "layerdrop": 0.0,
-    "gradient_checkpointing": true
+    "gradient_checkpointing": false
   },
   "finetuning": {
     "mode": "last_n",
@@ -68,7 +68,7 @@
     "weight_decay": 0.01,
     "warmup_epochs": 5,
     "scheduler": "linear_warmup_then_cosine_annealing",
-    "precision": "fp16",
+    "precision": "bf16",
     "max_grad_norm": 1.0,
     "early_stopping_patience": 8
   },

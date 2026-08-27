@@ -66,7 +66,22 @@ def build_parser() -> argparse.ArgumentParser:
         default=0.0,
         help="Encoder LayerDrop probability (zero for the clean partial-finetuning baseline).",
     )
-    parser.add_argument("--disable-gradient-checkpointing", action="store_true")
+    checkpointing_group = parser.add_mutually_exclusive_group()
+    checkpointing_group.add_argument(
+        "--gradient-checkpointing",
+        action="store_true",
+        help=(
+            "Enable non-reentrant gradient checkpointing. Disabled by default for the "
+            "verified 12 GB RTX 4070 baseline."
+        ),
+    )
+    checkpointing_group.add_argument(
+        "--disable-gradient-checkpointing",
+        dest="gradient_checkpointing",
+        action="store_false",
+        help=argparse.SUPPRESS,
+    )
+    parser.set_defaults(gradient_checkpointing=False)
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=8)
     parser.add_argument("--epochs", type=int, default=50)
@@ -77,7 +92,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--warmup-epochs", type=int, default=5)
     parser.add_argument("--max-grad-norm", type=float, default=1.0)
     parser.add_argument("--early-stopping-patience", type=int, default=8)
-    parser.add_argument("--precision", choices=["fp32", "fp16", "bf16"], default="fp16")
+    parser.add_argument("--precision", choices=["fp32", "fp16", "bf16"], default="bf16")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--num-workers", type=int, default=4)
     parser.add_argument("--device", default=None)
@@ -103,7 +118,7 @@ def main() -> None:
         train_last_n_layers=args.train_last_n_layers,
         apply_spec_augment=args.apply_spec_augment,
         layerdrop=args.layerdrop,
-        gradient_checkpointing=not args.disable_gradient_checkpointing,
+        gradient_checkpointing=args.gradient_checkpointing,
         batch_size=args.batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         epochs=args.epochs,
