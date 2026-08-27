@@ -1,7 +1,7 @@
 # DeepShip Wav2Vec2-Conformer 基线：Linux/RTX 4070 运行说明
 
-最后更新：2026-08-26
-状态：代码已实现并通过静态检查；尚未在安装 PyTorch 的 Linux 服务器执行前向或训练
+最后更新：2026-08-27
+状态：代码、服务器环境、权重缓存和真实 20 s 无梯度前向已验证；尚未执行反向传播或训练
 
 ## 1. 基线定义
 
@@ -29,24 +29,29 @@ DeepShip frozen split manifest
 全冻结或仅解冻最后若干层时，冻结部分保持 evaluation mode，避免 dropout 改变冻结特征，也
 减少不必要的反向图和显存占用；最后若干可训练层仍启用 gradient checkpointing。
 
-所选官方预训练 checkpoint 是 24 层、hidden size 1024 的 large 版本，比计划文档中用于起步估算
-的 12 层、80M～120M 方案更大。选择它是因为存在可直接复用的官方预训练权重；不把它与计划
-中的中型 scratch Conformer 混称为同一模型。后续架构因果线仍需加入参数更受控的 C0～C3。
+所选官方预训练 checkpoint 是在 960 h、16 kHz LibriSpeech 上自监督预训练的 24 层、hidden
+size 1024、16 头 relative-position large 版本。当前分类系统共 619,353,477 个参数，`last-4`
+模式有 101,701,381 个可训练参数。选择它是为了建立公开可复现的强通用迁移基线，不因为它是
+水声专用模型；后续必须用 scratch、冻结和不同解冻深度分离预训练与参数规模的贡献。
 
 该版本还不是 recording-level MIL；它保持当前冻结 manifest 的 14,000/4,000/2,000 个 anchor
 预算，先建立可对照的 raw-waveform 预训练基线。MIL 和 recording-balanced sampling 属于后续 B5。
 
-## 2. 服务器目录建议
+## 2. 当前服务器目录
 
 ```text
-/data/Deepship/
-  code/
+/home/slwang/workspace/Deepship/        # Git 仓库
+/home/slwang/.venvs/deepship/           # Python 3.11 环境
+/home/slwang/deepship/
   datasets/DeepShip/
+  datasets/PORTIA/
   pretrained/huggingface/
   runs/conformer_baseline_v1/
+  env.sh
 ```
 
-代码和小型配置可以在 Git 仓库中，音频、Hugging Face 权重和 run 输出应在服务器数据盘。
+代码和小型配置在 Git 仓库中；音频、Hugging Face 权重和 run 输出位于挂载为 `/home` 的 7.3 TB
+服务器数据盘，不使用 70 GB 根分区保存大文件。
 
 ## 3. 环境准备
 
@@ -54,8 +59,8 @@ DeepShip frozen split manifest
 `torchaudio`，随后安装项目依赖：
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python3.11 -m venv /home/slwang/.venvs/deepship
+source /home/slwang/.venvs/deepship/bin/activate
 python -m pip install --upgrade pip
 # 先按 https://pytorch.org/get-started/locally/ 安装匹配服务器 CUDA 的 torch/torchaudio
 python -m pip install -r requirements-conformer.txt
@@ -64,8 +69,10 @@ python -m pip install -r requirements-conformer.txt
 设置大文件缓存和数据路径：
 
 ```bash
-export DEEPSHIP_DATA_ROOT=/data/Deepship/datasets/DeepShip
-export HF_HOME=/data/Deepship/pretrained/huggingface
+source /home/slwang/deepship/env.sh
+# 等价的核心变量：
+export DEEPSHIP_DATA_ROOT=/home/slwang/deepship/datasets/DeepShip
+export HF_HOME=/home/slwang/deepship/pretrained/huggingface
 ```
 
 预训练权重约 2.5 GB。首次运行由 Transformers 下载；正式训练前应记录最终缓存 revision 和
@@ -80,7 +87,7 @@ export HF_HOME=/data/Deepship/pretrained/huggingface
 python scripts/check_conformer_environment.py \
   --data-root "$DEEPSHIP_DATA_ROOT" \
   --split-manifest protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json \
-  --output-root /data/Deepship/runs/conformer_baseline_v1
+  --output-root /home/slwang/deepship/runs/conformer_baseline_v1
 ```
 
 预检默认要求模型缓存至少剩余 5 GiB、run 输出盘至少剩余 20 GiB。正式进行多 seed 前应按每个
@@ -114,7 +121,7 @@ python scripts/train/train_deepship_conformer.py \
   --data-root "$DEEPSHIP_DATA_ROOT" \
   --split-manifest protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json \
   --protocol-name vessel_name_disjoint \
-  --output-root /data/Deepship/runs/conformer_baseline_v1/smoke_frozen_3s_seed42 \
+  --output-root /home/slwang/deepship/runs/conformer_baseline_v1/smoke_frozen_3s_seed42 \
   --clip-duration 3 \
   --finetuning-mode frozen \
   --epochs 1 \
@@ -130,7 +137,7 @@ python scripts/train/train_deepship_conformer.py \
   --data-root "$DEEPSHIP_DATA_ROOT" \
   --split-manifest protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json \
   --protocol-name vessel_name_disjoint \
-  --output-root /data/Deepship/runs/conformer_baseline_v1/smoke_last4_20s_seed42 \
+  --output-root /home/slwang/deepship/runs/conformer_baseline_v1/smoke_last4_20s_seed42 \
   --clip-duration 20 \
   --finetuning-mode last_n \
   --train-last-n-layers 4 \
@@ -150,10 +157,12 @@ RTX 4070 默认使用 FP16、batch size 1、梯度累积 8 和 gradient checkpoi
 ## 6. 首轮正式运行顺序
 
 1. F0：20 s，encoder frozen，seed 42；
-2. F1：20 s，last 4 blocks，seed 42；
-3. T：F1 下比较 3/10/20 s，seed 42；
-4. 选定上下文后运行 recording-disjoint 和 vessel-name-disjoint；
-5. 只有最佳候选进入 42/43/44/45/46 多 seed。
+2. F1b：20 s，last 4 blocks，seed 42；
+3. 根据 F0/F1b 差异决定是否追加 last-2 或 last-8；
+4. 只有部分解冻显示稳定收益时，才运行“冻结卷积前端、训练全部 Conformer”和全量微调控制；
+5. T：选定微调策略下比较 3/10/20 s，30 s 只在 20 s 仍有收益时追加；
+6. 选定上下文后运行 recording-disjoint 和 vessel-name-disjoint；
+7. 只有最佳候选进入 42/43/44/45/46 多 seed。
 
 不要先运行所有因素的笛卡尔积，也不要在看 test 后修改聚合规则。
 
@@ -165,4 +174,5 @@ RTX 4070 默认使用 FP16、batch size 1、梯度累积 8 和 gradient checkpoi
 - 门控频谱支路（B7）；
 - PORTIA-4 和连续 Oceanship/ONC-4 外测读取器。
 
-这些功能应在首个 B3 基线前向、显存和训练链路验证后依次加入。
+这些功能不是固定依次累加：只有前一阶段的验证或外测结果指向明确缺口时才加入。尤其是 ONC
+自监督只在 B3 内部有效但外部泛化不足时启动，双前端只在线谱相关错误持续存在时启动。

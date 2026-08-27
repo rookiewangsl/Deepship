@@ -2,12 +2,11 @@
 
 ## 目的与边界
 
-现有 `95.15%` 是片段级随机划分的结果，不作为新录音或新船只泛化的结论。本路线新增两种
+历史 `95.15%` 是 V1 片段级随机划分结果，不作为新录音或新船只泛化结论。本路线新增两种
 隔离评测，并把“数据协议生成”和“GPU 训练”解耦：本地负责审核并冻结数据协议，远程
-Windows/Linux 主机只读取协议训练。本文同时记录原始路线和当前实施状态；本地准备代码已经
-实现，但尚未启动九次正式 GPU 训练。
+Windows/Linux 主机只读取协议训练。本文保留原始路线，同时记录已经完成的实施结果。
 
-## 当前实施状态（2026-08-11）
+## 当前实施状态（2026-08-12）
 
 - 已冻结 `configs/experiments/isolation_comparison_v1.json`；三种协议均为每类
   `3500/1000/500`，即 70%/20%/10%，正式 model seed 为 `42/43/44`。
@@ -18,17 +17,22 @@ Windows/Linux 主机只读取协议训练。本文同时记录原始路线和当
 - 已生成并验证三个各含 20,000 个片段的冻结 manifest；所有路径均为 POSIX 风格相对路径，
   不包含 macOS 挂载点或 Windows 盘符。
 - 已实现 manifest 驱动训练、checkpoint/resume、分层评估、Windows PowerShell 操作脚本和
-  九次正式 run 的一致性检查/汇总脚本。
-- 不依赖 PyTorch 的本地单元测试已通过。本地没有安装 PyTorch，因此 GPU 前向、反向与恢复
-  链路要在 Windows 上先通过三组 smoke test 后，才能开始正式训练。
+  三 seed 完整矩阵的一致性检查/汇总脚本。
+- Windows 三组 smoke test 已通过。随后在 RTX 4070 上完成三种协议的 model seed 42/43，
+  共六个正式 run，均有完整 checkpoint、预测、指标、环境和 `run_complete.json`。
+- 当前 segment Accuracy 为：`segment_level` 97.30±0.21%、`recording_disjoint`
+  66.20±0.49%、`vessel_name_disjoint` 50.98±0.18%。主要聚合 Accuracy 为 recording
+  70.19±4.08%、vessel-name group 53.13±4.42%。
+- 由于时间原因未运行 seed 44。当前报告明确按两个 seed 统计；若需要满足原冻结计划和严格
+  自动汇总器的完成标准，再补 seed 44。
 
 ## 三种协议
 
 | 协议 | 分组键 | 使用数据 | 可以声称的结论 |
 |---|---|---|---|
-| `segment_level` | 片段 | 当前完整数据 | 片段级基线复现；不代表独立录音泛化 |
-| `recording_disjoint` | `relative_path`（每条 WAV） | 609 条 WAV | 对未见录音的泛化 |
-| `vessel_name_disjoint` | 经审核的 `vessel_key` | 已可靠映射的 603 条录音 | 对未见规范船名组的泛化 |
+| `segment_level` | 片段 | 审计 609 条，manifest 选中 596 条录音 | 片段级基线复现；不代表独立录音泛化 |
+| `recording_disjoint` | 音频内容组（相对路径＋重复哈希） | 审计 609 条，manifest 选中 594 条录音/588 组 | 对未见录音内容组的泛化 |
+| `vessel_name_disjoint` | 经审核的 `vessel_key` | 603 条可纳入，manifest 选中 581 条录音/244 名称组 | 对未见规范船名组的泛化 |
 | `physical_vessel_disjoint` | MMSI / IMO / 发布方确认的物理船只 ID | 身份核验完成后确定 | 对未见物理船只的严格泛化 |
 
 `vessel_name_disjoint` 不是 `physical_vessel_disjoint` 的同义词。没有可核验的 MMSI、IMO 或
@@ -53,7 +57,10 @@ Windows/Linux 主机只读取协议训练。本文同时记录原始路线和当
 
 训练脚本不得在运行时重新随机划分数据；`seed` 仅影响模型初始化、DataLoader 顺序和训练随机性。
 
-## 后续实现计划
+## 原始实现计划与剩余工作
+
+以下数据协议、训练和评估工作已完成；保留细节用于复核。仍未完成的是 MMSI/IMO 身份核验、
+physical-vessel manifest、seed 44，以及部署性能测试。
 
 ### 1. 身份清单与准入规则
 
@@ -70,7 +77,8 @@ Windows/Linux 主机只读取协议训练。本文同时记录原始路线和当
 
 新增独立的准备脚本（拟定为 `scripts/prepare/build_deepship_split.py`）：
 
-1. `recording_disjoint`：每条 WAV 是一个 group，使用全部 609 条录音。
+1. `recording_disjoint`：默认每条 WAV 是一个 group；内容 SHA-256 完全相同的不同路径合并为
+   同一 group，避免副本跨集合。审计覆盖全部 609 条录音。
 2. `vessel_name_disjoint`：同一 `vessel_key` 下所有录音强制进入同一个 partition。
 3. 按类别做 group-aware 的 train/validation/test 候选容量分配，固定目标为 70%/20%/10%。
    组不可拆分；完成 group 分配后，在各集合内部确定性抽取每类 `3500/1000/500` 个片段。
@@ -109,12 +117,13 @@ Windows/Linux 主机只读取协议训练。本文同时记录原始路线和当
 每次训练在输出目录保存：输入 manifest 副本及哈希、完整 CLI/配置、git commit、Python/
 PyTorch/CUDA 环境、最佳模型、训练历史、片段级指标、录音级聚合指标和混淆矩阵。
 
-## 实验顺序
+## 已执行的实验顺序
 
 1. 实现并冻结 `recording_disjoint`，先验证全 609 条录音的流程。
 2. 审核船名组映射后，实现并冻结 `vessel_name_disjoint`。
 3. 各协议先执行一个短 smoke run，确认路径、manifest、GPU 和输出链路无误。
-4. smoke run 通过后，固定代码 commit 与 manifest；每种协议正式运行至少 3 个训练 seed。
+4. smoke run 通过后固定代码 commit 与 manifest；当前实际完成每种协议 2 个训练 seed
+   （42/43），原计划的 seed 44 保留为可选补充。
 5. 使用验证集早停和选模型；测试集只用于最终评估。比较不同协议时保持模型、特征、epoch
    上限和训练规则一致。
 6. 远程完成后，只回传 `runs/<实验名>/`，不回传原始数据集或可重建缓存；本地统一汇总结果。
@@ -129,19 +138,19 @@ PyTorch/CUDA 环境、最佳模型、训练历史、片段级指标、录音级�
 
 Windows 示例：
 
-当前 T7 的数据集相对盘根目录为 `DeepShip\\DeepShip`。Windows 分配的盘符可能变化，因此命令
-中的 `E:` 只是示例；应在每次训练前确认实际盘符。协议文件不记录盘符。
+当前训练机的代码位于 `C:\Users\shilongwang\Desktop\Deepship`，T7 数据集根目录为
+`D:\ProjectData\Deepship\datasets\DeepShip`。协议文件不记录盘符；若以后盘符变化，只修改
+`-DataRoot`。
 
 ```powershell
 .\scripts\windows\run_formal.ps1 `
-  -DataRoot "E:\DeepShip\DeepShip" `
-  -OutputRoot "D:\Runs\Deepship\isolation_comparison_v1" `
-  -Seeds 42 `
+  -DataRoot "D:\ProjectData\Deepship\datasets\DeepShip" `
+  -OutputRoot ".\runs\isolation_comparison_v1_epoch_output" `
+  -Seeds 42,43 `
   -NumWorkers 0
 ```
 
-这里的 `E:` 仅为示例。T7 的盘符变化时只修改 `-DataRoot`；三个冻结 manifest 不需要修改。
-完整步骤见 `docs/windows_training_guide.md`。
+完整步骤见 [`windows_training_guide.md`](../guides/windows_training_guide.md)。
 
 ## 完成标准
 
@@ -149,7 +158,8 @@ Windows 示例：
 2. 任意训练输出能追溯到唯一 git commit、唯一 manifest 哈希和唯一训练配置；
 3. 自动化测试覆盖同船多录音、多片段、别名合并、未解析记录和交集检测；
 4. 对外报告清楚标示评测协议，不把 recording-disjoint 或 vessel-name-disjoint 混称为物理
-   船只完全隔离。
+   船只完全隔离；当前两个 seed 可报告为阶段性正式结果，补齐 seed 44 后才满足原三 seed
+   完成标准。
 
 ## 逐项实施计划
 
@@ -316,35 +326,38 @@ Windows 示例：
 
 验收：Windows 先完成每种协议各一个 1 epoch smoke run，并能从 last checkpoint 恢复。
 
-### 阶段 8：正式远程训练
+### 阶段 8：正式远程训练（seed 42/43 已完成）
 
 执行顺序：
 
 1. 固定并记录 git commit；push 代码、配置和三个协议，不上传 WAV 或缓存。
 2. Windows `git pull` 后再次核对 commit 和 manifest 哈希。
 3. 先跑三个协议的 model seed 42；检查 loss、样本数、输出完整性和显存。
-4. seed 42 均正常后，再运行 seed 43、44。
+4. seed 42 均正常后运行 seed 43；当前因时间限制没有继续 seed 44。
 5. 每个 run 完成后执行结果完整性检查；不完整 run 不进入最终统计。
 6. 将 run 目录复制回本地，复制后对关键 JSON、预测文件和 checkpoint 校验哈希。
 
-验收：共 9 个正式 run（3 个协议乘 3 个 model seed）均具有完整配置、日志、checkpoint、
-预测和指标；三种协议之间除 split manifest 和 model seed 外的训练配置一致。
+当前验收：6 个正式 run（3 个协议乘 2 个 model seed）均具有完整配置、日志、checkpoint、
+预测和指标；三种协议之间除 split manifest 和 model seed 外的训练配置一致。原计划的完整
+验收仍是 9 个 run，补齐 seed 44 后达成。
 
-### 阶段 9：结果汇总与结论边界
+### 阶段 9：结果汇总与结论边界（两 seed 汇总已完成）
 
 目标：生成可复核的三协议对比结果。
 
 工作项：
 
-1. 使用 `scripts/eval/summarize_isolation_runs.py` 检查九个 run 的模型结构、特征、优化配置、
-   commit 和 manifest 是否一致；缺少 run、发现 smoke override 或跨 commit 时立即失败。
-2. 分协议统计三 seed 的均值、标准差和单次结果。
+1. 使用 run 内配置、环境和 manifest 哈希核对当前六个 run 的模型结构、特征、优化配置、
+   commit 和协议一致性；完整三 seed 矩阵仍可使用 `scripts/eval/summarize_isolation_runs.py`。
+2. 当前分协议统计两个 seed 的均值、样本标准差和单次结果；补 seed 44 后重新生成三 seed
+   终稿。
 3. 对比 segment、recording、vessel-group 三个层级的 Accuracy 与 macro-F1。
 4. 生成统一表格、混淆矩阵和训练曲线；保留失败类别与典型误判的可追溯记录。
 5. 明确表述：无隔离结果、录音级隔离结果、船名组隔离结果；只有获得物理 ID 后才能增加
    物理船只严格隔离结论。
 
-验收：汇总报告中的每个数字都能追溯到某个 run、manifest 哈希和预测文件。
+当前验收：本文档中的每个数字都能追溯到某个 run、manifest 哈希和预测文件。
+文献比较见 [`deepship_literature_benchmarks.md`](../research/deepship_literature_benchmarks.md)。
 
 结果复制回本地后的命令：
 
@@ -356,7 +369,7 @@ python scripts/eval/summarize_isolation_runs.py \
 输出位于 `<runs-root>/summary/`，包含逐 run CSV、分协议均值/样本标准差 CSV、JSON、聚合混淆
 矩阵和 Markdown 对比表。
 
-## 建议的逐次实施顺序
+## 原始逐次实施顺序
 
 实际协作时按以下九个任务逐一进行，每次只推进一项：
 
@@ -368,4 +381,4 @@ python scripts/eval/summarize_isolation_runs.py \
 6. 实现 recording/vessel 多层级评估；
 7. 完成本地测试和 CPU smoke run；
 8. 准备 Windows 指南并执行远程训练；
-9. 回传结果并生成最终对比报告。
+9. 回传结果并生成最终对比报告（两 seed 版本已完成；三 seed 版本待可选 seed 44）。

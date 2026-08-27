@@ -15,3 +15,10 @@ The stored run used the earlier `branch_channels=88` configuration. The current
 working tree contains later architecture and learning-rate-schedule changes, so
 these metrics must not be presented as measurements of the current code until
 that code is retrained and evaluated.
+
+The current 532,166-parameter V2 code has since been trained separately under
+the three frozen protocols for seeds 42 and 43. Its segment-level accuracy is
+`97.30 ± 0.21%`; recording-disjoint recording accuracy is
+`70.19 ± 4.08%`; vessel-name-disjoint group accuracy is
+`53.13 ± 4.42%`. Those runs live under the Git-ignored `runs/` directory and
+must not be merged into this legacy evidence folder.

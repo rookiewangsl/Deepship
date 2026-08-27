@@ -18,13 +18,14 @@
 ._*
 __pycache__/
 *.pyc
+/tmp/
 
 # Obsolete figures and notes intentionally removed from the repository. Dropbox
 # may restore local copies while syncing; keep them out of future commits.
 /docs/figures/ma_cnn_a_network_structure.png
 /docs/figures/ma_cnn_a_overall_flow.png
 /docs/ma_cnn_a_framework.svg
-/docs/paper_reproduction_analysis.md
+/docs/archive/paper_reproduction_analysis.md
 /docs/redraw_ma_cnn_a_three_branch.py
 /docs/storage_migration_20260810.md
 /image_redrawn.png

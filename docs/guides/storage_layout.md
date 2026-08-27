@@ -41,5 +41,23 @@ Mel/STFT tensors; the current MA-CNN-A pipeline still reads source audio and
 does not consume those tensors automatically. `--cache-root` is currently a
 reserved experiment path, not an implemented feature-cache loader.
 
-Small final metrics and figures may be copied into `results/`. Checkpoints,
-full split manifests, logs, and complete runs remain on T7.
+Small final metrics and figures may be copied into `results/`. Normally,
+checkpoints, logs, and complete runs remain on T7 or another Git-ignored local
+run directory rather than being committed.
+
+## Current Windows and returned-run locations
+
+The completed seed 42/43 isolation runs used:
+
+```text
+C:\Users\shilongwang\Desktop\Deepship
+D:\ProjectData\Deepship\datasets\DeepShip
+C:\Users\shilongwang\Desktop\Deepship\runs\isolation_comparison_v1_epoch_output
+```
+
+After training, the six complete run directories were copied into the local
+repository root under `runs/` for analysis. `runs/` is Git-ignored because it
+contains large checkpoints, predictions, logs, and figures. Documentation may
+quote metrics from these runs, but Git should contain only the small legacy
+evidence under `results/`, frozen protocol files under `protocols/`, and the
+written summaries under `docs/`.
