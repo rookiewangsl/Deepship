@@ -84,7 +84,7 @@ class Wav2Vec2ConformerTests(unittest.TestCase):
         mask = torch.tensor([[True, True, False]])
         result = pooling(hidden, mask)
         self.assertEqual(result.shape, (1, 4))
-        self.assertLess(float(result[0, 0]), 3.0)
+        self.assertLess(float(result[0, 0].detach()), 3.0)
 
     def test_classifier_accepts_injected_backbone_without_download(self) -> None:
         model = Wav2Vec2ConformerClassifier(
