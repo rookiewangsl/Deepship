@@ -5,6 +5,7 @@ from io import StringIO
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 import soundfile as sf
@@ -13,11 +14,15 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from src.data.deepship import SegmentRecord
-from src.data.deepship_waveform import DeepShipWaveformSegmentDataset
+from src.data.deepship_waveform import (
+    DeepShipWaveformSegmentDataset,
+    RecordingBalancedEpochSampler,
+)
 from src.pipelines.waveform_conformer.train_deepship_conformer import (
     ConformerTrainConfig,
     TrainingProgress,
     _learning_rate_text,
+    build_dataloaders,
     build_scheduler,
     run_epoch,
     validate_config,
@@ -78,6 +83,7 @@ class ConformerTrainingSafetyTests(unittest.TestCase):
             config,
             total_optimizer_steps=4,
         )
+        runtime_stats: dict[str, float] = {}
         with redirect_stdout(output):
             run_epoch(
                 model,
@@ -90,6 +96,7 @@ class ConformerTrainingSafetyTests(unittest.TestCase):
                 learning_rates="head:1.00e-02",
                 optimizer=optimizer,
                 scheduler=scheduler,
+                runtime_stats=runtime_stats,
             )
 
         lines = output.getvalue().splitlines()
@@ -101,6 +108,9 @@ class ConformerTrainingSafetyTests(unittest.TestCase):
         self.assertTrue(any("samples_per_sec=" in line for line in lines))
         self.assertTrue(any("gpu_peak=n/a" in line for line in lines))
         self.assertEqual(scheduler.last_epoch, 1)
+        self.assertGreater(runtime_stats["phase_seconds"], 0.0)
+        self.assertGreaterEqual(runtime_stats["data_wait_seconds"], 0.0)
+        self.assertGreater(runtime_stats["samples_per_second"], 0.0)
 
     def test_interactive_progress_overwrites_and_logs_only_epoch_summary(self) -> None:
         terminal = StringIO()
@@ -176,6 +186,116 @@ class ConformerTrainingSafetyTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "prefetch_factor must be positive"):
             validate_config(zero_prefetch)
+
+    def test_rejects_invalid_sampling_and_early_stopping_configuration(self) -> None:
+        invalid_sampling = ConformerTrainConfig(
+            split_manifest="unused.json",
+            device="cpu",
+            precision="fp32",
+            training_sampling="vessel_balanced_dynamic",
+        )
+        with self.assertRaisesRegex(ValueError, "training_sampling"):
+            validate_config(invalid_sampling)
+
+        fixed_with_budget = ConformerTrainConfig(
+            split_manifest="unused.json",
+            device="cpu",
+            precision="fp32",
+            train_samples_per_epoch=100,
+        )
+        with self.assertRaisesRegex(ValueError, "only supported for dynamic"):
+            validate_config(fixed_with_budget)
+
+        invalid_eval_batch = ConformerTrainConfig(
+            split_manifest="unused.json",
+            device="cpu",
+            precision="fp32",
+            eval_batch_size=0,
+        )
+        with self.assertRaisesRegex(ValueError, "eval_batch_size"):
+            validate_config(invalid_eval_batch)
+
+        invalid_min_delta = ConformerTrainConfig(
+            split_manifest="unused.json",
+            device="cpu",
+            precision="fp32",
+            early_stopping_min_delta=-0.01,
+        )
+        with self.assertRaisesRegex(ValueError, "early_stopping_min_delta"):
+            validate_config(invalid_min_delta)
+
+    def test_dynamic_training_keeps_fixed_evaluation_and_separate_batch_size(self) -> None:
+        cargo_anchor_a = SegmentRecord(
+            relative_path="Cargo/a.wav",
+            class_name="Cargo",
+            label_index=0,
+            start_frame=0,
+            num_frames=30,
+            sample_rate=10,
+            segment_index=0,
+            total_segments=2,
+            group_key="cargo-vessel",
+            vessel_key="cargo-vessel",
+        )
+        cargo_anchor_b = SegmentRecord(
+            **{
+                **cargo_anchor_a.__dict__,
+                "start_frame": 30,
+                "segment_index": 1,
+            }
+        )
+        passenger = SegmentRecord(
+            relative_path="Passenger/b.wav",
+            class_name="Passenger",
+            label_index=1,
+            start_frame=0,
+            num_frames=30,
+            sample_rate=10,
+            segment_index=0,
+            total_segments=1,
+            group_key="passenger-vessel",
+            vessel_key="passenger-vessel",
+        )
+        split_segments = {
+            "train": [cargo_anchor_a, cargo_anchor_b, passenger],
+            "val": [cargo_anchor_a],
+            "test": [passenger],
+        }
+        split_report = {
+            "protocol": "vessel_name_disjoint",
+            "window_rule": "fixed manifest anchor",
+            "manifest_sha256": "unused",
+        }
+        config = ConformerTrainConfig(
+            split_manifest="unused.json",
+            device="cpu",
+            precision="fp32",
+            sample_rate=16000,
+            training_sampling="recording_balanced_dynamic",
+            train_samples_per_epoch=8,
+            batch_size=1,
+            eval_batch_size=2,
+            num_workers=0,
+        )
+
+        with patch(
+            "src.pipelines.waveform_conformer.train_deepship_conformer."
+            "load_and_validate_split",
+            return_value=(split_segments, split_report),
+        ):
+            dataloaders, report = build_dataloaders(config)
+
+        self.assertIsInstance(
+            dataloaders["train"].sampler,
+            RecordingBalancedEpochSampler,
+        )
+        self.assertTrue(dataloaders["train"].dataset.dynamic_crop)
+        self.assertEqual(len(dataloaders["train"].dataset), 2)
+        self.assertFalse(dataloaders["val"].dataset.dynamic_crop)
+        self.assertTrue(dataloaders["val"].dataset.return_index)
+        self.assertEqual(dataloaders["val"].batch_size, 2)
+        self.assertEqual(report["training_sampling"]["id"], "S1")
+        self.assertEqual(report["batch_sizes"]["validation"], 2)
 
     def test_step_scheduler_warms_up_then_cosine_decays(self) -> None:
         encoder = nn.Parameter(torch.zeros(1))

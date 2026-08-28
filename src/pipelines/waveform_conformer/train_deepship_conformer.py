@@ -23,7 +23,11 @@ from torch.utils.data import DataLoader
 from src.data.deepship import CLASS_NAMES, SegmentRecord, segment_record_from_dict
 from src.data.deepship_audit import load_experiment_config
 from src.data.deepship_protocol_validation import load_split_manifest, validate_protocol_manifest
-from src.data.deepship_waveform import DeepShipWaveformSegmentDataset
+from src.data.deepship_waveform import (
+    DeepShipWaveformSegmentDataset,
+    RecordingBalancedEpochSampler,
+    recording_representatives,
+)
 from src.evaluation.classification import (
     plot_confusion_matrix,
     plot_training_curves,
@@ -36,6 +40,7 @@ from src.evaluation.grouped_classification import (
 from src.evaluation.model_selection import (
     SELECTION_SCHEMA_VERSION,
     build_validation_selection,
+    primary_metric_improves,
     selection_is_better,
     should_stop_early,
     validate_resume_selection_state,
@@ -155,7 +160,10 @@ class ConformerTrainConfig:
     train_last_n_layers: int = 4
     gradient_checkpointing: bool = False
     batch_size: int = 1
+    eval_batch_size: int | None = None
     gradient_accumulation_steps: int = 8
+    training_sampling: str = "fixed_anchor"
+    train_samples_per_epoch: int | None = None
     epochs: int = 30
     encoder_learning_rate: float = 5e-6
     head_learning_rate: float = 1e-4
@@ -165,6 +173,7 @@ class ConformerTrainConfig:
     warmup_start_factor: float = 0.1
     max_grad_norm: float = 1.0
     early_stopping_patience: int = 5
+    early_stopping_min_delta: float = 0.0
     precision: str = "bf16"
     seed: int = 42
     num_workers: int = 4
@@ -173,6 +182,7 @@ class ConformerTrainConfig:
     resume: bool = False
     max_train_batches: int | None = None
     max_eval_batches: int | None = None
+    evaluate_test_on_completion: bool = False
     device: str = "cuda"
 
 
@@ -185,6 +195,22 @@ def validate_config(config: ConformerTrainConfig) -> None:
         raise ValueError("clip_duration must be positive")
     if config.batch_size <= 0 or config.gradient_accumulation_steps <= 0:
         raise ValueError("batch_size and gradient_accumulation_steps must be positive")
+    if config.eval_batch_size is not None and config.eval_batch_size <= 0:
+        raise ValueError("eval_batch_size must be positive when provided")
+    if config.training_sampling not in {
+        "fixed_anchor",
+        "recording_balanced_dynamic",
+    }:
+        raise ValueError("Unsupported training_sampling policy")
+    if config.train_samples_per_epoch is not None and config.train_samples_per_epoch <= 0:
+        raise ValueError("train_samples_per_epoch must be positive when provided")
+    if (
+        config.training_sampling == "fixed_anchor"
+        and config.train_samples_per_epoch is not None
+    ):
+        raise ValueError(
+            "train_samples_per_epoch is only supported for dynamic training sampling"
+        )
     if config.epochs <= 0:
         raise ValueError("epochs must be positive")
     if config.encoder_learning_rate <= 0 or config.head_learning_rate <= 0:
@@ -201,6 +227,11 @@ def validate_config(config: ConformerTrainConfig) -> None:
         raise ValueError("warmup_start_factor must be in (0, 1]")
     if config.early_stopping_patience <= 0:
         raise ValueError("early_stopping_patience must be positive")
+    if (
+        not math.isfinite(config.early_stopping_min_delta)
+        or config.early_stopping_min_delta < 0
+    ):
+        raise ValueError("early_stopping_min_delta must be finite and non-negative")
     if config.log_interval <= 0:
         raise ValueError("log_interval must be positive")
     if config.num_workers < 0:
@@ -272,18 +303,72 @@ def build_dataloaders(
     config: ConformerTrainConfig,
 ) -> tuple[dict[str, DataLoader], dict[str, object]]:
     split_segments, split_report = load_and_validate_split(config)
-    datasets = {
-        split: DeepShipWaveformSegmentDataset(
-            segments,
+    protocol = str(split_report["protocol"])
+    train_sampler: RecordingBalancedEpochSampler | None = None
+    if config.training_sampling == "recording_balanced_dynamic":
+        if protocol == "segment_level":
+            raise ValueError(
+                "Dynamic recording sampling requires a recording- or vessel-disjoint protocol"
+            )
+        train_recordings = recording_representatives(split_segments["train"])
+        train_dataset = DeepShipWaveformSegmentDataset(
+            train_recordings,
             data_root=config.data_root,
             sample_rate=config.sample_rate,
             clip_duration=config.clip_duration,
             normalize=config.normalize_waveform,
             remove_dc=config.remove_dc,
-            return_index=(split != "train"),
+            dynamic_crop=True,
         )
-        for split, segments in split_segments.items()
+        epoch_samples = config.train_samples_per_epoch or len(split_segments["train"])
+        train_sampler = RecordingBalancedEpochSampler(
+            train_recordings,
+            epoch_samples=epoch_samples,
+            seed=config.seed,
+        )
+        split_report["training_sampling"] = {
+            "id": "S1",
+            "policy": "class_then_recording_balanced_dynamic_crop",
+            "epoch_samples": epoch_samples,
+            "recordings": len(train_recordings),
+            "classes": len({row.label_index for row in train_recordings}),
+            "crop_seed_rule": "deterministic from model seed, epoch, and draw",
+        }
+        split_report["training_window_rule"] = (
+            "uniform random frame-aligned crop within the selected training recording"
+        )
+    else:
+        train_dataset = DeepShipWaveformSegmentDataset(
+            split_segments["train"],
+            data_root=config.data_root,
+            sample_rate=config.sample_rate,
+            clip_duration=config.clip_duration,
+            normalize=config.normalize_waveform,
+            remove_dc=config.remove_dc,
+        )
+        split_report["training_sampling"] = {
+            "id": "S0",
+            "policy": "fixed_manifest_anchor",
+            "epoch_samples": len(split_segments["train"]),
+        }
+        split_report["training_window_rule"] = split_report["window_rule"]
+
+    datasets = {
+        "train": train_dataset,
+        **{
+            split: DeepShipWaveformSegmentDataset(
+                split_segments[split],
+                data_root=config.data_root,
+                sample_rate=config.sample_rate,
+                clip_duration=config.clip_duration,
+                normalize=config.normalize_waveform,
+                remove_dc=config.remove_dc,
+                return_index=True,
+            )
+            for split in ("val", "test")
+        },
     }
+    split_report["evaluation_window_rule"] = split_report["window_rule"]
     pin_memory = str(config.device).startswith("cuda")
     worker_options: dict[str, object] = {}
     if config.num_workers > 0:
@@ -292,16 +377,31 @@ def build_dataloaders(
             "prefetch_factor": config.prefetch_factor,
             "worker_init_fn": _configure_dataloader_worker,
         }
-    dataloaders = {
-        split: DataLoader(
-            dataset,
+    eval_batch_size = config.eval_batch_size or config.batch_size
+    dataloaders: dict[str, DataLoader] = {
+        "train": DataLoader(
+            datasets["train"],
             batch_size=config.batch_size,
-            shuffle=(split == "train"),
+            shuffle=train_sampler is None,
+            sampler=train_sampler,
+            num_workers=config.num_workers,
+            pin_memory=pin_memory,
+            **worker_options,
+        ),
+    }
+    for split in ("val", "test"):
+        dataloaders[split] = DataLoader(
+            datasets[split],
+            batch_size=eval_batch_size,
+            shuffle=False,
             num_workers=config.num_workers,
             pin_memory=pin_memory,
             **worker_options,
         )
-        for split, dataset in datasets.items()
+    split_report["batch_sizes"] = {
+        "train": config.batch_size,
+        "validation": eval_batch_size,
+        "test": eval_batch_size,
     }
     return dataloaders, split_report
 
@@ -624,6 +724,7 @@ def run_epoch(
     scaler: torch.amp.GradScaler | None = None,
     max_batches: int | None = None,
     prediction_rows: list[dict[str, object]] | None = None,
+    runtime_stats: dict[str, float] | None = None,
 ) -> tuple[float, float]:
     is_train = optimizer is not None
     model.train(is_train)
@@ -671,11 +772,14 @@ def run_epoch(
             ),
         )
     )
+    data_wait_seconds = 0.0
+    last_batch_finished_at = time.perf_counter()
 
     with torch.set_grad_enabled(is_train):
         for batch_index, batch in enumerate(dataloader):
             if batch_index >= effective_batches:
                 break
+            data_wait_seconds += time.perf_counter() - last_batch_finished_at
             input_values, attention_mask, targets = _move_batch(batch, config.device)
             with _autocast_context(config):
                 logits = model(input_values, attention_mask=attention_mask)
@@ -743,6 +847,17 @@ def run_epoch(
                         ),
                     ),
                 )
+            last_batch_finished_at = time.perf_counter()
+    phase_seconds = max(time.perf_counter() - started_at, 1e-12)
+    if runtime_stats is not None:
+        runtime_stats.update(
+            {
+                "phase_seconds": phase_seconds,
+                "data_wait_seconds": data_wait_seconds,
+                "data_wait_fraction": data_wait_seconds / phase_seconds,
+                "samples_per_second": total_samples / phase_seconds,
+            }
+        )
     return total_loss / total_samples, total_correct / total_samples
 
 
@@ -800,7 +915,10 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
 
     dataloaders, split_report = build_dataloaders(config)
     protocol = str(split_report["protocol"])
-    shutil.copyfile(resolve_path(config.split_manifest), reports_dir / "frozen_split_manifest.json")
+    shutil.copyfile(
+        resolve_path(config.split_manifest),
+        reports_dir / "frozen_split_manifest.json",
+    )
     (reports_dir / "split_validation.json").write_text(
         json.dumps(split_report, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
@@ -890,7 +1008,11 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
     best_selection: dict[str, object] | None = None
     best_validation_metrics: dict[str, dict[str, object] | None] | None = None
     best_epoch = -1
+    early_stopping_primary_value: float | None = None
+    early_stopping_reference_epoch = -1
     start_epoch = 1
+    sampling_exposure_path = reports_dir / "training_sampling_exposure.json"
+    sampling_exposure_history: list[dict[str, object]] = []
 
     if config.resume:
         if not last_model_path.is_file():
@@ -913,12 +1035,50 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         best_validation_metrics = checkpoint["best_validation_metrics"]
         best_epoch = int(checkpoint["best_epoch"])
         start_epoch = int(checkpoint["epoch"]) + 1
+        stored_primary_value = checkpoint.get("early_stopping_primary_value")
+        early_stopping_primary_value = (
+            float(stored_primary_value) if stored_primary_value is not None else None
+        )
+        early_stopping_reference_epoch = int(
+            checkpoint.get("early_stopping_reference_epoch", -1)
+        )
+        if early_stopping_primary_value is None or early_stopping_reference_epoch < 1:
+            early_stopping_primary_value = None
+            early_stopping_reference_epoch = -1
+            for completed_epoch, primary_value in enumerate(
+                history["selection_primary_value"], start=1
+            ):
+                if (
+                    early_stopping_primary_value is None
+                    or float(primary_value)
+                    > early_stopping_primary_value
+                    + config.early_stopping_min_delta
+                    + 1e-12
+                ):
+                    early_stopping_primary_value = float(primary_value)
+                    early_stopping_reference_epoch = completed_epoch
+        if sampling_exposure_path.is_file():
+            stored_exposure = json.loads(
+                sampling_exposure_path.read_text(encoding="utf-8")
+            )
+            if isinstance(stored_exposure, list):
+                sampling_exposure_history = [
+                    row
+                    for row in stored_exposure
+                    if int(row.get("epoch", 0)) < start_epoch
+                ]
         restore_rng_state(checkpoint["rng_state"])
 
     progress = TrainingProgress.auto()
     for epoch in range(start_epoch, config.epochs + 1):
         epoch_started_at = time.perf_counter()
+        epoch_sampling_exposure = None
+        train_sampler = dataloaders["train"].sampler
+        if isinstance(train_sampler, RecordingBalancedEpochSampler):
+            train_sampler.set_epoch(epoch)
+            epoch_sampling_exposure = train_sampler.exposure_report()
         progress_learning_rates = _learning_rate_text(optimizer)
+        train_runtime_stats: dict[str, float] = {}
         train_loss, train_acc = run_epoch(
             model,
             dataloaders["train"],
@@ -932,7 +1092,10 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             scheduler=scheduler,
             scaler=scaler,
             max_batches=config.max_train_batches,
+            runtime_stats=train_runtime_stats,
         )
+        if epoch_sampling_exposure is not None:
+            epoch_sampling_exposure["runtime"] = train_runtime_stats
         validation_learning_rates = _learning_rate_text(optimizer)
         validation_segment_predictions: list[dict[str, object]] = []
         val_loss, val_acc = run_epoch(
@@ -990,9 +1153,24 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         history["encoder_learning_rate"].append(encoder_lr)
         history["head_learning_rate"].append(head_lr)
         history_path.write_text(json.dumps(history, indent=2) + "\n", encoding="utf-8")
+        if epoch_sampling_exposure is not None:
+            sampling_exposure_history.append(epoch_sampling_exposure)
+            sampling_exposure_path.write_text(
+                json.dumps(sampling_exposure_history, indent=2, ensure_ascii=False)
+                + "\n",
+                encoding="utf-8",
+            )
 
-        improved = selection_is_better(selection, best_selection)
-        if improved:
+        checkpoint_improved = selection_is_better(selection, best_selection)
+        meaningful_improvement = primary_metric_improves(
+            selection,
+            early_stopping_primary_value,
+            min_delta=config.early_stopping_min_delta,
+        )
+        if meaningful_improvement:
+            early_stopping_primary_value = float(selection["primary_value"])
+            early_stopping_reference_epoch = epoch
+        if checkpoint_improved:
             best_selection = selection
             best_validation_metrics = validation_metrics
             best_epoch = epoch
@@ -1047,9 +1225,9 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
                 best_model_path,
             )
         should_stop = should_stop_early(
-            improved=improved,
+            improved=meaningful_improvement,
             epoch=epoch,
-            best_epoch=best_epoch,
+            best_epoch=early_stopping_reference_epoch,
             patience=config.early_stopping_patience,
         )
         if best_selection is None or best_validation_metrics is None:
@@ -1069,6 +1247,8 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
                 "best_selection": best_selection,
                 "best_validation_metrics": best_validation_metrics,
                 "best_epoch": best_epoch,
+                "early_stopping_primary_value": early_stopping_primary_value,
+                "early_stopping_reference_epoch": early_stopping_reference_epoch,
                 "split_manifest_sha256": split_report["manifest_sha256"],
                 "rng_state": capture_rng_state(),
             },
@@ -1092,6 +1272,8 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             f"| val_vessel_f1={vessel_summary} "
             f"| select={selection_name}:{float(selection['primary_value']):.4f} "
             f"| best_select={best_selection_value:.4f} "
+            f"| early_stop_wait={epoch - early_stopping_reference_epoch}/"
+            f"{config.early_stopping_patience} "
             f"| time={_format_duration(time.perf_counter() - epoch_started_at)}"
         )
         if should_stop:
@@ -1101,62 +1283,72 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             break
     progress.close()
 
-    checkpoint = torch.load(best_model_path, map_location=config.device, weights_only=False)
-    model.load_state_dict(checkpoint["model_state_dict"])
-    segment_predictions = collect_prediction_rows(
-        model,
-        dataloaders["test"],
-        config,
-        max_batches=config.max_eval_batches,
-    )
-    test_metrics, recording_predictions, vessel_predictions = (
-        compute_grouped_metrics(segment_predictions, CLASS_NAMES)
-    )
-    segment_metrics = test_metrics["segment"]
-    recording_metrics = test_metrics["recording"]
-    vessel_metrics = test_metrics["vessel"]
-    if segment_metrics is None or recording_metrics is None:
-        raise RuntimeError("Test aggregation did not produce required metrics")
-    save_metrics(segment_metrics, metrics_dir / "segment_metrics.json")
-    save_metrics(recording_metrics, metrics_dir / "recording_metrics.json")
-    if vessel_metrics is not None:
-        save_metrics(vessel_metrics, metrics_dir / "vessel_metrics.json")
-    save_prediction_rows(
-        segment_predictions,
-        predictions_dir / "test_segment_predictions.csv",
-        CLASS_NAMES,
-    )
-    save_prediction_rows(
-        recording_predictions,
-        predictions_dir / "test_recording_predictions.csv",
-        CLASS_NAMES,
-    )
-    if vessel_predictions:
+    segment_metrics = None
+    recording_metrics = None
+    vessel_metrics = None
+    if config.evaluate_test_on_completion:
+        checkpoint = torch.load(
+            best_model_path,
+            map_location=config.device,
+            weights_only=False,
+        )
+        model.load_state_dict(checkpoint["model_state_dict"])
+        segment_predictions = collect_prediction_rows(
+            model,
+            dataloaders["test"],
+            config,
+            max_batches=config.max_eval_batches,
+        )
+        test_metrics, recording_predictions, vessel_predictions = (
+            compute_grouped_metrics(segment_predictions, CLASS_NAMES)
+        )
+        segment_metrics = test_metrics["segment"]
+        recording_metrics = test_metrics["recording"]
+        vessel_metrics = test_metrics["vessel"]
+        if segment_metrics is None or recording_metrics is None:
+            raise RuntimeError("Test aggregation did not produce required metrics")
+        save_metrics(segment_metrics, metrics_dir / "segment_metrics.json")
+        save_metrics(recording_metrics, metrics_dir / "recording_metrics.json")
+        if vessel_metrics is not None:
+            save_metrics(vessel_metrics, metrics_dir / "vessel_metrics.json")
         save_prediction_rows(
-            vessel_predictions,
-            predictions_dir / "test_vessel_predictions.csv",
+            segment_predictions,
+            predictions_dir / "test_segment_predictions.csv",
             CLASS_NAMES,
         )
+        save_prediction_rows(
+            recording_predictions,
+            predictions_dir / "test_recording_predictions.csv",
+            CLASS_NAMES,
+        )
+        if vessel_predictions:
+            save_prediction_rows(
+                vessel_predictions,
+                predictions_dir / "test_vessel_predictions.csv",
+                CLASS_NAMES,
+            )
 
-    plot_confusion_matrix(
-        segment_metrics["confusion_matrix"],
-        CLASS_NAMES,
-        figures_dir / "segment_confusion_matrix.png",
-        title=f"DeepShip {protocol} Conformer Segment Confusion Matrix",
-    )
-    plot_confusion_matrix(
-        recording_metrics["confusion_matrix"],
-        CLASS_NAMES,
-        figures_dir / "recording_confusion_matrix.png",
-        title=f"DeepShip {protocol} Conformer Recording Confusion Matrix",
-    )
-    if vessel_metrics is not None:
         plot_confusion_matrix(
-            vessel_metrics["confusion_matrix"],
+            segment_metrics["confusion_matrix"],
             CLASS_NAMES,
-            figures_dir / "vessel_confusion_matrix.png",
-            title=f"DeepShip {protocol} Conformer Vessel-group Confusion Matrix",
+            figures_dir / "segment_confusion_matrix.png",
+            title=f"DeepShip {protocol} Conformer Segment Confusion Matrix",
         )
+        plot_confusion_matrix(
+            recording_metrics["confusion_matrix"],
+            CLASS_NAMES,
+            figures_dir / "recording_confusion_matrix.png",
+            title=f"DeepShip {protocol} Conformer Recording Confusion Matrix",
+        )
+        if vessel_metrics is not None:
+            plot_confusion_matrix(
+                vessel_metrics["confusion_matrix"],
+                CLASS_NAMES,
+                figures_dir / "vessel_confusion_matrix.png",
+                title=(
+                    f"DeepShip {protocol} Conformer Vessel-group Confusion Matrix"
+                ),
+            )
     curve_history = {
         key: history[key] for key in ("train_loss", "val_loss", "train_acc", "val_acc")
     }
@@ -1172,6 +1364,10 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
     if best_segment_metrics is None:
         raise RuntimeError("Best validation segment metrics are unavailable")
     result = {
+        "status": (
+            "complete" if config.evaluate_test_on_completion else "validation_complete"
+        ),
+        "test_evaluated": config.evaluate_test_on_completion,
         "protocol": protocol,
         "segment_metrics": segment_metrics,
         "recording_metrics": recording_metrics,

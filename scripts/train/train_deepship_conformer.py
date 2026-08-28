@@ -83,7 +83,32 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.set_defaults(gradient_checkpointing=False)
     parser.add_argument("--batch-size", type=int, default=1)
+    parser.add_argument(
+        "--eval-batch-size",
+        type=int,
+        default=None,
+        help="Optional validation/test batch size; defaults to --batch-size.",
+    )
     parser.add_argument("--gradient-accumulation-steps", type=int, default=8)
+    parser.add_argument(
+        "--training-sampling",
+        choices=["fixed_anchor", "recording_balanced_dynamic"],
+        default="fixed_anchor",
+        help=(
+            "Use frozen manifest anchors (S0), or class→recording-balanced "
+            "whole-recording dynamic crops (S1). Validation/test always use "
+            "the frozen anchors."
+        ),
+    )
+    parser.add_argument(
+        "--train-samples-per-epoch",
+        type=int,
+        default=None,
+        help=(
+            "Dynamic-sampling draw budget per epoch. Defaults to the number of "
+            "frozen training anchors; invalid with fixed_anchor."
+        ),
+    )
     parser.add_argument("--epochs", type=int, default=30)
     parser.add_argument("--encoder-learning-rate", type=float, default=5e-6)
     parser.add_argument("--head-learning-rate", type=float, default=1e-4)
@@ -93,6 +118,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--warmup-start-factor", type=float, default=0.1)
     parser.add_argument("--max-grad-norm", type=float, default=1.0)
     parser.add_argument("--early-stopping-patience", type=int, default=5)
+    parser.add_argument(
+        "--early-stopping-min-delta",
+        type=float,
+        default=0.0,
+        help=(
+            "Minimum absolute gain in the protocol's primary validation macro-F1 "
+            "required to reset early stopping."
+        ),
+    )
     parser.add_argument("--precision", choices=["fp32", "fp16", "bf16"], default="bf16")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--num-workers", type=int, default=4)
@@ -112,6 +146,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--max-train-batches", type=int, default=None)
     parser.add_argument("--max-eval-batches", type=int, default=None)
+    parser.add_argument(
+        "--evaluate-test-on-completion",
+        action="store_true",
+        help=(
+            "Evaluate the frozen DeepShip test split after training. Leave this off "
+            "during model development and enable it only for a finalized protocol."
+        ),
+    )
     return parser
 
 
@@ -133,7 +175,10 @@ def main() -> None:
         layerdrop=args.layerdrop,
         gradient_checkpointing=args.gradient_checkpointing,
         batch_size=args.batch_size,
+        eval_batch_size=args.eval_batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
+        training_sampling=args.training_sampling,
+        train_samples_per_epoch=args.train_samples_per_epoch,
         epochs=args.epochs,
         encoder_learning_rate=args.encoder_learning_rate,
         head_learning_rate=args.head_learning_rate,
@@ -143,6 +188,7 @@ def main() -> None:
         warmup_start_factor=args.warmup_start_factor,
         max_grad_norm=args.max_grad_norm,
         early_stopping_patience=args.early_stopping_patience,
+        early_stopping_min_delta=args.early_stopping_min_delta,
         precision=args.precision,
         seed=args.seed,
         num_workers=args.num_workers,
@@ -151,6 +197,7 @@ def main() -> None:
         resume=args.resume,
         max_train_batches=args.max_train_batches,
         max_eval_batches=args.max_eval_batches,
+        evaluate_test_on_completion=args.evaluate_test_on_completion,
         device=args.device or get_default_device(),
     )
     result = train(config)

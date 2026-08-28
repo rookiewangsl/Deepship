@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "experiment_id": "conformer_baseline_v1",
-  "status": "implementation_baseline_not_yet_trained",
+  "status": "v2_f0_complete_f1b_diagnostic_stopped",
   "description": "Pretrained raw-waveform Wav2Vec2-Conformer baseline on frozen DeepShip isolation manifests.",
   "classes": [
     "Cargo",
@@ -61,16 +61,19 @@
     ],
     "batch_size": 1,
     "gradient_accumulation_steps": 8,
-    "epochs": 50,
+    "epochs": 30,
     "optimizer": "AdamW",
-    "encoder_learning_rate": 0.00001,
-    "head_learning_rate": 0.0003,
+    "encoder_learning_rate": 0.000005,
+    "head_learning_rate": 0.0001,
     "weight_decay": 0.01,
-    "warmup_epochs": 5,
-    "scheduler": "linear_warmup_then_cosine_annealing",
+    "minimum_learning_rate": 0.000001,
+    "warmup_ratio": 0.05,
+    "warmup_start_factor": 0.1,
+    "scheduler": "optimizer_step_linear_warmup_then_cosine_decay",
     "precision": "bf16",
     "max_grad_norm": 1.0,
-    "early_stopping_patience": 8,
+    "early_stopping_patience": 5,
+    "early_stopping_min_delta": 0.0,
     "log_interval_batches": 100
   },
   "evaluation": {
@@ -80,9 +83,29 @@
       "vessel_name_group"
     ],
     "primary_internal_level": "vessel_name_group",
+    "development_test_policy": "sealed unless evaluate_test_on_completion is explicit",
     "external_evaluation": [
       "PORTIA-4 MMSI-level",
       "held-out Oceanship/ONC-4 passage and MMSI-level"
     ]
+  },
+  "observed_validation": {
+    "f0_frozen_seed42": {
+      "vessel_macro_f1": 0.4725705329,
+      "vessel_accuracy": 0.48,
+      "recording_macro_f1": 0.4181246
+    },
+    "f1b_last4_seed42_diagnostic": {
+      "status": "manually_stopped_for_overfitting",
+      "best_epoch": 3,
+      "vessel_macro_f1": 0.4649936061,
+      "vessel_accuracy": 0.48,
+      "recording_macro_f1": 0.4005663752,
+      "paired_vessel_macro_f1_delta_vs_f0": -0.0075769268,
+      "paired_95_percent_interval": [
+        -0.14455398,
+        0.1474403
+      ]
+    }
   }
 }

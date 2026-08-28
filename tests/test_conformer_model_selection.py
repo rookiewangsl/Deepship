@@ -4,6 +4,7 @@ import unittest
 
 from src.evaluation.model_selection import (
     build_validation_selection,
+    primary_metric_improves,
     selection_is_better,
     should_stop_early,
     validate_resume_selection_state,
@@ -123,6 +124,21 @@ class ConformerModelSelectionTests(unittest.TestCase):
         self.assertFalse(
             should_stop_early(improved=True, epoch=9, best_epoch=9, patience=8)
         )
+
+    def test_early_stopping_min_delta_uses_only_the_primary_group_metric(self) -> None:
+        candidate = build_validation_selection(
+            "vessel_name_disjoint",
+            _metrics(vessel_macro_f1=0.504, vessel_accuracy=0.9),
+            0.1,
+        )
+
+        self.assertFalse(
+            primary_metric_improves(candidate, 0.5, min_delta=0.005)
+        )
+        self.assertTrue(primary_metric_improves(candidate, 0.49, min_delta=0.005))
+        self.assertTrue(primary_metric_improves(candidate, None, min_delta=0.005))
+        with self.assertRaisesRegex(ValueError, "non-negative"):
+            primary_metric_improves(candidate, 0.5, min_delta=-0.001)
 
     def test_resume_requires_matching_selection_schema_and_rule(self) -> None:
         rule = validation_selection_rule("vessel_name_disjoint")

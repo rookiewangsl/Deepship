@@ -1,7 +1,8 @@
 # DeepShip Wav2Vec2-Conformer 基线：Linux/RTX 4070 运行说明
 
 最后更新：2026-08-28
-状态：代码、服务器环境、权重缓存、真实 20 s 前向和两批次反向 smoke 已验证；尚未正式训练
+状态：第二版 F0 已完成，F1b 因明确过拟合主动停止；S1 recording-balanced 动态裁剪已实现，
+待服务器测试和 GPU 空闲后运行
 
 ## 1. 基线定义
 
@@ -40,8 +41,8 @@ size 1024、16 头 relative-position large 版本。当前分类系统共 619,35
 模式有 101,701,381 个可训练参数。选择它是为了建立公开可复现的强通用迁移基线，不因为它是
 水声专用模型；后续必须用 scratch、冻结和不同解冻深度分离预训练与参数规模的贡献。
 
-该版本还不是 recording-level MIL；它保持当前冻结 manifest 的 14,000/4,000/2,000 个 anchor
-预算，先建立可对照的 raw-waveform 预训练基线。MIL 和 recording-balanced sampling 属于后续 B5。
+该版本还不是 recording-level MIL。S0 保持冻结 manifest 的 14,000/4,000/2,000 个 anchor；S1
+在训练集改为 class→recording-balanced 的 14,000 次动态裁剪，validation/test 仍保持冻结 anchor。
 
 ## 2. 当前服务器目录
 
@@ -203,20 +204,65 @@ Epoch 1/30 | done | train_loss=0.8421 | train_acc=0.6812 | val_loss=0.9912 | val
 连续 5 epoch 不提升，最终摘要追加 `early_stop=true` 和 `best_epoch`。窄终端会截断动态行而不换行，
 完整 epoch 摘要和结构化 history 不受影响。
 
-1. F0：20 s，encoder frozen，seed 42；
-2. F1b：20 s，last 4 blocks，seed 42；
-3. 根据 F0/F1b 差异决定是否追加 last-2 或 last-8；
-4. 只有部分解冻显示稳定收益时，才运行“冻结卷积前端、训练全部 Conformer”和全量微调控制；
-5. T：选定微调策略下比较 3/10/20 s，30 s 只在 20 s 仍有收益时追加；
-6. 选定上下文后运行 recording-disjoint 和 vessel-name-disjoint；
+1. 第二版 F0 已完成，最佳 validation vessel macro-F1 为 0.4726；
+2. F1b 最佳值为 0.4650，并在后续出现明显过拟合，已停止；不运行 last-8；
+3. 下一项运行 F0-S1，检验固定 anchor 冗余与 recording 暴露偏置；
+4. F0-S1 提高至少 1 pp 且 recording macro-F1 不退化时，再运行 S1＋last-2；
+5. S2 仅由 S1 收益或残余 vessel 暴露偏置触发；
+6. 若 S1 无效，转入 3/10/20 s 上下文和 scratch/预训练控制；
 7. 只有最佳候选进入 42/43/44/45/46 多 seed。
 
 不要先运行所有因素的笛卡尔积，也不要在看 test 后修改聚合规则。
 
-## 7. 当前未实现范围
+## 7. S1 smoke 与正式运行
+
+新管线默认不评估 DeepShip test；最终方案完全冻结前不要添加
+`--evaluate-test-on-completion`。为避免多行命令粘贴错位，优先使用已冻结参数的启动脚本：
+
+```bash
+bash scripts/train/run_conformer_f0_s1_seed42.sh smoke
+```
+
+该脚本的 smoke 模式等价于：
+
+```bash
+python scripts/train/train_deepship_conformer.py \
+  --data-root "$DEEPSHIP_DATA_ROOT" \
+  --split-manifest protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json \
+  --protocol-name vessel_name_disjoint \
+  --pretrained-revision 1afaab48b41d924fbbcae05d8c5d88836c4a5719 \
+  --output-root /home/slwang/deepship/runs/conformer_sampling_v1/smoke_f0_s1_20s_seed42 \
+  --clip-duration 20 \
+  --finetuning-mode frozen \
+  --training-sampling recording_balanced_dynamic \
+  --train-samples-per-epoch 14000 \
+  --batch-size 1 \
+  --eval-batch-size 2 \
+  --gradient-accumulation-steps 8 \
+  --precision bf16 \
+  --epochs 1 \
+  --early-stopping-patience 3 \
+  --early-stopping-min-delta 0.005 \
+  --max-train-batches 2 \
+  --max-eval-batches 2 \
+  --num-workers 0
+```
+
+smoke 通过且 GPU 没有其他项目占用后运行：
+
+```bash
+bash scripts/train/run_conformer_f0_s1_seed42.sh formal
+```
+
+正式模式使用新目录 `formal_f0_s1_recording_dynamic_20s_seed42`、`--epochs 8` 和
+`--num-workers 4`。它会额外保存 `reports/training_sampling_exposure.json`，其中含每轮
+recording/vessel 暴露、重复率、吞吐和 DataLoader 等待占比。
+
+## 8. 当前未实现范围
 
 - ONC 水声自监督适配（B4）；
-- recording-level MIL/ASP 训练采样（B5；当前已使用 ASP，但 loss 仍是 anchor-level）；
+- S2 vessel-balanced 动态采样；
+- recording-level MIL（当前已使用 ASP，但 loss 仍是单窗口级）；
 - 真实背景混合（B6）；
 - 门控频谱支路（B7）；
 - PORTIA-4 和连续 Oceanship/ONC-4 外测读取器。

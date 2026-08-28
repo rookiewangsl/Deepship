@@ -106,6 +106,27 @@ def selection_is_better(
     return False
 
 
+def primary_metric_improves(
+    candidate: dict[str, object],
+    incumbent_primary: float | None,
+    *,
+    min_delta: float,
+    tolerance: float = 1e-12,
+) -> bool:
+    """Return whether the primary metric meaningfully advances early stopping."""
+
+    if not math.isfinite(min_delta) or min_delta < 0:
+        raise ValueError("min_delta must be finite and non-negative")
+    candidate_primary = float(candidate["primary_value"])
+    if not math.isfinite(candidate_primary):
+        raise FloatingPointError("Candidate primary selection value is non-finite")
+    if incumbent_primary is None:
+        return True
+    if not math.isfinite(incumbent_primary):
+        raise FloatingPointError("Incumbent primary selection value is non-finite")
+    return candidate_primary > incumbent_primary + min_delta + tolerance
+
+
 def should_stop_early(
     *,
     improved: bool,

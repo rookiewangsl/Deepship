@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "experiment_id": "conformer_sampling_v1",
+  "status": "ready_for_server_smoke",
+  "description": "Recording-balanced dynamic-crop ablation after F0/F1b validation diagnostics.",
+  "parent_experiment": "configs/experiments/conformer_baseline_v1.json",
+  "source_protocol": {
+    "manifest": "protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json",
+    "modify_source_manifest": false,
+    "validation_and_test_windows": "fixed_manifest_anchor"
+  },
+  "comparison": {
+    "reference": "F0-S0 frozen encoder with fixed anchors",
+    "candidate": "F0-S1 frozen encoder with class-then-recording-balanced dynamic crops",
+    "single_changed_factor": "training sampling policy"
+  },
+  "input": {
+    "sample_rate": 16000,
+    "clip_duration_seconds": 20.0,
+    "remove_dc": true,
+    "normalize_waveform": true
+  },
+  "sampling": {
+    "policy": "recording_balanced_dynamic",
+    "samples_per_epoch": 14000,
+    "samples_per_class": 3500,
+    "crop_seed": "deterministic from model seed, epoch, class, and draw",
+    "recording_draw_count_difference_within_class_max": 1,
+    "exposure_report": "reports/training_sampling_exposure.json"
+  },
+  "model": {
+    "pretrained_model": "facebook/wav2vec2-conformer-rel-pos-large",
+    "pretrained_revision": "1afaab48b41d924fbbcae05d8c5d88836c4a5719",
+    "finetuning_mode": "frozen",
+    "apply_spec_augment": false,
+    "layerdrop": 0.0,
+    "gradient_checkpointing": false
+  },
+  "training": {
+    "seed": 42,
+    "batch_size": 1,
+    "eval_batch_size": 2,
+    "gradient_accumulation_steps": 8,
+    "max_epochs": 8,
+    "optimizer": "AdamW",
+    "head_learning_rate": 0.0001,
+    "encoder_learning_rate": 0.000005,
+    "minimum_learning_rate": 0.000001,
+    "weight_decay": 0.01,
+    "warmup_ratio": 0.05,
+    "warmup_start_factor": 0.1,
+    "scheduler": "optimizer_step_linear_warmup_then_cosine_decay",
+    "precision": "bf16",
+    "max_grad_norm": 1.0,
+    "early_stopping_patience": 3,
+    "early_stopping_min_delta": 0.005,
+    "num_workers": 4,
+    "prefetch_factor": 2
+  },
+  "selection": {
+    "primary": "validation_vessel_macro_f1",
+    "candidate_threshold_absolute_gain": 0.01,
+    "required_secondary_condition": "validation recording macro-F1 does not regress",
+    "evaluate_test_on_completion": false
+  },
+  "decision_after_seed42": {
+    "candidate_passes": "retain S1, then evaluate last-2 on S1",
+    "candidate_fails_without_residual_vessel_bias": "stop sampling branch and run context/pretraining controls",
+    "residual_vessel_bias_or_clear_s1_gain": "implement the conditional S2 vessel-balanced sampler",
+    "never_from_this_result": "run last-8 or tune against DeepShip test"
+  }
+}
