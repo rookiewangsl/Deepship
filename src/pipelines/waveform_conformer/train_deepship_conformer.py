@@ -3,6 +3,8 @@ from __future__ import annotations
 from contextlib import nullcontext
 from dataclasses import asdict, dataclass
 import json
+import math
+import os
 import platform
 import random
 import shutil
@@ -15,7 +17,7 @@ from typing import TextIO
 import numpy as np
 import torch
 from torch import nn
-from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
+from torch.optim.lr_scheduler import LambdaLR, LRScheduler
 from torch.utils.data import DataLoader
 
 from src.data.deepship import CLASS_NAMES, SegmentRecord, segment_record_from_dict
@@ -23,15 +25,21 @@ from src.data.deepship_audit import load_experiment_config
 from src.data.deepship_protocol_validation import load_split_manifest, validate_protocol_manifest
 from src.data.deepship_waveform import DeepShipWaveformSegmentDataset
 from src.evaluation.classification import (
-    compute_metrics,
     plot_confusion_matrix,
     plot_training_curves,
     save_metrics,
 )
 from src.evaluation.grouped_classification import (
-    aggregate_recording_predictions,
-    aggregate_vessel_predictions,
+    compute_grouped_metrics,
     save_prediction_rows,
+)
+from src.evaluation.model_selection import (
+    SELECTION_SCHEMA_VERSION,
+    build_validation_selection,
+    selection_is_better,
+    should_stop_early,
+    validate_resume_selection_state,
+    validation_selection_rule,
 )
 from src.models.wav2vec2_conformer import (
     DEFAULT_PRETRAINED_MODEL,
@@ -148,17 +156,19 @@ class ConformerTrainConfig:
     gradient_checkpointing: bool = False
     batch_size: int = 1
     gradient_accumulation_steps: int = 8
-    epochs: int = 50
-    encoder_learning_rate: float = 1e-5
-    head_learning_rate: float = 3e-4
+    epochs: int = 30
+    encoder_learning_rate: float = 5e-6
+    head_learning_rate: float = 1e-4
     weight_decay: float = 1e-2
     min_learning_rate: float = 1e-6
-    warmup_epochs: int = 5
+    warmup_ratio: float = 0.05
+    warmup_start_factor: float = 0.1
     max_grad_norm: float = 1.0
-    early_stopping_patience: int = 8
+    early_stopping_patience: int = 5
     precision: str = "bf16"
     seed: int = 42
     num_workers: int = 4
+    prefetch_factor: int = 2
     log_interval: int = 100
     resume: bool = False
     max_train_batches: int | None = None
@@ -177,8 +187,26 @@ def validate_config(config: ConformerTrainConfig) -> None:
         raise ValueError("batch_size and gradient_accumulation_steps must be positive")
     if config.epochs <= 0:
         raise ValueError("epochs must be positive")
+    if config.encoder_learning_rate <= 0 or config.head_learning_rate <= 0:
+        raise ValueError("learning rates must be positive")
+    if config.min_learning_rate < 0:
+        raise ValueError("min_learning_rate must be non-negative")
+    if config.min_learning_rate > min(
+        config.encoder_learning_rate, config.head_learning_rate
+    ):
+        raise ValueError("min_learning_rate cannot exceed a parameter-group learning rate")
+    if not 0.0 <= config.warmup_ratio < 1.0:
+        raise ValueError("warmup_ratio must be in [0, 1)")
+    if not 0.0 < config.warmup_start_factor <= 1.0:
+        raise ValueError("warmup_start_factor must be in (0, 1]")
+    if config.early_stopping_patience <= 0:
+        raise ValueError("early_stopping_patience must be positive")
     if config.log_interval <= 0:
         raise ValueError("log_interval must be positive")
+    if config.num_workers < 0:
+        raise ValueError("num_workers must be non-negative")
+    if config.prefetch_factor <= 0:
+        raise ValueError("prefetch_factor must be positive")
     if config.max_train_batches is not None and config.max_train_batches <= 0:
         raise ValueError("max_train_batches must be positive when provided")
     if config.max_eval_batches is not None and config.max_eval_batches <= 0:
@@ -252,11 +280,18 @@ def build_dataloaders(
             clip_duration=config.clip_duration,
             normalize=config.normalize_waveform,
             remove_dc=config.remove_dc,
-            return_index=(split == "test"),
+            return_index=(split != "train"),
         )
         for split, segments in split_segments.items()
     }
     pin_memory = str(config.device).startswith("cuda")
+    worker_options: dict[str, object] = {}
+    if config.num_workers > 0:
+        worker_options = {
+            "persistent_workers": True,
+            "prefetch_factor": config.prefetch_factor,
+            "worker_init_fn": _configure_dataloader_worker,
+        }
     dataloaders = {
         split: DataLoader(
             dataset,
@@ -264,11 +299,17 @@ def build_dataloaders(
             shuffle=(split == "train"),
             num_workers=config.num_workers,
             pin_memory=pin_memory,
-            persistent_workers=config.num_workers > 0,
+            **worker_options,
         )
         for split, dataset in datasets.items()
     }
     return dataloaders, split_report
+
+
+def _configure_dataloader_worker(_worker_id: int) -> None:
+    # Each process handles one audio item at a time. Keeping Torch kernels
+    # single-threaded avoids num_workers × BLAS-thread oversubscription.
+    torch.set_num_threads(1)
 
 
 def build_optimizer(
@@ -308,34 +349,52 @@ def build_optimizer(
 def build_scheduler(
     optimizer: torch.optim.Optimizer,
     config: ConformerTrainConfig,
-) -> SequentialLR | CosineAnnealingLR | None:
-    if config.epochs <= 1:
-        return None
-    warmup_epochs = max(0, min(config.warmup_epochs, config.epochs - 1))
-    cosine_epochs = config.epochs - warmup_epochs
-    if warmup_epochs == 0:
-        return CosineAnnealingLR(
-            optimizer,
-            T_max=max(1, cosine_epochs),
-            eta_min=config.min_learning_rate,
-        )
-    return SequentialLR(
-        optimizer,
-        schedulers=[
-            LinearLR(
-                optimizer,
-                start_factor=0.1,
-                end_factor=1.0,
-                total_iters=warmup_epochs,
-            ),
-            CosineAnnealingLR(
-                optimizer,
-                T_max=max(1, cosine_epochs),
-                eta_min=config.min_learning_rate,
-            ),
-        ],
-        milestones=[warmup_epochs],
+    *,
+    total_optimizer_steps: int,
+) -> tuple[LambdaLR, dict[str, object]]:
+    if total_optimizer_steps <= 0:
+        raise ValueError("total_optimizer_steps must be positive")
+    warmup_steps = min(
+        total_optimizer_steps - 1,
+        int(round(total_optimizer_steps * config.warmup_ratio)),
     )
+    decay_steps = max(1, total_optimizer_steps - warmup_steps)
+
+    def schedule_for(base_learning_rate: float):
+        minimum_factor = config.min_learning_rate / base_learning_rate
+
+        def learning_rate_multiplier(current_step: int) -> float:
+            if warmup_steps > 0 and current_step < warmup_steps:
+                progress = current_step / warmup_steps
+                return config.warmup_start_factor + (
+                    1.0 - config.warmup_start_factor
+                ) * progress
+            decay_progress = min(
+                max(current_step - warmup_steps, 0) / decay_steps,
+                1.0,
+            )
+            cosine_factor = 0.5 * (1.0 + math.cos(math.pi * decay_progress))
+            return minimum_factor + (1.0 - minimum_factor) * cosine_factor
+
+        return learning_rate_multiplier
+
+    base_learning_rates = [float(group["lr"]) for group in optimizer.param_groups]
+    scheduler = LambdaLR(
+        optimizer,
+        lr_lambda=[schedule_for(rate) for rate in base_learning_rates],
+    )
+    report = {
+        "name": "optimizer_step_linear_warmup_cosine_decay",
+        "scheduler_step_unit": "optimizer_step",
+        "total_optimizer_steps": total_optimizer_steps,
+        "warmup_ratio": config.warmup_ratio,
+        "warmup_steps": warmup_steps,
+        "warmup_start_factor": config.warmup_start_factor,
+        "decay_steps": decay_steps,
+        "base_learning_rates": base_learning_rates,
+        "minimum_learning_rate": config.min_learning_rate,
+    }
+    return scheduler, report
 
 
 def _autocast_context(config: ConformerTrainConfig):
@@ -406,9 +465,11 @@ class TrainingProgress:
         interactive_stream: TextIO | None,
         *,
         owns_stream: bool = False,
+        terminal_width: int | None = None,
     ) -> None:
         self.interactive_stream = interactive_stream
         self.owns_stream = owns_stream
+        self.terminal_width = terminal_width
         self.rendered_width = 0
 
     @classmethod
@@ -424,19 +485,31 @@ class TrainingProgress:
             return cls(None)
         return cls(terminal_stream, owns_stream=True)
 
+    def _available_width(self) -> int | None:
+        if self.terminal_width is not None:
+            return self.terminal_width
+        if self.interactive_stream is None:
+            return None
+        try:
+            return max(20, os.get_terminal_size(self.interactive_stream.fileno()).columns - 1)
+        except (AttributeError, OSError):
+            return None
+
     def update(self, line: str) -> None:
         if self.interactive_stream is None:
             print(line, flush=True)
             return
-        padding = " " * max(0, self.rendered_width - len(line))
-        self.interactive_stream.write(f"\r{line}{padding}")
+        available_width = self._available_width()
+        if available_width is not None and len(line) > available_width:
+            line = line[: max(1, available_width - 1)] + "…"
+        self.interactive_stream.write(f"\r{line}\x1b[K")
         self.interactive_stream.flush()
         self.rendered_width = len(line)
 
     def clear(self) -> None:
         if self.interactive_stream is None or self.rendered_width == 0:
             return
-        self.interactive_stream.write(f"\r{' ' * self.rendered_width}\r")
+        self.interactive_stream.write("\r\x1b[2K\r")
         self.interactive_stream.flush()
         self.rendered_width = 0
 
@@ -506,6 +579,36 @@ def _progress_line(
     )
 
 
+def _append_prediction_rows(
+    rows: list[dict[str, object]],
+    dataset: DeepShipWaveformSegmentDataset,
+    targets: torch.Tensor,
+    logits: torch.Tensor,
+    indexes: torch.Tensor,
+) -> None:
+    probabilities = torch.softmax(logits, dim=1).detach().cpu().tolist()
+    predictions = logits.argmax(dim=1).detach().cpu().tolist()
+    for target, prediction, probability, index in zip(
+        targets.detach().cpu().tolist(),
+        predictions,
+        probabilities,
+        indexes.tolist(),
+        strict=True,
+    ):
+        segment = dataset.segments[index]
+        rows.append(
+            {
+                "relative_path": segment.relative_path,
+                "group_key": segment.group_key,
+                "vessel_key": segment.vessel_key,
+                "segment_index": segment.segment_index,
+                "true_label": target,
+                "predicted_label": prediction,
+                "probabilities": probability,
+            }
+        )
+
+
 def run_epoch(
     model: Wav2Vec2ConformerClassifier,
     dataloader: DataLoader,
@@ -517,8 +620,10 @@ def run_epoch(
     progress: TrainingProgress,
     learning_rates: str,
     optimizer: torch.optim.Optimizer | None = None,
+    scheduler: LRScheduler | None = None,
     scaler: torch.amp.GradScaler | None = None,
     max_batches: int | None = None,
+    prediction_rows: list[dict[str, object]] | None = None,
 ) -> tuple[float, float]:
     is_train = optimizer is not None
     model.train(is_train)
@@ -534,6 +639,17 @@ def run_epoch(
         raise ValueError("phase must be train or val")
     if (phase == "train") != is_train:
         raise ValueError("train phase requires an optimizer; val phase must not receive one")
+    if scheduler is not None and not is_train:
+        raise ValueError("A learning-rate scheduler is only valid during training")
+    prediction_dataset = None
+    if prediction_rows is not None:
+        if is_train:
+            raise ValueError("Prediction collection is only supported during validation")
+        if not isinstance(dataloader.dataset, DeepShipWaveformSegmentDataset):
+            raise ValueError("Prediction DataLoader must use DeepShip waveform segments")
+        if not dataloader.dataset.return_index:
+            raise ValueError("Prediction DataLoader must expose DeepShip segment indexes")
+        prediction_dataset = dataloader.dataset
     if is_train:
         optimizer.zero_grad(set_to_none=True)
     gradients_validated = False
@@ -550,7 +666,9 @@ def run_epoch(
             total_correct=0,
             started_at=started_at,
             cuda_device=cuda_device,
-            learning_rates=learning_rates,
+            learning_rates=(
+                _learning_rate_text(optimizer) if optimizer is not None else learning_rates
+            ),
         )
     )
 
@@ -562,6 +680,15 @@ def run_epoch(
             with _autocast_context(config):
                 logits = model(input_values, attention_mask=attention_mask)
                 loss = criterion(logits, targets)
+
+            if prediction_rows is not None and prediction_dataset is not None:
+                _append_prediction_rows(
+                    prediction_rows,
+                    prediction_dataset,
+                    targets,
+                    logits,
+                    batch[3],
+                )
 
             if is_train:
                 scaled_loss = loss / config.gradient_accumulation_steps
@@ -585,6 +712,8 @@ def run_epoch(
                         scaler.update()
                     else:
                         optimizer.step()
+                    if scheduler is not None:
+                        scheduler.step()
                     optimizer.zero_grad(set_to_none=True)
 
             total_loss += loss.item() * input_values.size(0)
@@ -607,7 +736,11 @@ def run_epoch(
                         total_correct=total_correct,
                         started_at=started_at,
                         cuda_device=cuda_device,
-                        learning_rates=learning_rates,
+                        learning_rates=(
+                            _learning_rate_text(optimizer)
+                            if optimizer is not None
+                            else learning_rates
+                        ),
                     ),
                 )
     return total_loss / total_samples, total_correct / total_samples
@@ -633,27 +766,7 @@ def collect_prediction_rows(
             indexes = batch[3]
             with _autocast_context(config):
                 logits = model(input_values, attention_mask=attention_mask)
-            probabilities = torch.softmax(logits, dim=1).cpu().tolist()
-            predictions = logits.argmax(dim=1).cpu().tolist()
-            for target, prediction, probability, index in zip(
-                targets.cpu().tolist(),
-                predictions,
-                probabilities,
-                indexes.tolist(),
-                strict=True,
-            ):
-                segment = dataset.segments[index]
-                rows.append(
-                    {
-                        "relative_path": segment.relative_path,
-                        "group_key": segment.group_key,
-                        "vessel_key": segment.vessel_key,
-                        "segment_index": segment.segment_index,
-                        "true_label": target,
-                        "predicted_label": prediction,
-                        "probabilities": probability,
-                    }
-                )
+            _append_prediction_rows(rows, dataset, targets, logits, indexes)
     return rows
 
 
@@ -686,6 +799,7 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
     )
 
     dataloaders, split_report = build_dataloaders(config)
+    protocol = str(split_report["protocol"])
     shutil.copyfile(resolve_path(config.split_manifest), reports_dir / "frozen_split_manifest.json")
     (reports_dir / "split_validation.json").write_text(
         json.dumps(split_report, indent=2, ensure_ascii=False) + "\n",
@@ -732,7 +846,26 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
     )
     criterion = nn.CrossEntropyLoss()
     optimizer = build_optimizer(model, config)
-    scheduler = build_scheduler(optimizer, config)
+    train_batches_per_epoch = (
+        len(dataloaders["train"])
+        if config.max_train_batches is None
+        else min(len(dataloaders["train"]), config.max_train_batches)
+    )
+    optimizer_steps_per_epoch = math.ceil(
+        train_batches_per_epoch / config.gradient_accumulation_steps
+    )
+    total_optimizer_steps = optimizer_steps_per_epoch * config.epochs
+    scheduler, schedule_report = build_scheduler(
+        optimizer,
+        config,
+        total_optimizer_steps=total_optimizer_steps,
+    )
+    schedule_report["train_batches_per_epoch"] = train_batches_per_epoch
+    schedule_report["optimizer_steps_per_epoch"] = optimizer_steps_per_epoch
+    (reports_dir / "training_schedule.json").write_text(
+        json.dumps(schedule_report, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
     use_scaler = str(config.device).startswith("cuda") and config.precision == "fp16"
     scaler = torch.amp.GradScaler("cuda", enabled=True) if use_scaler else None
 
@@ -741,13 +874,21 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         "val_loss": [],
         "train_acc": [],
         "val_acc": [],
+        "val_segment_macro_f1": [],
+        "val_recording_acc": [],
+        "val_recording_macro_f1": [],
+        "val_vessel_acc": [],
+        "val_vessel_macro_f1": [],
+        "selection_primary_value": [],
+        "optimizer_steps_completed": [],
         "encoder_learning_rate": [],
         "head_learning_rate": [],
     }
     history_path = reports_dir / "deepship_conformer_history.json"
     best_model_path = models_dir / "deepship_conformer_best.pt"
     last_model_path = models_dir / "deepship_conformer_last.pt"
-    best_val_acc = -1.0
+    best_selection: dict[str, object] | None = None
+    best_validation_metrics: dict[str, dict[str, object] | None] | None = None
     best_epoch = -1
     start_epoch = 1
 
@@ -755,16 +896,21 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         if not last_model_path.is_file():
             raise FileNotFoundError(f"Resume checkpoint is unavailable: {last_model_path}")
         checkpoint = torch.load(last_model_path, map_location=config.device, weights_only=False)
-        if checkpoint.get("split_manifest_sha256") != split_report["manifest_sha256"]:
-            raise ValueError("Resume checkpoint uses a different split manifest")
+        validate_resume_selection_state(
+            checkpoint,
+            manifest_sha256=str(split_report["manifest_sha256"]),
+            protocol=protocol,
+        )
+        if checkpoint.get("schedule_report") != schedule_report:
+            raise ValueError("Resume checkpoint uses a different optimizer schedule")
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        if scheduler is not None and checkpoint["scheduler_state_dict"] is not None:
-            scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
         if scaler is not None and checkpoint.get("scaler_state_dict") is not None:
             scaler.load_state_dict(checkpoint["scaler_state_dict"])
         history = checkpoint["history"]
-        best_val_acc = float(checkpoint["best_val_acc"])
+        best_selection = checkpoint["best_selection"]
+        best_validation_metrics = checkpoint["best_validation_metrics"]
         best_epoch = int(checkpoint["best_epoch"])
         start_epoch = int(checkpoint["epoch"]) + 1
         restore_rng_state(checkpoint["rng_state"])
@@ -783,9 +929,12 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             progress=progress,
             learning_rates=progress_learning_rates,
             optimizer=optimizer,
+            scheduler=scheduler,
             scaler=scaler,
             max_batches=config.max_train_batches,
         )
+        validation_learning_rates = _learning_rate_text(optimizer)
+        validation_segment_predictions: list[dict[str, object]] = []
         val_loss, val_acc = run_epoch(
             model,
             dataloaders["val"],
@@ -794,9 +943,19 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             epoch=epoch,
             phase="val",
             progress=progress,
-            learning_rates=progress_learning_rates,
+            learning_rates=validation_learning_rates,
             max_batches=config.max_eval_batches,
+            prediction_rows=validation_segment_predictions,
         )
+        validation_metrics, validation_recording_predictions, validation_vessel_predictions = (
+            compute_grouped_metrics(validation_segment_predictions, CLASS_NAMES)
+        )
+        selection = build_validation_selection(protocol, validation_metrics, val_loss)
+        segment_validation_metrics = validation_metrics["segment"]
+        recording_validation_metrics = validation_metrics["recording"]
+        vessel_validation_metrics = validation_metrics["vessel"]
+        if segment_validation_metrics is None or recording_validation_metrics is None:
+            raise RuntimeError("Validation aggregation did not produce required metrics")
         learning_rates = {
             str(group.get("name", index)): float(group["lr"])
             for index, group in enumerate(optimizer.param_groups)
@@ -807,49 +966,132 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         history["val_loss"].append(val_loss)
         history["train_acc"].append(train_acc)
         history["val_acc"].append(val_acc)
+        history["val_segment_macro_f1"].append(
+            float(segment_validation_metrics["macro_f1"])
+        )
+        history["val_recording_acc"].append(
+            float(recording_validation_metrics["accuracy"])
+        )
+        history["val_recording_macro_f1"].append(
+            float(recording_validation_metrics["macro_f1"])
+        )
+        history["val_vessel_acc"].append(
+            float(vessel_validation_metrics["accuracy"])
+            if vessel_validation_metrics is not None
+            else None
+        )
+        history["val_vessel_macro_f1"].append(
+            float(vessel_validation_metrics["macro_f1"])
+            if vessel_validation_metrics is not None
+            else None
+        )
+        history["selection_primary_value"].append(float(selection["primary_value"]))
+        history["optimizer_steps_completed"].append(epoch * optimizer_steps_per_epoch)
         history["encoder_learning_rate"].append(encoder_lr)
         history["head_learning_rate"].append(head_lr)
         history_path.write_text(json.dumps(history, indent=2) + "\n", encoding="utf-8")
 
-        improved = val_acc > best_val_acc
+        improved = selection_is_better(selection, best_selection)
         if improved:
-            best_val_acc = val_acc
+            best_selection = selection
+            best_validation_metrics = validation_metrics
             best_epoch = epoch
+            save_prediction_rows(
+                validation_segment_predictions,
+                predictions_dir / "validation_best_segment_predictions.csv",
+                CLASS_NAMES,
+            )
+            save_prediction_rows(
+                validation_recording_predictions,
+                predictions_dir / "validation_best_recording_predictions.csv",
+                CLASS_NAMES,
+            )
+            if validation_vessel_predictions:
+                save_prediction_rows(
+                    validation_vessel_predictions,
+                    predictions_dir / "validation_best_vessel_predictions.csv",
+                    CLASS_NAMES,
+                )
+            save_metrics(
+                segment_validation_metrics,
+                metrics_dir / "validation_best_segment_metrics.json",
+            )
+            save_metrics(
+                recording_validation_metrics,
+                metrics_dir / "validation_best_recording_metrics.json",
+            )
+            if vessel_validation_metrics is not None:
+                save_metrics(
+                    vessel_validation_metrics,
+                    metrics_dir / "validation_best_vessel_metrics.json",
+                )
+            (reports_dir / "validation_best_selection.json").write_text(
+                json.dumps(selection, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
             atomic_torch_save(
                 {
                     "model_state_dict": model.state_dict(),
                     "config": asdict(config),
                     "epoch": epoch,
+                    "val_loss": val_loss,
                     "val_acc": val_acc,
+                    "selection_schema_version": SELECTION_SCHEMA_VERSION,
+                    "selection": selection,
+                    "validation_metrics": validation_metrics,
+                    "schedule_report": schedule_report,
                     "num_parameters": model.num_parameters,
                     "num_trainable_parameters": model.num_trainable_parameters,
                     "split_report": split_report,
                 },
                 best_model_path,
             )
-        should_stop = not improved and epoch - best_epoch >= config.early_stopping_patience
-        if scheduler is not None:
-            scheduler.step()
+        should_stop = should_stop_early(
+            improved=improved,
+            epoch=epoch,
+            best_epoch=best_epoch,
+            patience=config.early_stopping_patience,
+        )
+        if best_selection is None or best_validation_metrics is None:
+            raise RuntimeError("Best validation selection was not initialized")
         atomic_torch_save(
             {
                 "model_state_dict": model.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
-                "scheduler_state_dict": scheduler.state_dict() if scheduler is not None else None,
+                "scheduler_state_dict": scheduler.state_dict(),
+                "schedule_report": schedule_report,
                 "scaler_state_dict": scaler.state_dict() if scaler is not None else None,
                 "config": asdict(config),
                 "epoch": epoch,
                 "history": history,
-                "best_val_acc": best_val_acc,
+                "selection_schema_version": SELECTION_SCHEMA_VERSION,
+                "selection_rule": validation_selection_rule(protocol),
+                "best_selection": best_selection,
+                "best_validation_metrics": best_validation_metrics,
                 "best_epoch": best_epoch,
                 "split_manifest_sha256": split_report["manifest_sha256"],
                 "rng_state": capture_rng_state(),
             },
             last_model_path,
         )
+        selection_name = str(selection["rule"]["name"])
+        best_selection_value = float(best_selection["primary_value"])
+        recording_macro_f1 = float(recording_validation_metrics["macro_f1"])
+        vessel_macro_f1 = (
+            float(vessel_validation_metrics["macro_f1"])
+            if vessel_validation_metrics is not None
+            else None
+        )
+        vessel_summary = (
+            f"{vessel_macro_f1:.4f}" if vessel_macro_f1 is not None else "n/a"
+        )
         summary = (
             f"Epoch {epoch}/{config.epochs} | done | train_loss={train_loss:.4f} "
             f"| train_acc={train_acc:.4f} | val_loss={val_loss:.4f} "
-            f"| val_acc={val_acc:.4f} | best_val_acc={best_val_acc:.4f} "
+            f"| val_acc={val_acc:.4f} | val_recording_f1={recording_macro_f1:.4f} "
+            f"| val_vessel_f1={vessel_summary} "
+            f"| select={selection_name}:{float(selection['primary_value']):.4f} "
+            f"| best_select={best_selection_value:.4f} "
             f"| time={_format_duration(time.perf_counter() - epoch_started_at)}"
         )
         if should_stop:
@@ -867,27 +1109,14 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         config,
         max_batches=config.max_eval_batches,
     )
-    recording_predictions = aggregate_recording_predictions(segment_predictions)
-    vessel_predictions = aggregate_vessel_predictions(recording_predictions)
-    segment_metrics = compute_metrics(
-        [int(row["true_label"]) for row in segment_predictions],
-        [int(row["predicted_label"]) for row in segment_predictions],
-        CLASS_NAMES,
+    test_metrics, recording_predictions, vessel_predictions = (
+        compute_grouped_metrics(segment_predictions, CLASS_NAMES)
     )
-    recording_metrics = compute_metrics(
-        [int(row["true_label"]) for row in recording_predictions],
-        [int(row["predicted_label"]) for row in recording_predictions],
-        CLASS_NAMES,
-    )
-    vessel_metrics = (
-        compute_metrics(
-            [int(row["true_label"]) for row in vessel_predictions],
-            [int(row["predicted_label"]) for row in vessel_predictions],
-            CLASS_NAMES,
-        )
-        if vessel_predictions
-        else None
-    )
+    segment_metrics = test_metrics["segment"]
+    recording_metrics = test_metrics["recording"]
+    vessel_metrics = test_metrics["vessel"]
+    if segment_metrics is None or recording_metrics is None:
+        raise RuntimeError("Test aggregation did not produce required metrics")
     save_metrics(segment_metrics, metrics_dir / "segment_metrics.json")
     save_metrics(recording_metrics, metrics_dir / "recording_metrics.json")
     if vessel_metrics is not None:
@@ -909,7 +1138,6 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
             CLASS_NAMES,
         )
 
-    protocol = str(split_report["protocol"])
     plot_confusion_matrix(
         segment_metrics["confusion_matrix"],
         CLASS_NAMES,
@@ -938,13 +1166,22 @@ def train(config: ConformerTrainConfig) -> dict[str, object]:
         title=f"DeepShip {protocol} Wav2Vec2-Conformer Training Curves",
     )
 
+    if best_selection is None or best_validation_metrics is None:
+        raise RuntimeError("Best validation selection is unavailable")
+    best_segment_metrics = best_validation_metrics["segment"]
+    if best_segment_metrics is None:
+        raise RuntimeError("Best validation segment metrics are unavailable")
     result = {
         "protocol": protocol,
         "segment_metrics": segment_metrics,
         "recording_metrics": recording_metrics,
         "vessel_metrics": vessel_metrics,
         "best_epoch": best_epoch,
-        "best_val_acc": best_val_acc,
+        "selection_schema_version": SELECTION_SCHEMA_VERSION,
+        "selection_rule": validation_selection_rule(protocol),
+        "best_selection": best_selection,
+        "best_validation_metrics": best_validation_metrics,
+        "best_val_acc": float(best_segment_metrics["accuracy"]),
         "num_parameters": model.num_parameters,
         "num_trainable_parameters": model.num_trainable_parameters,
     }

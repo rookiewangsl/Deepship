@@ -161,7 +161,8 @@ python scripts/train/train_deepship_conformer.py \
 2026-08-28 的服务器验证发现，旧的 FP16＋重入 gradient checkpointing 组合会让最后 4 层没有
 梯度；FP16 首批梯度也可能非有限。当前代码因此默认使用 BF16、batch size 1、梯度累积 8，并
 关闭 checkpointing。两批次 20 s/last-4 smoke 的 `nvidia-smi` 采样峰值约 6.7 GiB，最后 4 层、
-pooling 和分类头均有有限梯度，encoder 学习参数按约 `1e-5` 幅度更新。
+pooling 和分类头均有有限梯度。第二版正式训练把 last-4 encoder 峰值学习率降为 `5e-6`，head
+峰值学习率降为 `1e-4`，并改为逐 optimizer step 更新的 5% warmup＋cosine decay。
 
 只有显存不足时才显式加入 `--gradient-checkpointing`；该选项使用非重入 checkpointing，启用后
 必须重新通过梯度回归检查和 smoke。4070 可能是 8 GB、12 GB 或其他显存配置，不能只凭型号
@@ -176,29 +177,31 @@ pooling 和分类头均有有限梯度，encoder 学习参数按约 `1e-5` 幅�
 物理行在不同时刻的内容，实际不会纵向累积：
 
 ```text
-Epoch 1/50 | train | batch=0/14000 (0.0%) | avg_loss=-- | avg_acc=-- | lr=head:3.00e-05 | samples_per_sec=-- | gpu_peak=2.34GiB
-Epoch 1/50 | train | batch=100/14000 (0.7%) | avg_loss=1.4321 | avg_acc=0.2900 | lr=head:3.00e-05 | samples_per_sec=2.35 | gpu_peak=6.71GiB
+Epoch 1/30 | train | batch=0/14000 (0.0%) | avg_loss=-- | avg_acc=-- | lr=head:1.00e-05 | samples_per_sec=-- | gpu_peak=2.34GiB
+Epoch 1/30 | train | batch=100/14000 (0.7%) | avg_loss=1.4321 | avg_acc=0.2900 | lr=head:1.04e-05 | samples_per_sec=2.35 | gpu_peak=6.71GiB
 ...
-Epoch 1/50 | train | batch=14000/14000 (100.0%) | avg_loss=0.8421 | avg_acc=0.6812 | lr=head:3.00e-05 | samples_per_sec=2.38 | gpu_peak=6.72GiB
+Epoch 1/30 | train | batch=14000/14000 (100.0%) | avg_loss=0.8421 | avg_acc=0.6812 | lr=head:7.00e-05 | samples_per_sec=2.38 | gpu_peak=6.72GiB
 ```
 
 训练结束后，同一物理行切换到验证进度：
 
 ```text
-Epoch 1/50 | val | batch=100/4000 (2.5%) | avg_loss=1.1034 | avg_acc=0.5600 | lr=head:3.00e-05 | samples_per_sec=3.41 | gpu_peak=2.94GiB
+Epoch 1/30 | val | batch=100/4000 (2.5%) | avg_loss=1.1034 | avg_acc=0.5600 | lr=head:7.00e-05 | samples_per_sec=3.41 | gpu_peak=2.94GiB
 ...
-Epoch 1/50 | val | batch=4000/4000 (100.0%) | avg_loss=0.9912 | avg_acc=0.5905 | lr=head:3.00e-05 | samples_per_sec=3.45 | gpu_peak=2.95GiB
+Epoch 1/30 | val | batch=4000/4000 (100.0%) | avg_loss=0.9912 | avg_acc=0.5905 | lr=head:7.00e-05 | samples_per_sec=3.45 | gpu_peak=2.95GiB
 ```
 
 保存 history 和 best/last checkpoint 后，清除动态行并固定本轮唯一的最终输出：
 
 ```text
-Epoch 1/50 | done | train_loss=0.8421 | train_acc=0.6812 | val_loss=0.9912 | val_acc=0.5905 | best_val_acc=0.5905 | time=02:08:31
+Epoch 1/30 | done | train_loss=0.8421 | train_acc=0.6812 | val_loss=0.9912 | val_acc=0.5905 | val_recording_f1=0.6012 | val_vessel_f1=0.5840 | select=vessel_macro_f1:0.5840 | best_select=0.5840 | time=02:08:31
 ```
 
-上述数字仅用于展示格式，不是实际实验结果。F0 的 encoder 完全冻结，因此汇总中的
-动态行显示 `lr=head:...`；F1b 会显示 `lr=enc:...,head:...`。如果触发早停，最终摘要会追加
-`early_stop=true` 和 `best_epoch`，不会额外占用一行。
+上述数字仅用于展示格式，不是实际实验结果。学习率在每次 optimizer update 后变化，终端显示
+当前值；F0 的 encoder 完全冻结，因此动态行显示 `lr=head:...`，F1b 会显示
+`lr=enc:...,head:...`。vessel-name-disjoint 以 validation vessel macro-F1 选择 checkpoint；如果
+连续 5 epoch 不提升，最终摘要追加 `early_stop=true` 和 `best_epoch`。窄终端会截断动态行而不换行，
+完整 epoch 摘要和结构化 history 不受影响。
 
 1. F0：20 s，encoder frozen，seed 42；
 2. F1b：20 s，last 4 blocks，seed 42；

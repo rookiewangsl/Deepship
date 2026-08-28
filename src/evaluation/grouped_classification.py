@@ -65,6 +65,39 @@ def aggregate_vessel_predictions(
     return results
 
 
+def compute_grouped_metrics(
+    segment_rows: list[dict[str, object]],
+    class_names: list[str],
+) -> tuple[
+    dict[str, dict[str, object] | None],
+    list[dict[str, object]],
+    list[dict[str, object]],
+]:
+    if not segment_rows:
+        raise ValueError("At least one segment prediction is required")
+
+    # Lazy import keeps probability aggregation usable without plotting/metrics
+    # dependencies, including lightweight manifest-audit environments.
+    from src.evaluation.classification import compute_metrics
+
+    recording_rows = aggregate_recording_predictions(segment_rows)
+    vessel_rows = aggregate_vessel_predictions(recording_rows)
+
+    def metrics(rows: list[dict[str, object]]) -> dict[str, object]:
+        return compute_metrics(
+            [int(row["true_label"]) for row in rows],
+            [int(row["predicted_label"]) for row in rows],
+            class_names,
+        )
+
+    grouped_metrics: dict[str, dict[str, object] | None] = {
+        "segment": metrics(segment_rows),
+        "recording": metrics(recording_rows),
+        "vessel": metrics(vessel_rows) if vessel_rows else None,
+    }
+    return grouped_metrics, recording_rows, vessel_rows
+
+
 def save_prediction_rows(
     rows: list[dict[str, object]],
     output_path: str | Path,

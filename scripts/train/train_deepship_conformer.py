@@ -84,17 +84,24 @@ def build_parser() -> argparse.ArgumentParser:
     parser.set_defaults(gradient_checkpointing=False)
     parser.add_argument("--batch-size", type=int, default=1)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=8)
-    parser.add_argument("--epochs", type=int, default=50)
-    parser.add_argument("--encoder-learning-rate", type=float, default=1e-5)
-    parser.add_argument("--head-learning-rate", type=float, default=3e-4)
+    parser.add_argument("--epochs", type=int, default=30)
+    parser.add_argument("--encoder-learning-rate", type=float, default=5e-6)
+    parser.add_argument("--head-learning-rate", type=float, default=1e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-2)
     parser.add_argument("--min-learning-rate", type=float, default=1e-6)
-    parser.add_argument("--warmup-epochs", type=int, default=5)
+    parser.add_argument("--warmup-ratio", type=float, default=0.05)
+    parser.add_argument("--warmup-start-factor", type=float, default=0.1)
     parser.add_argument("--max-grad-norm", type=float, default=1.0)
-    parser.add_argument("--early-stopping-patience", type=int, default=8)
+    parser.add_argument("--early-stopping-patience", type=int, default=5)
     parser.add_argument("--precision", choices=["fp32", "fp16", "bf16"], default="bf16")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument(
+        "--prefetch-factor",
+        type=int,
+        default=2,
+        help="Batches prefetched by each DataLoader worker.",
+    )
     parser.add_argument(
         "--log-interval",
         type=int,
@@ -132,12 +139,14 @@ def main() -> None:
         head_learning_rate=args.head_learning_rate,
         weight_decay=args.weight_decay,
         min_learning_rate=args.min_learning_rate,
-        warmup_epochs=args.warmup_epochs,
+        warmup_ratio=args.warmup_ratio,
+        warmup_start_factor=args.warmup_start_factor,
         max_grad_norm=args.max_grad_norm,
         early_stopping_patience=args.early_stopping_patience,
         precision=args.precision,
         seed=args.seed,
         num_workers=args.num_workers,
+        prefetch_factor=args.prefetch_factor,
         log_interval=args.log_interval,
         resume=args.resume,
         max_train_batches=args.max_train_batches,
