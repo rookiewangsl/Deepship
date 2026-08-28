@@ -92,12 +92,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--gradient-accumulation-steps", type=int, default=8)
     parser.add_argument(
         "--training-sampling",
-        choices=["fixed_anchor", "recording_balanced_dynamic"],
+        choices=[
+            "fixed_anchor",
+            "recording_balanced_dynamic",
+            "vessel_balanced_dynamic",
+        ],
         default="fixed_anchor",
         help=(
-            "Use frozen manifest anchors (S0), or class→recording-balanced "
-            "whole-recording dynamic crops (S1). Validation/test always use "
-            "the frozen anchors."
+            "Use frozen manifest anchors (S0), class→recording-balanced crops "
+            "(S1), or class→vessel→recording-balanced crops (S2). "
+            "Validation/test always use the frozen anchors."
         ),
     )
     parser.add_argument(

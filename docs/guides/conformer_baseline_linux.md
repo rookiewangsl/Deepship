@@ -208,7 +208,7 @@ Epoch 1/30 | done | train_loss=0.8421 | train_acc=0.6812 | val_loss=0.9912 | val
 2. F1b 最佳值为 0.4650，并在后续出现明显过拟合，已停止；不运行 last-8；
 3. 下一项运行 F0-S1，检验固定 anchor 冗余与 recording 暴露偏置；
 4. F0-S1 提高至少 1 pp 且 recording macro-F1 不退化时，再运行 S1＋last-2；
-5. S2 仅由 S1 收益或残余 vessel 暴露偏置触发；
+5. S2 代码已由残余 vessel 暴露偏置触发并实现，但仍等待 S1 结果后再决定是否运行；
 6. 若 S1 无效，转入 3/10/20 s 上下文和 scratch/预训练控制；
 7. 只有最佳候选进入 42/43/44/45/46 多 seed。
 
@@ -258,10 +258,10 @@ bash scripts/train/run_conformer_f0_s1_seed42.sh formal
 `--num-workers 4`。它会额外保存 `reports/training_sampling_exposure.json`，其中含每轮
 recording/vessel 暴露、重复率、吞吐和 DataLoader 等待占比。
 
-## 8. 当前未实现范围
+## 8. 尚未运行或未实现的条件分支
 
 - ONC 水声自监督适配（B4）；
-- S2 vessel-balanced 动态采样；
+- S2 已实现但尚未运行，不与 S1 并行；
 - recording-level MIL（当前已使用 ASP，但 loss 仍是单窗口级）；
 - 真实背景混合（B6）；
 - 门控频谱支路（B7）；

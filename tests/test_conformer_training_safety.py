@@ -192,7 +192,7 @@ class ConformerTrainingSafetyTests(unittest.TestCase):
             split_manifest="unused.json",
             device="cpu",
             precision="fp32",
-            training_sampling="vessel_balanced_dynamic",
+            training_sampling="unknown_dynamic_policy",
         )
         with self.assertRaisesRegex(ValueError, "training_sampling"):
             validate_config(invalid_sampling)
@@ -296,6 +296,19 @@ class ConformerTrainingSafetyTests(unittest.TestCase):
         self.assertEqual(dataloaders["val"].batch_size, 2)
         self.assertEqual(report["training_sampling"]["id"], "S1")
         self.assertEqual(report["batch_sizes"]["validation"], 2)
+
+        config.training_sampling = "vessel_balanced_dynamic"
+        with patch(
+            "src.pipelines.waveform_conformer.train_deepship_conformer."
+            "load_and_validate_split",
+            return_value=(split_segments, split_report),
+        ):
+            vessel_dataloaders, vessel_report = build_dataloaders(config)
+        self.assertEqual(vessel_report["training_sampling"]["id"], "S2")
+        self.assertIsInstance(
+            vessel_dataloaders["train"].sampler,
+            RecordingBalancedEpochSampler,
+        )
 
     def test_step_scheduler_warms_up_then_cosine_decays(self) -> None:
         encoder = nn.Parameter(torch.zeros(1))

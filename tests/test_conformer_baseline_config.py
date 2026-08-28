@@ -73,6 +73,18 @@ class ConformerBaselineConfigTests(unittest.TestCase):
         self.assertEqual(dynamic.eval_batch_size, 2)
         self.assertEqual(dynamic.early_stopping_min_delta, 0.005)
 
+        vessel_dynamic = build_parser().parse_args(
+            [
+                "--output-root",
+                "unused",
+                "--split-manifest",
+                "unused.json",
+                "--training-sampling",
+                "vessel_balanced_dynamic",
+            ]
+        )
+        self.assertEqual(vessel_dynamic.training_sampling, "vessel_balanced_dynamic")
+
     def test_sampling_ablation_changes_only_training_exposure(self) -> None:
         config = json.loads(
             (ROOT / "configs" / "experiments" / "conformer_sampling_v1.json").read_text(

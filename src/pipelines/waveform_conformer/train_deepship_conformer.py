@@ -26,6 +26,7 @@ from src.data.deepship_protocol_validation import load_split_manifest, validate_
 from src.data.deepship_waveform import (
     DeepShipWaveformSegmentDataset,
     RecordingBalancedEpochSampler,
+    VesselBalancedEpochSampler,
     recording_representatives,
 )
 from src.evaluation.classification import (
@@ -200,6 +201,7 @@ def validate_config(config: ConformerTrainConfig) -> None:
     if config.training_sampling not in {
         "fixed_anchor",
         "recording_balanced_dynamic",
+        "vessel_balanced_dynamic",
     }:
         raise ValueError("Unsupported training_sampling policy")
     if config.train_samples_per_epoch is not None and config.train_samples_per_epoch <= 0:
@@ -305,7 +307,10 @@ def build_dataloaders(
     split_segments, split_report = load_and_validate_split(config)
     protocol = str(split_report["protocol"])
     train_sampler: RecordingBalancedEpochSampler | None = None
-    if config.training_sampling == "recording_balanced_dynamic":
+    if config.training_sampling in {
+        "recording_balanced_dynamic",
+        "vessel_balanced_dynamic",
+    }:
         if protocol == "segment_level":
             raise ValueError(
                 "Dynamic recording sampling requires a recording- or vessel-disjoint protocol"
@@ -321,14 +326,27 @@ def build_dataloaders(
             dynamic_crop=True,
         )
         epoch_samples = config.train_samples_per_epoch or len(split_segments["train"])
-        train_sampler = RecordingBalancedEpochSampler(
+        sampler_class = (
+            RecordingBalancedEpochSampler
+            if config.training_sampling == "recording_balanced_dynamic"
+            else VesselBalancedEpochSampler
+        )
+        train_sampler = sampler_class(
             train_recordings,
             epoch_samples=epoch_samples,
             seed=config.seed,
         )
+        sampling_id = (
+            "S1" if config.training_sampling == "recording_balanced_dynamic" else "S2"
+        )
+        sampling_policy = (
+            "class_then_recording_balanced_dynamic_crop"
+            if config.training_sampling == "recording_balanced_dynamic"
+            else "class_then_vessel_then_recording_balanced_dynamic_crop"
+        )
         split_report["training_sampling"] = {
-            "id": "S1",
-            "policy": "class_then_recording_balanced_dynamic_crop",
+            "id": sampling_id,
+            "policy": sampling_policy,
             "epoch_samples": epoch_samples,
             "recordings": len(train_recordings),
             "classes": len({row.label_index for row in train_recordings}),

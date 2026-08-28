@@ -66,7 +66,7 @@
   "decision_after_seed42": {
     "candidate_passes": "retain S1, then evaluate last-2 on S1",
     "candidate_fails_without_residual_vessel_bias": "stop sampling branch and run context/pretraining controls",
-    "residual_vessel_bias_or_clear_s1_gain": "implement the conditional S2 vessel-balanced sampler",
+    "residual_vessel_bias_or_clear_s1_gain": "S2 sampler is implemented; run it only after reviewing S1 validation",
     "never_from_this_result": "run last-8 or tune against DeepShip test"
   }
 }

@@ -11,6 +11,7 @@ from src.data.deepship import SegmentRecord
 from src.data.deepship_waveform import (
     DeepShipWaveformSegmentDataset,
     RecordingBalancedEpochSampler,
+    VesselBalancedEpochSampler,
     recording_representatives,
 )
 
@@ -205,9 +206,61 @@ class DeepShipWaveformDatasetTests(unittest.TestCase):
         self.assertEqual(report["classes"], {"Cargo": 5, "Passenger": 5})
         self.assertEqual(report["unique_recordings"], 6)
         self.assertAlmostEqual(float(report["recording_repeat_rate"]), 0.4)
+        for summary in report["recording_draws_by_class"].values():
+            self.assertLessEqual(int(summary["max"]) - int(summary["min"]), 1)
 
         sampler.set_epoch(2)
         self.assertNotEqual(epoch_one, list(sampler))
+
+    def test_vessel_balanced_sampler_balances_vessels_then_recordings(self) -> None:
+        specifications = [
+            (0, "Cargo", "cargo-a", 3),
+            (0, "Cargo", "cargo-b", 1),
+            (1, "Passenger", "passenger-a", 2),
+            (1, "Passenger", "passenger-b", 1),
+        ]
+        recordings = []
+        for label, class_name, vessel_key, recording_count in specifications:
+            for recording_index in range(recording_count):
+                recordings.append(
+                    self._segment(
+                        start_frame=0,
+                        num_frames=10,
+                        sample_rate=10,
+                        relative_path=(
+                            f"{class_name}/{vessel_key}-{recording_index}.wav"
+                        ),
+                        class_name=class_name,
+                        label_index=label,
+                        group_key=vessel_key,
+                        vessel_key=vessel_key,
+                    )
+                )
+        sampler = VesselBalancedEpochSampler(
+            recordings,
+            epoch_samples=20,
+            seed=42,
+        )
+
+        requests = list(sampler)
+        vessel_counts = {
+            vessel_key: sum(
+                recordings[index].vessel_key == vessel_key for index, _ in requests
+            )
+            for _, _, vessel_key, _ in specifications
+        }
+        self.assertEqual(set(vessel_counts.values()), {5})
+        for _, _, vessel_key, _ in specifications:
+            per_recording = [
+                sum(index == recording_index for index, _ in requests)
+                for recording_index, row in enumerate(recordings)
+                if row.vessel_key == vessel_key
+            ]
+            self.assertLessEqual(max(per_recording) - min(per_recording), 1)
+
+        report = sampler.exposure_report()
+        for summary in report["vessel_draws_by_class"].values():
+            self.assertEqual(summary["min"], summary["max"])
 
 
 if __name__ == "__main__":

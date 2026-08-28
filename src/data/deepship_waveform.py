@@ -267,6 +267,12 @@ class RecordingBalancedEpochSampler(Sampler[tuple[int, int]]):
         vessel_counts = Counter(
             self.recordings[index].vessel_key for index, _ in requests
         )
+        recording_counts_by_class: dict[str, Counter[int]] = defaultdict(Counter)
+        vessel_counts_by_class: dict[str, Counter[str]] = defaultdict(Counter)
+        for index, _ in requests:
+            recording = self.recordings[index]
+            recording_counts_by_class[recording.class_name][index] += 1
+            vessel_counts_by_class[recording.class_name][recording.vessel_key] += 1
         return {
             "epoch": self.epoch,
             "seed": self.seed,
@@ -278,4 +284,69 @@ class RecordingBalancedEpochSampler(Sampler[tuple[int, int]]):
             "vessel_repeat_rate": 1.0 - len(vessel_counts) / len(requests),
             "recording_draws": self._count_summary(list(recording_counts.values())),
             "vessel_draws": self._count_summary(list(vessel_counts.values())),
+            "recording_draws_by_class": {
+                class_name: self._count_summary(list(counts.values()))
+                for class_name, counts in sorted(recording_counts_by_class.items())
+            },
+            "vessel_draws_by_class": {
+                class_name: self._count_summary(list(counts.values()))
+                for class_name, counts in sorted(vessel_counts_by_class.items())
+            },
         }
+
+
+class VesselBalancedEpochSampler(RecordingBalancedEpochSampler):
+    """Build a deterministic class→vessel→recording-balanced crop epoch."""
+
+    def __init__(
+        self,
+        recordings: list[SegmentRecord],
+        *,
+        epoch_samples: int,
+        seed: int,
+    ) -> None:
+        super().__init__(recordings, epoch_samples=epoch_samples, seed=seed)
+        self.indexes_by_class_and_vessel: dict[int, dict[str, list[int]]] = (
+            defaultdict(lambda: defaultdict(list))
+        )
+        for index, recording in enumerate(recordings):
+            if not recording.vessel_key:
+                raise ValueError("Vessel-balanced sampling requires non-empty vessel keys")
+            self.indexes_by_class_and_vessel[recording.label_index][
+                recording.vessel_key
+            ].append(index)
+
+    def _requests(self) -> list[tuple[int, int]]:
+        labels = sorted(self.indexes_by_class_and_vessel)
+        base_count, remainder = divmod(self.epoch_samples, len(labels))
+        requests: list[tuple[int, int]] = []
+        for label_position, label in enumerate(labels):
+            target = base_count + (1 if label_position < remainder else 0)
+            indexes_by_vessel = self.indexes_by_class_and_vessel[label]
+            vessel_keys = sorted(indexes_by_vessel)
+            rng = random.Random(
+                (self.seed + 1) * 2_000_003 + self.epoch * 20_011 + label * 211
+            )
+            selected_vessels: list[str] = []
+            while len(selected_vessels) < target:
+                cycle = vessel_keys[:]
+                rng.shuffle(cycle)
+                selected_vessels.extend(cycle[: target - len(selected_vessels)])
+
+            recording_cycles: dict[str, list[int]] = {}
+            recording_positions: Counter[str] = Counter()
+            for vessel_key in selected_vessels:
+                cycle = recording_cycles.get(vessel_key)
+                position = recording_positions[vessel_key]
+                if cycle is None or position >= len(cycle):
+                    cycle = indexes_by_vessel[vessel_key][:]
+                    rng.shuffle(cycle)
+                    recording_cycles[vessel_key] = cycle
+                    position = 0
+                recording_index = cycle[position]
+                recording_positions[vessel_key] = position + 1
+                requests.append((recording_index, rng.getrandbits(63)))
+        random.Random((self.seed + 1) * 193_939 + self.epoch * 131_101).shuffle(
+            requests
+        )
+        return requests

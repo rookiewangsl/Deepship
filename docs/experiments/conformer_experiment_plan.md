@@ -45,8 +45,9 @@ loss 继续下降而 validation loss 上升到 2 以上，形成明确过拟合�
   MMSI-disjoint manifest 包含 15,114 个窗口，development/test MMSI 无交叉；
 - PORTIA 完整音频正在服务器后台下载，完成后自动 MD5 校验、分卷 ZIP 测试、解压和 WAV 索引。
 
-尚未实现范围仍包括 S2 vessel-balanced 动态采样、轻量 vessel-invariant 微调、水声自监督适配、
-recording-level MIL、真实背景混合、双前端和 E1/E2 模型推理读取器；这些按本文决策门顺序加入。
+S2 vessel-balanced 动态采样已因 S1 预检中观察到的残余 vessel 暴露差异而实现，但尚未运行。
+尚未实现范围包括轻量 vessel-invariant 微调、水声自监督适配、recording-level MIL、真实背景混合、
+双前端和 E1/E2 模型推理读取器；这些按本文决策门顺序加入。
 
 ### 0.1 从当前训练开始的执行顺序
 
@@ -54,7 +55,7 @@ recording-level MIL、真实背景混合、双前端和 E1/E2 模型推理读取
 冻结新版 F0/F1b 的 validation 诊断，不恢复 F1b、不运行 last-8
 → 在 F0 上运行 S1 recording-balanced 动态裁剪（8 epoch 上限、patience 3）
 → 若 S1 主指标提高至少 1 pp 且 recording 指标不退化，保留 S1 并检查 F1a last-2
-→ 只有 S1 有收益或暴露审计仍显示明显 vessel 偏置时才实现 S2
+→ S2 代码已准备，但实验仍等待 S1 结果，不与 S1 并行
 → 若 F0-S1 仍无收益，优先做 3/10/20 s 上下文与 scratch/预训练控制，不继续盲目加深解冻
 → 在最佳采样上比较 V0/V1，必要时才加入 V2
 → raw Conformer 达标则跳过频谱 Transformer；不达标才运行 G0/G1/G2 诊断
@@ -222,8 +223,10 @@ S1/S2 的每 epoch optimizer step 数与 S0 保持一致，使比较不混入训
 增加 HGRS；只有组平衡后仍观察到大量低损失重复样本时，才测试固定比例的 hard＋random 采样。
 
 当前 S1 已实现，仍使用每类 3,500、合计 14,000 次 draw，使 optimizer update 数与 S0 完全相同。
-类内 recording 访问次数最多相差 1；不同 epoch 使用不同、但可由 seed 复现的裁剪。S2 暂不实现，
-由 S1 的组级结果和实际 vessel 暴露报告共同触发。
+类内 recording 访问次数最多相差 1；不同 epoch 使用不同、但可由 seed 复现的裁剪。真实训练集预检
+覆盖 399 条 recording 和 162 个 vessel，S1 下单 vessel 每轮暴露为 24～1165 次（median 48），
+说明 recording 平衡没有消除多录音 vessel 的影响。因此 S2 class→vessel→recording sampler 也已
+实现和测试，但仍必须先获得 S1 validation 结果，再决定是否实际运行 S2。
 
 ### 4.3 录音级训练与推理
 
@@ -497,8 +500,8 @@ validation 改善后，才用 F1a/last-2 检查“轻量表征适配＋去冗余
 ### 8.5 组平衡动态采样消融 S
 
 当前以 F0-S0 为对照，先运行 F0-S1。详细定义见第 4.2 节；保持相同 optimizer step 数、20 s
-上下文、优化器、head 学习率和分类目标。S2 不是无条件下一项：只有 S1 有收益，或 S1 暴露审计
-证明多录音 vessel 仍明显支配 draw 时才实现。
+上下文、优化器、head 学习率和分类目标。S2 已因预检发现残余 vessel 暴露差异而完成代码准备，
+但不是无条件下一项：仍根据 S1 validation 结果决定是否实际运行。
 
 采用两级判定：
 
