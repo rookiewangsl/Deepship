@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "experiment_id": "macnna_global_v1",
+  "research_question": "Does lightweight full-time-axis attention add vessel-level generalization beyond a domain-specific log-Mel CNN and a parameter-matched local control?",
+  "base_protocol": {
+    "experiment_config": "configs/experiments/isolation_comparison_v1.json",
+    "split_manifest": "protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json",
+    "protocol": "vessel_name_disjoint",
+    "test_policy": "sealed; never evaluated during G-series development"
+  },
+  "features": {
+    "sample_rate": 16000,
+    "clip_duration_seconds": 3.0,
+    "n_fft": 1024,
+    "win_length": 1024,
+    "hop_length": 512,
+    "n_mels": 64,
+    "highpass_freq": null
+  },
+  "variants": {
+    "g0": {
+      "description": "Unchanged MA-CNN-A baseline",
+      "expected_num_parameters": 532166
+    },
+    "g0_c": {
+      "description": "Projection, frequency coordinates, local multi-scale temporal convolution, FFN and gated residual; no self-attention",
+      "expected_num_parameters": 679593
+    },
+    "g1": {
+      "description": "Projection, frequency coordinates and one shared temporal axial Conformer-lite block with full-time MHSA",
+      "expected_num_parameters": 694057
+    }
+  },
+  "shared_adapter": {
+    "d_model": 128,
+    "num_heads": 4,
+    "ffn_expansion": 2,
+    "position_kernel_size": 9,
+    "temporal_kernel_size": 15,
+    "dropout": 0.1,
+    "gate_init": -2.0
+  },
+  "training": {
+    "seed": 42,
+    "batch_size": 16,
+    "eval_batch_size": 16,
+    "epochs": 100,
+    "optimizer": "SGD",
+    "learning_rate": 0.01,
+    "momentum": 0.9,
+    "min_learning_rate": 0.00001,
+    "warmup_epochs": 10,
+    "early_stopping_patience": 10,
+    "early_stopping_min_delta": 0.005,
+    "precision": "bf16",
+    "num_workers": 8,
+    "selection_metric": "validation vessel macro-F1",
+    "execution_order": [
+      "g0",
+      "g0_c",
+      "g1"
+    ]
+  },
+  "retention_gate": {
+    "g1_minus_g0_vessel_macro_f1_minimum": 0.01,
+    "g1_must_exceed_g0_c": true,
+    "recording_macro_f1_maximum_allowed_drop": 0.01,
+    "additional_seeds_only_after_gate": [
+      43,
+      44
+    ]
+  }
+}

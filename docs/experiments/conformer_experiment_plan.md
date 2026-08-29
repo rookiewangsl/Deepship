@@ -1,12 +1,13 @@
 # DeepShip 预训练 Conformer、轻量全局注意力与外部评测计划
 
 最后更新：2026-08-29
-状态：B3 工程基线与第二版组级选模管线已验证。第二版 F0、F1b 和 F0-S1 已完成。F1b 明显
-过拟合，不进入 last-8。F0-S1 recording-balanced 动态裁剪显著改善 recording 指标，但 vessel
-主指标只提高 0.73 pp，未达到预设的 1 pp 幅度门。由于 S1 仍存在显著的类内 vessel 暴露差异，
-当前正在 F0 和每 epoch 14,000 个样本预算不变时检验 S2 vessel-balanced 动态裁剪；test 默认
-封存，不参与开发期选模。大型 scratch Conformer 已从必做矩阵删除；轻量全局注意力改为与通用
-预训练迁移并行的核心研究线，而不再是 raw Conformer 失败后的临时补救
+状态：B3 工程基线与第二版组级选模管线已验证。第二版 F0、F1b、F0-S1 和 F0-S2 已完成。
+F1b 明显过拟合，不进入 last-8。S1 显著改善 recording、但未改善 vessel；S2 将主优化方向转为
+未见船名后，validation vessel macro-F1 提高到 0.5625，并且 recording 未低于 F0-S0，因此通过
+预设点估计幅度门。当前只运行一次 F1a last-2＋S2，检查极轻量表征适配是否还能增加收益。
+G0/G0-C/G1 的阶段 2B 架构、validation-only 训练管线和核心测试已实现，等待迁移线冻结后按顺序
+smoke 和正式训练。test 继续封存，不参与开发期选模。大型 scratch Conformer 已从必做矩阵删除；
+轻量全局注意力是与通用预训练迁移并行的核心研究线，而不是 raw Conformer 失败后的临时补救
 
 ## 0. 当前实施状态
 
@@ -56,18 +57,31 @@ bootstrap 的 95% 区间为 [−0.1059, +0.1207]，`P(Δ>0)=0.5605`；recording 
 0.1537，同 recording 配对区间为 [+0.0744, +0.2358]，`P(Δ>0)=0.99998`。该 bootstrap 只描述
 当前 validation group 的抽样不确定性，不包含训练 seed 不确定性。S1 没有通过 vessel +1 pp 的
 幅度门，但 recording 改善明确，且 S1 下单 vessel 每轮暴露仍为 24～1165 次，因此触发 S2。
-尚未实现的核心范围是轻量全局注意力 G 系列、E1 模型推理读取器，以及仅在证据触发时才进行的
-10～20 h 水声自监督原型。recording-level MIL、真实背景混合、双前端和大规模水声自监督不属于
-本项目完成条件，统一降级为未来工作。
+
+F0-S2 在 epoch 4 取得最佳 validation vessel macro-F1 **0.5625**、recording macro-F1
+**0.4360**。相对 F0-S0，vessel 增加 **0.0900**，50,000 次同 vessel 配对区间为
+[−0.0638, +0.2482]，`P(Δ>0)=0.8753`；recording 增加 **0.0179**，同 recording 区间为
+[−0.0697, +0.1085]，`P(Δ>0)=0.6579`。相对 S1，S2 的 vessel 增加 **0.0827**，但 recording
+下降 **0.1358**，且 recording 配对区间 [−0.2233, −0.0447] 完全低于零。这说明 S1/S2 的
+训练分布目标确实不同：S1 强化录音等权，S2 强化船舶等权。S2 按预先冻结的点估计门通过，但
+50 艘 validation vessel 的区间仍跨零，单 seed 不能写成确定性提升。
+
+F1a 的两 batch smoke 已完成：解冻最后 2 个 Conformer block 后可训练参数为 51,248,901，训练/
+验证 loss、全部优化器浮点状态均有限，峰值显存 3.59 GiB；正式任务已启动。G 系列已实现 G0
+数值等价重构、G0-C 局部容量对照和 G1 shared temporal axial attention。当前实际参数量分别为
+532,166、679,593 和 694,057；G0-C/G1 新增参数差 8.93%，前向 FLOPs 差 8.53%，满足冻结的
+10%/15% 匹配门。尚未完成的是服务器真实数据 smoke、三个正式 G run、E1 推理读取器，以及仅在
+证据触发时才进行的 10～20 h 水声自监督原型。recording-level MIL、真实背景混合、双前端和
+大规模水声自监督不属于本项目完成条件，统一降级为未来工作。
 
 ### 0.1 从当前训练开始的执行顺序
 
 ```text
 冻结新版 F0/F1b/S1 的 validation 诊断，不恢复 F1b、不运行 last-8
-→ 在 F0 上运行 S2 vessel-balanced 动态裁剪（8 epoch 上限、patience 3）
-→ 若 S2 主指标相对 F0-S0 提高至少 1 pp 且 recording 指标不退化，保留最佳 S1/S2
-→ 只有最佳采样通过上述门，才在该采样上检查 F1a last-2
-→ 若 S2 仍无 vessel 收益，停止采样分支；不通过更多解冻层或 scratch 追逐结果
+完成 F0-S2 vessel-balanced 动态裁剪和 validation paired bootstrap
+→ S2 已通过点估计门；当前运行唯一一次 F1a last-2＋S2
+→ F1a 只有相对 F0-S2 的 vessel 再提高至少 1 pp 且 recording 不退化才保留
+→ 无论 F1a 结果如何，不再扩大解冻层数或运行大型 scratch
 → 冻结最低成本、validation 最好的 B3 配置并形成通用预训练迁移阶段结论
 → 无论 raw Conformer 是否超过 CNN，都运行受控的 G0/G0-C/G1 轻量注意力核心比较
 → G1 只有同时优于 G0 与容量对照 G0-C，vessel 至少 +1 pp 且 recording 不退化，才补多 seed
@@ -854,9 +868,8 @@ checkpoint 留在外置盘或训练服务器。
 
 - 已完成 S1 的确定性 recording-balanced 动态裁剪、暴露报告和 CPU 等待统计；
 - S1 显著改善 recording 指标，但 vessel 主指标仅增加 0.73 pp；
-- 残余 vessel 暴露偏置已触发 S2；当前正在运行 F0-S2，固定每 epoch 14,000 样本和 optimizer
-  step 数；
-- S2 通过 vessel 幅度门后才检查 F1a；否则停止采样分支；
+- 已完成 S2；其 vessel macro-F1 为 0.5625，按预设点估计门通过，但 paired bootstrap 区间跨零；
+- 当前正在运行唯一一次 F1a；它不改变 S2 数据分布，只检查解冻最后 2 个 block 的边际价值；
 - F1a 使用 `scripts/train/run_conformer_f1a_s2_seed42.sh`，与 F0-S2 相比只把冻结 encoder 改为
   解冻最后 2 个 block；正式运行仍为 8 epoch 上限、patience 3，且不读取 test；
 - 全部选择只使用 validation recording/vessel 指标，不根据 DeepShip test 反复调参；
@@ -868,11 +881,12 @@ checkpoint 留在外置盘或训练服务器。
 
 ### 阶段 2B：核心轻量全局注意力比较
 
-- 按独立方案实现 G0、G0-C 和 G1，不修改正在运行的 Conformer checkout；
+- 已实现 G0、G0-C 和 G1，不修改正在运行的 Conformer checkout；
 - G1 保留完整时频图并使用 1 层共享 temporal axial Conformer-lite；G0-C 使用相同投影、频率位置
   信息和门控融合，仅以局部/扩张时间卷积替换 MHSA，并匹配新增参数和计算量；
 - 三组固定 3 s log-Mel、S0 anchor、优化器、总 step 和 validation vessel macro-F1 选模；
-- 完成单元测试、数值回归、梯度、resume、参数/FLOPs 和 smoke 后，顺序运行 seed 42；
+- 已通过本地数值回归、mask、窄频带、梯度、resume、参数/FLOPs 和无 test 读取测试；服务器真实
+  数据 smoke 仍需在 F1a 冻结后执行，然后顺序运行 seed 42；
 - G1 只有相对 G0 至少 +1 pp、优于 G0-C 且 recording 不退化，才补 seed 43/44 和 paired
   bootstrap；
 - 多 seed 仍为正后，才允许在两层 attention、双轴 attention 或共同 10 s 上下文中选择一项；

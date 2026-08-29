@@ -1,7 +1,8 @@
 # DeepShip 轻量全局注意力架构实验计划
 
 最后更新：2026-08-29  
-状态：方案冻结前；等待 F0-S2 validation 结果，不影响当前后台训练
+状态：结构与首轮配置已冻结；F0-S2 已完成，F1a 正式训练进行中；G 系列本地工程与核心测试已完成，
+等待服务器真实数据 smoke 和顺序正式训练
 
 ## 1. 研究问题与边界
 
@@ -65,8 +66,11 @@ log-Mel [B, 1, F, T]
 - 注意力前不在时间或频率维做全局平均；只在 contextualized feature map 与原特征做门控残差后，
   复用 G0 原有的最终全局池化和分类器。
 
-预计新增约 15～20 万参数，目标总参数量约 0.68～0.75 M。正式实现后以脚本输出的实际参数量、
-MACs/FLOPs、峰值显存和推理时延为准，不以手工估算代替报告。
+实际实现结果为：G0 532,166 参数，G0-C 679,593 参数，G1 694,057 参数；G0-C/G1 的新增参数
+分别为 147,427/161,891，相对差 8.93%。在 `[1,1,64,94]` 输入上用 PyTorch flop counter 得到
+G0/G0-C/G1 前向 FLOPs 约为 1.767/2.274/2.095 G（对应近似 MACs 为其一半），G0-C 与 G1
+相差 8.53%。参数与计算量均达到预设 10%/15% 匹配门。CPU 延迟不作为最终部署结论；服务器
+GPU 峰值显存和推理时延仍由正式审计补充。
 
 首轮不使用二维全局注意力，也不在注意力前平均频率。3 s 特征图即可能产生约千级时频 token；
 直接对 `F'×T'` 做二次复杂度注意力既增加成本，也把频率和时间当成同质维度。时间轴向注意力的
@@ -125,6 +129,15 @@ F0-S2 完成后确定的 Conformer 动态采样结论，不自动迁移为 G 系
 20 s G1 的差值归因于注意力。
 
 ## 5. 训练与工程计划
+
+当前实现入口：
+
+- 模型：`src/models/ma_cnn_a.py`；
+- validation-only 管线：`src/pipelines/mel_ml/train_deepship_macnna_global.py`；
+- CLI：`scripts/train/train_deepship_macnna_global.py`；
+- 统一 runner：`scripts/train/run_macnna_global_seed42.sh`；
+- 参数/FLOPs 审计：`scripts/eval/audit_macnna_variants.py`；
+- 冻结配置：`configs/experiments/macnna_global_v1.json`。
 
 ### 5.1 实施前基准冻结
 
