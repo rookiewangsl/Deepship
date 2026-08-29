@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "experiment_id": "isolation_comparison_v1",
+  "status": "passed",
+  "dataset_inventory_sha256": "3901822bbc89656cce163d5001b1f915d06472022d35acb98a9878c8c68e8de6",
+  "recording_identity_manifest_sha256": "4e1c106c9212e6089342714cc0dd2d9c74957db75224ee61c2481251999159d6",
+  "recordings": 609,
+  "recordings_by_class": {
+    "Cargo": 109,
+    "Passenger": 191,
+    "Tank": 240,
+    "Tug": 69
+  },
+  "full_segments_by_class": {
+    "Cargo": 12801,
+    "Passenger": 15410,
+    "Tank": 14762,
+    "Tug": 13495
+  },
+  "metadata_records": 613,
+  "unmatched_metadata_records": 10,
+  "identity_included_recordings": 603,
+  "identity_included_recordings_by_class": {
+    "Cargo": 109,
+    "Passenger": 191,
+    "Tank": 234,
+    "Tug": 69
+  },
+  "identity_excluded_recordings": 6,
+  "identity_match_confidence": {
+    "high": 585,
+    "medium": 18
+  },
+  "identity_match_methods": {
+    "date_and_duration": 14,
+    "exact_date_time": 504,
+    "record_id_and_date": 81,
+    "same_date_duration_assignment": 2,
+    "time_and_duration_date_mismatch": 2
+  },
+  "vessel_name_groups": 247,
+  "vessel_name_groups_by_class": {
+    "Cargo": 62,
+    "Passenger": 43,
+    "Tank": 126,
+    "Tug": 16
+  },
+  "vessel_keys_crossing_classes": [],
+  "ambiguous_name_recordings_included_conservatively": 49,
+  "ambiguous_canonical_names": [
+    "CABO DE",
+    "QUEEN OF",
+    "SPIRIT OF"
+  ],
+  "metadata_parse_issues": [],
+  "duplicate_content_check": {
+    "status": "completed",
+    "duplicate_groups": 6,
+    "duplicate_files": 12,
+    "groups": {
+      "542ebf57d98d7223e425b773ee4223433a4ebcc708d63d34d5ae39bfdaaa9647": [
+        "Passenger/20160827-35/043503.wav",
+        "Passenger/20160827-36/043503.wav"
+      ],
+      "61f8b90b64b2b1f2912473dbc0757e989b1ee80b2c86a66e29daf7c23c0e3d23": [
+        "Passenger/20170401-63/000636.wav",
+        "Passenger/20170401-64/000636.wav"
+      ],
+      "69393276122d65bf0229bbc45d6707c051cdbeb322d96994bce3f0a2b98df789": [
+        "Passenger/20170219-57/153805.wav",
+        "Passenger/20170219-58/153805.wav"
+      ],
+      "94bde64a5665730daaa14102751433f7ff631de0cf48eee6917b4f1e2cc57419": [
+        "Passenger/20170906-114/104632.wav",
+        "Passenger/20170906-115/104632.wav"
+      ],
+      "b9957fc81ad6e8aa3eff77307f2245a9faa2f32a31ce9dd2489c3b70988248fe": [
+        "Passenger/20170111-51/193600.wav",
+        "Passenger/20170111-52/193600.wav"
+      ],
+      "de1f880a56a585cc9ed41d6b1ecbbdf57350a6babad75c984a9d52b0e5704959": [
+        "Passenger/20170912a-116/184302.wav",
+        "Passenger/20170912a-117/184302.wav"
+      ]
+    },
+    "hashes_crossing_classes": [],
+    "hashes_crossing_vessel_keys": []
+  },
+  "preliminary_budget_feasibility": {
+    "target_segments_per_class_total": 5000,
+    "segment_level": {
+      "Cargo": true,
+      "Passenger": true,
+      "Tank": true,
+      "Tug": true
+    },
+    "recording_disjoint_preliminary": {
+      "Cargo": true,
+      "Passenger": true,
+      "Tank": true,
+      "Tug": true
+    },
+    "vessel_name_disjoint_preliminary": {
+      "Cargo": true,
+      "Passenger": true,
+      "Tank": true,
+      "Tug": true
+    },
+    "note": "Preliminary checks use total capacity and group counts; exact group allocation is validated by the protocol compiler."
+  },
+  "validation": {
+    "inventory_paths_unique": true,
+    "identity_paths_unique": true,
+    "inventory_identity_paths_equal": true,
+    "all_classes_present": true,
+    "included_identities_have_vessel_key": true,
+    "vessel_keys_do_not_cross_classes": true,
+    "all_recordings_content_hashed": true,
+    "duplicate_content_does_not_cross_classes": true,
+    "duplicate_content_does_not_cross_vessel_keys": true
+  }
+}

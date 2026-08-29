@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "base_split_seed": 42,
+  "repeat_splits": [
+    {
+      "split_seed": 43,
+      "experiment_id": "macnna_global_l20_repeats_v1_split43",
+      "manifest_sha256": "0ce0c268d6527dbe19830e1ba667269c4b5565ee208d728a3e833f771d7b6be2",
+      "selected_recordings": 590,
+      "selected_vessel_name_groups": 245
+    },
+    {
+      "split_seed": 44,
+      "experiment_id": "macnna_global_l20_repeats_v1_split44",
+      "manifest_sha256": "b2c56585c3b67f39b263b6f845b47051f76f3c7d9294c14c9ea8d05e9fe2f72c",
+      "selected_recordings": 593,
+      "selected_vessel_name_groups": 247
+    }
+  ]
+}

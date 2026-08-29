@@ -899,8 +899,11 @@ checkpoint 留在外置盘或训练服务器。
   validation vessel macro-F1 选模；短录音的 padded Mel/CNN 时间位置统一 mask；
 - 3 s 已通过数值回归、窄频带、梯度、resume、参数/FLOPs 和无 test 读取测试；L20 新增动态
   log-Mel、padding mask、梯度累积与优化器测试，服务器真实数据 smoke 后顺序运行 seed 42；
-- G1-L20 只有相对 G0-L20 至少 +1 pp、优于 G0-C-L20 且 recording 最多下降 1 pp，才补 seed 43/44 和 paired
-  bootstrap；
+- L20 seed42 的 G0/G0-C/G1 vessel macro-F1 为 0.6261/0.6440/0.6741，但 G1 recording
+  由 G0 的 0.6187 降至 0.5604，且单 split paired bootstrap 区间跨零；
+- 为区分训练随机性与 vessel split 随机性，冻结 3 个 split seed × 3 个 model seed × 3 个模型的
+  DeepShip-only 全交叉矩阵，复用现有 split42/seed42 三项并顺序新增 24 项；只用 validation；
+- 最终用 split→model seed 分层 bootstrap、逐 split 均值和 recording 代价共同判定；
 - 若 L20 不通过即停止 G 分支，不再运行两层 attention、双轴 attention 或更多上下文点。
 
 验收：能够区分额外容量与全局时间注意力；所有比较使用相同输入、训练和选模协议；结论用词限定

@@ -1,0 +1,610 @@
+relative_path,class_name,match_status,match_method,match_confidence,metadata_record_id,ais_type_code,metadata_date,metadata_time,raw_vessel_name,canonical_vessel_name,mmsi,vessel_key,ambiguous_vessel_name
+Cargo/20171104-1/1.wav,Cargo,matched,record_id_and_date,high,1,70,20171104,203623,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171104a-2/2.wav,Cargo,matched,record_id_and_date,high,2,70,20171104,223241,ISTRA ACE,ISTRA ACE,,NAME:1533fa5c8ebe,False
+Cargo/20171105a-3/3.wav,Cargo,matched,record_id_and_date,high,3,70,20171105,084406,SAMOS WARRIOR,SAMOS WARRIOR,,NAME:7a966cb92647,False
+Cargo/20171106-4/4.wav,Cargo,matched,record_id_and_date,high,4,70,20171106,115234,NYK REMUS,NYK REMUS,,NAME:a24be31ff777,False
+Cargo/20171107-5/5.wav,Cargo,matched,record_id_and_date,high,5,76,20171107,000452,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171107b-6/6.wav,Cargo,matched,record_id_and_date,high,6,79,20171107,075012,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171110-7/7.wav,Cargo,matched,record_id_and_date,high,7,70,20171110,121636,UNITED SPIRIT,UNITED SPIRIT,,NAME:75855f8e8979,False
+Cargo/20171111-8/8.wav,Cargo,matched,record_id_and_date,high,8,79,20171111,030510,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171111e-9/9.wav,Cargo,matched,record_id_and_date,high,9,74,20171111,201843,ITAL UNIVERSO,ITAL UNIVERSO,,NAME:4ee15de8a55a,False
+Cargo/20171111f-10/10.wav,Cargo,matched,record_id_and_date,high,10,70,20171111,212650,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171111g-11/11.wav,Cargo,matched,record_id_and_date,high,11,70,20171111,234213,EMINENT ACE,EMINENT ACE,,NAME:c110a032c444,False
+Cargo/20171112-12/12.wav,Cargo,matched,record_id_and_date,high,12,70,20171112,084555,HARVEST LEADER,HARVEST LEADER,,NAME:4c77e6b801e7,False
+Cargo/20171113-13/13.wav,Cargo,matched,record_id_and_date,high,13,70,20171113,002202,MERLIN ARROW,MERLIN ARROW,,NAME:d84e45f0d825,False
+Cargo/20171114a-14/14.wav,Cargo,matched,record_id_and_date,high,14,71,20171114,180932,APL PARIS,APL PARIS,,NAME:619b115ec925,False
+Cargo/20171114b-15/15.wav,Cargo,matched,record_id_and_date,high,15,70,20171114,195740,NEW NADA,NEW NADA,,NAME:38c12430c02b,False
+Cargo/20171114c-16/16.wav,Cargo,matched,record_id_and_date,high,16,70,20171114,200823,NEW NADA,NEW NADA,,NAME:38c12430c02b,False
+Cargo/20171114d-17/17.wav,Cargo,matched,record_id_and_date,high,17,70,20171114,214206,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171115a-18/18.wav,Cargo,matched,record_id_and_date,high,18,79,20171115,105346,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171115b-19/19.wav,Cargo,matched,record_id_and_date,high,19,70,20171115,134804,KM TOKYO,KM TOKYO,,NAME:cb61c07a7a1a,False
+Cargo/20171115d-20/20.wav,Cargo,matched,record_id_and_date,high,20,70,20171115,185200,BUENA VENTURA,BUENA VENTURA,,NAME:f6b49023d7f3,False
+Cargo/20171116-22/002044.wav,Cargo,matched,exact_date_time,high,22,76,20171116,002044,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171117a-24/045829.wav,Cargo,matched,exact_date_time,high,24,70,20171117,045829,ISLAND SPIRIT,ISLAND SPIRIT,,NAME:a0d706db5033,False
+Cargo/20171117b-25/055206.wav,Cargo,matched,exact_date_time,high,25,70,20171117,055206,TRITON HAWK,TRITON HAWK,,NAME:b6cdb45129bb,False
+Cargo/20171117d-26/225044.wav,Cargo,matched,exact_date_time,high,26,70,20171117,225044,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171118-27/27.wav,Cargo,matched,record_id_and_date,high,27,76,20171118,055532,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171118a-28/074918.wav,Cargo,matched,exact_date_time,high,28,79,20171118,074918,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171119b-29/151043.wav,Cargo,matched,exact_date_time,high,29,76,20171119,151043,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171120-30/214753.wav,Cargo,matched,exact_date_time,high,30,70,20171120,214753,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171121-31/031902.wav,Cargo,matched,exact_date_time,high,31,79,20171121,031902,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171121c-32/111158.wav,Cargo,matched,exact_date_time,high,32,70,20171121,111158,KITE ARROW,KITE ARROW,,NAME:d9f26214025f,False
+Cargo/20171121e-33/202039.wav,Cargo,matched,exact_date_time,high,33,70,20171121,202039,AMIS FORTUNE,AMIS FORTUNE,,NAME:59ba6b6f6fa1,False
+Cargo/20171121f-34/210343.wav,Cargo,matched,exact_date_time,high,34,74,20171121,210343,APL SOUTHAMPTON,APL SOUTHAMPTON,,NAME:98126d72ec3c,False
+Cargo/20171122a-35/060651.wav,Cargo,matched,exact_date_time,high,35,76,20171122,060651,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171122b-36/075414.wav,Cargo,matched,exact_date_time,high,36,79,20171122,075414,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171122c-37/113017.wav,Cargo,matched,exact_date_time,high,37,70,20171122,113017,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171122d-38/38.wav,Cargo,matched,record_id_and_date,high,38,70,20171122,135158,MERLIN ARROW,MERLIN ARROW,,NAME:d84e45f0d825,False
+Cargo/20171123-39/004508.wav,Cargo,matched,exact_date_time,high,39,70,20171123,004508,ARIES LEADER,ARIES LEADER,,NAME:cad2e05b3af7,False
+Cargo/20171123c-40/135730.wav,Cargo,matched,exact_date_time,high,40,79,20171123,135730,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171124a-41/41.wav,Cargo,matched,record_id_and_date,high,41,76,20171124,054853,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171124c-42/134001.wav,Cargo,matched,exact_date_time,high,42,79,20171124,134001,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171124d-43/161634.wav,Cargo,matched,exact_date_time,high,43,70,20171124,161634,CHIOS LUCK,CHIOS LUCK,,NAME:eae500282cf9,False
+Cargo/20171125-44/44.wav,Cargo,matched,record_id_and_date,high,44,70,20171125,025208,GLOVIS CENTURY,GLOVIS CENTURY,,NAME:4f98ee78f934,False
+Cargo/20171125b-45/45.wav,Cargo,matched,record_id_and_date,high,45,79,20171125,120743,WESTWOOD COLUMBIA,WESTWOOD COLUMBIA,,NAME:85628b3ed480,False
+Cargo/20171125c-46/134833.wav,Cargo,matched,exact_date_time,high,46,79,20171125,134833,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171125d-47/214505.wav,Cargo,matched,exact_date_time,high,47,70,20171125,214505,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171125e-48/234924.wav,Cargo,matched,exact_date_time,high,48,70,20171125,234924,MORNING MENAD,MORNING MENAD,,NAME:1f603aa156d0,False
+Cargo/20171126-49/023314.wav,Cargo,matched,exact_date_time,high,49,71,20171126,023314,SANTA REGULA,SANTA REGULA,,NAME:a106214b7e57,False
+Cargo/20171126a-50/035027.wav,Cargo,matched,exact_date_time,high,50,71,20171126,035027,MAERSK SEMAKAU,MAERSK SEMAKAU,,NAME:ce2cc8f11dd8,False
+Cargo/20171126b-51/044753.wav,Cargo,matched,exact_date_time,high,51,70,20171126,044753,PAGANINO 218821000,PAGANINO,218821000,MMSI:218821000,False
+Cargo/20171126c-52/063408.wav,Cargo,matched,exact_date_time,high,52,70,20171126,063408,STAR LOFOTEN,STAR LOFOTEN,,NAME:6963110a094f,False
+Cargo/20171127-53/231436.wav,Cargo,matched,exact_date_time,high,53,70,20171127,231436,MORNING MENAD,MORNING MENAD,,NAME:1f603aa156d0,False
+Cargo/20171128a-54/080742.wav,Cargo,matched,exact_date_time,high,54,79,20171128,080742,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171129-55/000645.wav,Cargo,matched,exact_date_time,high,55,76,20171129,000645,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171129c-56/075459.wav,Cargo,matched,exact_date_time,high,56,79,20171129,075459,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171130-57/165031.wav,Cargo,matched,exact_date_time,high,57,70,20171130,165031,AMSTEL OSPREY,AMSTEL OSPREY,,NAME:6f5173da1960,False
+Cargo/20171130c-58/231720.wav,Cargo,matched,exact_date_time,high,58,70,20171130,231720,IVS NORTH,IVS NORTH,,NAME:dc6bbcf79723,False
+Cargo/20171201-59/080357.wav,Cargo,matched,exact_date_time,high,59,79,20171201,080357,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171201a-60/111402.wav,Cargo,matched,exact_date_time,high,60,70,20171201,111402,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171202a-61/054923.wav,Cargo,matched,exact_date_time,high,61,76,20171202,054923,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171202b-62/62.wav,Cargo,matched,record_id_and_date,high,62,70,20171202,100609,ULTRA EXCELLENCE,ULTRA EXCELLENCE,,NAME:25f8571ad937,False
+Cargo/20171202c-63/123015.wav,Cargo,matched,exact_date_time,high,63,70,20171202,123015,ANASTASIA,ANASTASIA,,NAME:58f9969a0115,False
+Cargo/20171202e-64/141802.wav,Cargo,matched,exact_date_time,high,64,79,20171202,141802,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171203-65/191824.wav,Cargo,matched,exact_date_time,high,65,70,20171203,191824,COSMIC ACE,COSMIC ACE,,NAME:b68decb5e35f,False
+Cargo/20171204-66/024305.wav,Cargo,matched,exact_date_time,high,66,70,20171204,024305,HALIFAX EXPRESS,HALIFAX EXPRESS,,NAME:0454eb16c7f2,False
+Cargo/20171204a-67/051220.wav,Cargo,matched,exact_date_time,high,67,70,20171204,051220,POYANG 477669100,POYANG,477669100,MMSI:477669100,False
+Cargo/20171204b-68/201125.wav,Cargo,matched,exact_date_time,high,68,76,20171204,201125,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171205-69/69.wav,Cargo,matched,record_id_and_date,high,69,70,20171205,010947,GLOVIS CHORUS,GLOVIS CHORUS,,NAME:ab6709103bb5,False
+Cargo/20171205a-70/030344.wav,Cargo,matched,exact_date_time,high,70,79,20171205,030344,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171205e-71/111659.wav,Cargo,matched,exact_date_time,high,71,70,20171205,111659,TERN BULKER,TERN BULKER,,NAME:5af949216224,False
+Cargo/20171205f-72/114551.wav,Cargo,matched,exact_date_time,high,72,70,20171205,114551,CAPRICORNUS LEADER,CAPRICORNUS LEADER,,NAME:63acb8f3e756,False
+Cargo/20171205g-73/124454.wav,Cargo,matched,exact_date_time,high,73,70,20171205,124454,CAPE SUNRISE,CAPE SUNRISE,,NAME:e2b7e04e42ad,False
+Cargo/20171205h-74/140834.wav,Cargo,matched,exact_date_time,high,74,79,20171205,140834,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171205i-75/202122.wav,Cargo,matched,exact_date_time,high,75,76,20171205,202122,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171206-76/004911.wav,Cargo,matched,exact_date_time,high,76,70,20171206,004911,CAPRICORNUS LEADER,CAPRICORNUS LEADER,,NAME:63acb8f3e756,False
+Cargo/20171206a-77/014907.wav,Cargo,matched,exact_date_time,high,77,70,20171206,014907,POYANG 477669100,POYANG,477669100,MMSI:477669100,False
+Cargo/20171206e-78/78.wav,Cargo,matched,record_id_and_date,high,78,70,20171206,132824,GALLEON,GALLEON,,NAME:90a6918d0cc2,False
+Cargo/20171207-79/010450.wav,Cargo,matched,exact_date_time,high,79,70,20171207,010450,CMA CGM,CMA CGM,,NAME:8ac2ca58c386,False
+Cargo/20171207a-80/013045.wav,Cargo,matched,exact_date_time,high,80,70,20171207,013045,ANTONELLA LEMBO,ANTONELLA LEMBO,,NAME:64d31728ecca,False
+Cargo/20171207b-81/032120.wav,Cargo,matched,exact_date_time,high,81,79,20171207,032120,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171207d-82/100039.wav,Cargo,matched,exact_date_time,high,82,76,20171207,100039,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171207f-83/190947.wav,Cargo,matched,exact_date_time,high,83,70,20171207,190947,ADVENTURE 1,ADVENTURE 1,,NAME:c028d85f8c7f,False
+Cargo/20171208-84/005033.wav,Cargo,matched,exact_date_time,high,84,70,20171208,005033,ANASTASIA,ANASTASIA,,NAME:58f9969a0115,False
+Cargo/20171209-85/001029.wav,Cargo,matched,exact_date_time,high,85,70,20171209,001029,KURENAI,KURENAI,,NAME:45bc83c012f4,False
+Cargo/20171209b-86/054935.wav,Cargo,matched,exact_date_time,high,86,76,20171209,054935,SEASPAN RELIANT,SEASPAN RELIANT,,NAME:d5212f5376c5,False
+Cargo/20171209c-87/140111.wav,Cargo,matched,exact_date_time,high,87,79,20171209,140111,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171210-88/004442.wav,Cargo,matched,exact_date_time,high,88,70,20171210,004442,PAN UNITY,PAN UNITY,,NAME:366a7d34c731,False
+Cargo/20171210a-89/020139.wav,Cargo,matched,exact_date_time,high,89,79,20171210,020139,CAP PASADO,CAP PASADO,,NAME:becd24724b0c,False
+Cargo/20171210c-90/124043.wav,Cargo,matched,exact_date_time,high,90,70,20171210,124043,SANTIAGO,SANTIAGO,,NAME:ac7764f3ea51,False
+Cargo/20171212a-91/003918.wav,Cargo,matched,exact_date_time,high,91,70,20171212,003918,GRAND MERCURY,GRAND MERCURY,,NAME:0b33ff8c9f47,False
+Cargo/20171212b-92/040423.wav,Cargo,matched,exact_date_time,high,92,70,20171212,040423,MAIZURU BISHAMON,MAIZURU BISHAMON,,NAME:53be55a3c310,False
+Cargo/20171212c-93/101404.wav,Cargo,matched,exact_date_time,high,93,70,20171212,101404,PROMETHEUS LEADER,PROMETHEUS LEADER,,NAME:5b38cef723e3,False
+Cargo/20171212d-94/141302.wav,Cargo,matched,exact_date_time,high,94,79,20171212,141302,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171213-95/042800.wav,Cargo,matched,exact_date_time,high,95,71,20171213,042800,APL SAVANNAH,APL SAVANNAH,,NAME:cb911fc87f5a,False
+Cargo/20171213b-96/96.wav,Cargo,matched,record_id_and_date,high,96,70,20171213,093631,ORIENT TRADER,ORIENT TRADER,,NAME:55e4cc202a44,False
+Cargo/20171213d-97/154210.wav,Cargo,matched,exact_date_time,high,97,70,20171213,154210,STAR HARMONIA,STAR HARMONIA,,NAME:2a7cd609290c,False
+Cargo/20171213e-98/231302.wav,Cargo,matched,exact_date_time,high,98,70,20171213,231302,AZALEA ACE,AZALEA ACE,,NAME:0884ca135c84,False
+Cargo/20171213f-99/99.wav,Cargo,matched,record_id_and_date,high,99,70,20171213,232927,MARGUERITE ACE,MARGUERITE ACE,,NAME:09300c73f5c9,False
+Cargo/20171213g-100/234857.wav,Cargo,matched,exact_date_time,high,100,70,20171213,234857,BRAZEN,BRAZEN,,NAME:614ac1089522,False
+Cargo/20171214a-101/075400.wav,Cargo,matched,exact_date_time,high,101,79,20171214,075400,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171214b-102/091542.wav,Cargo,matched,exact_date_time,high,102,70,20171214,091542,SPRING QUEEN,SPRING QUEEN,,NAME:6848ae434d06,False
+Cargo/20171214d-103/103.wav,Cargo,matched,record_id_and_date,high,103,70,20171214,155438,AFRICAN KITE,AFRICAN KITE,,NAME:9545bbe412c1,False
+Cargo/20171214e-104/213748.wav,Cargo,matched,exact_date_time,high,104,70,20171214,213748,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171214f-105/215513.wav,Cargo,matched,exact_date_time,high,105,70,20171214,215513,CARMEL,CARMEL,,NAME:87d007354e28,False
+Cargo/20171215-106/014609.wav,Cargo,matched,exact_date_time,high,106,79,20171215,014609,DALLAS EXPRESS,DALLAS EXPRESS,,NAME:59f2cdfa708b,False
+Cargo/20171215a-107/112126.wav,Cargo,matched,exact_date_time,high,107,70,20171215,112126,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Cargo/20171215b-108/114505.wav,Cargo,matched,exact_date_time,high,108,70,20171215,114505,ISTRA ACE,ISTRA ACE,,NAME:1533fa5c8ebe,False
+Cargo/20171215c-109/141018.wav,Cargo,matched,exact_date_time,high,109,79,20171215,141018,PRINCESS SUPERIOR,PRINCESS SUPERIOR,,NAME:3ab5953ca290,False
+Cargo/20171215d-110/110.wav,Cargo,matched,record_id_and_date,high,110,70,20171215,200555,VIKING ADVENTURE,VIKING ADVENTURE,,NAME:caf53d8c7d74,False
+Cargo/20171215e-111/214529.wav,Cargo,matched,exact_date_time,high,111,70,20171215,214529,SEASPAN SWIFT,SEASPAN SWIFT,,NAME:f0ec5fb36652,False
+Passenger/20160505-1/1.wav,Passenger,matched,record_id_and_date,high,1,60,20160505,125658,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20160506-2/2.wav,Passenger,matched,record_id_and_date,high,2,60,20160506,081240,CELEBRITY SOLSTICE,CELEBRITY SOLSTICE,,NAME:3c44b7853956,False
+Passenger/20160506d-3/3.wav,Passenger,matched,record_id_and_date,high,3,60,20160506,233804,MAYNE QUEEN,MAYNE QUEEN,,NAME:6dd310d689ab,False
+Passenger/20160507a-4/4.wav,Passenger,matched,record_id_and_date,high,4,60,20160507,043512,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20160507b-5/5.wav,Passenger,matched,record_id_and_date,high,5,69,20160507,115325,RUBY PRINCESS,RUBY PRINCESS,,NAME:294943da2ef8,False
+Passenger/20160507c-6/6.wav,Passenger,matched,record_id_and_date,high,6,60,20160507,202625,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20160514-7/113853.wav,Passenger,matched,exact_date_time,high,7,60,20160514,113853,CORAL PRINCESS,CORAL PRINCESS,,NAME:c9307fd7705a,False
+Passenger/20160515-8/8.wav,Passenger,matched,record_id_and_date,high,8,69,20160515,062337,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20160516a-9/9.wav,Passenger,matched,record_id_and_date,high,9,60,20160516,112116,CARNIVAL LEGEND,CARNIVAL LEGEND,,NAME:090036cade0f,False
+Passenger/20160521a-10/041411.wav,Passenger,matched,exact_date_time,high,10,60,20160521,041411,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20160522-11/182048.wav,Passenger,matched,exact_date_time,high,11,60,20160522,182048,CRYSTAL SERENITY,CRYSTAL SERENITY,,NAME:57a753175514,False
+Passenger/20160528-12/12.wav,Passenger,matched,record_id_and_date,high,12,60,20160528,040358,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20160529-13/083740.wav,Passenger,matched,exact_date_time,high,13,69,20160529,083740,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20160601c-14/14.wav,Passenger,matched,record_id_and_date,high,14,60,20160601,035047,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20160603-15/042208.wav,Passenger,matched,exact_date_time,high,15,69,20160603,042208,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160604-16/16.wav,Passenger,matched,record_id_and_date,high,16,60,20160604,040249,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20160606-17/17.wav,Passenger,matched,record_id_and_date,high,17,69,20160606,153056,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20160616a-20/165320.wav,Passenger,matched,exact_date_time,high,20,69,20160616,165320,TACHEK,TACHEK,,NAME:12709810e438,False
+Passenger/20160616b-21/200904.wav,Passenger,matched,exact_date_time,high,21,69,20160616,200904,TACHEK,TACHEK,,NAME:12709810e438,False
+Passenger/20160625a-22/041906.wav,Passenger,matched,exact_date_time,high,22,69,20160625,041906,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160629a-23/23.wav,Passenger,matched,record_id_and_date,high,23,60,20160629,135115,BOWEN QUEEN,BOWEN QUEEN,,NAME:5cdf69eccb08,False
+Passenger/20160629b-24/135359.wav,Passenger,matched,exact_date_time,high,24,60,20160629,135359,BOWEN QUEEN,BOWEN QUEEN,,NAME:5cdf69eccb08,False
+Passenger/20160716-26/035748.wav,Passenger,matched,exact_date_time,high,26,69,20160716,035748,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160724a-27/27.wav,Passenger,matched,record_id_and_date,high,27,69,20160724,035758,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20160724b-28/110548.wav,Passenger,matched,exact_date_time,high,28,69,20160724,110548,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160727-29/29.wav,Passenger,matched,record_id_and_date,high,29,60,20160727,111808,CRYSTAL SERENITY,CRYSTAL SERENITY,,NAME:57a753175514,False
+Passenger/20160806-30/30.wav,Passenger,matched,record_id_and_date,high,30,69,20160806,035410,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160807a-31/31.wav,Passenger,matched,record_id_and_date,high,31,69,20160807,043508,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20160813a-32/32.wav,Passenger,matched,record_id_and_date,high,32,69,20160813,040611,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160820a-33/33.wav,Passenger,matched,record_id_and_date,high,33,69,20160820,202935,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20160821a-34/174334.wav,Passenger,matched,exact_date_time,high,34,60,20160821,174334,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20160827-35/043503.wav,Passenger,matched,exact_date_time,high,35,69,20160827,043503,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160827-36/043503.wav,Passenger,matched,record_id_and_date,high,36,69,20160827,043550,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160827-37/37.wav,Passenger,matched,record_id_and_date,high,37,69,20160827,043733,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160831-38/034757.wav,Passenger,matched,exact_date_time,high,38,60,20160831,034757,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20160904a-39/035818.wav,Passenger,matched,exact_date_time,high,39,69,20160904,035818,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20160908a-40/174717.wav,Passenger,matched,exact_date_time,high,40,60,20160908,174717,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20160909-41/41.wav,Passenger,matched,record_id_and_date,high,41,60,20160909,114625,CELEBRITY SOLSTICE,CELEBRITY SOLSTICE,,NAME:3c44b7853956,False
+Passenger/20160910-42/035117.wav,Passenger,matched,exact_date_time,high,42,69,20160910,035117,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20160916a-43/124641.wav,Passenger,matched,exact_date_time,high,43,60,20160916,124641,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20160917a-44/184735.wav,Passenger,matched,exact_date_time,high,44,69,20160917,184735,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20161003b-45/175305.wav,Passenger,matched,exact_date_time,high,45,60,20161003,175305,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20161019a-46/174803.wav,Passenger,matched,exact_date_time,high,46,60,20161019,174803,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20161028a-47/224803.wav,Passenger,matched,exact_date_time,high,47,60,20161028,224803,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20161102-48/124450.wav,Passenger,matched,exact_date_time,high,48,60,20161102,124450,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20161208-49/163603.wav,Passenger,matched,record_id_and_date,high,49,60,20161208,163602,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20161214-50/50.wav,Passenger,matched,record_id_and_date,high,50,69,20161214,162017,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20170111-51/193600.wav,Passenger,matched,record_id_and_date,high,51,60,20170111,193906,SALISH ORCA,SALISH ORCA,,NAME:9bd30978b71e,False
+Passenger/20170111-52/193600.wav,Passenger,matched,record_id_and_date,high,52,60,20170111,194020,SALISH ORCA,SALISH ORCA,,NAME:9bd30978b71e,False
+Passenger/20170114-53/053615.wav,Passenger,matched,exact_date_time,high,53,60,20170114,053615,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20170202-54/183738.wav,Passenger,matched,exact_date_time,high,54,60,20170202,183738,SALISH ORCA,SALISH ORCA,,NAME:9bd30978b71e,False
+Passenger/20170215-55/152700.wav,Passenger,matched,exact_date_time,high,55,60,20170215,152700,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170218-56/050212.wav,Passenger,matched,exact_date_time,high,56,60,20170218,050212,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20170219-57/153805.wav,Passenger,matched,exact_date_time,high,57,60,20170219,153805,POWELL RIVER,POWELL RIVER,,NAME:e09db06529d3,False
+Passenger/20170219-58/153805.wav,Passenger,matched,record_id_and_date,high,58,60,20170219,154035,POWELL RIVER,POWELL RIVER,,NAME:e09db06529d3,False
+Passenger/20170312-59/153853.wav,Passenger,matched,exact_date_time,high,59,60,20170312,153853,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170322-60/061551.wav,Passenger,matched,exact_date_time,high,60,69,20170322,061551,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20170330-61/175151.wav,Passenger,matched,exact_date_time,high,61,60,20170330,175151,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170331-62/044959.wav,Passenger,matched,exact_date_time,high,62,60,20170331,044959,NORTHERN ADVENTURE,NORTHERN ADVENTURE,,NAME:475fbc93197e,False
+Passenger/20170401-63/000636.wav,Passenger,matched,exact_date_time,high,63,69,20170401,000636,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170401-64/000636.wav,Passenger,matched,record_id_and_date,high,64,69,20170401,000800,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170408-65/040520.wav,Passenger,matched,exact_date_time,high,65,60,20170408,040520,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20170408a-66/224944.wav,Passenger,matched,exact_date_time,high,66,60,20170408,224944,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170417-67/025741.wav,Passenger,matched,exact_date_time,high,67,65,20170417,025741,SAFARI QUEST,SAFARI QUEST,,NAME:d397b2cb1e5f,False
+Passenger/20170429a-68/102113.wav,Passenger,matched,exact_date_time,high,68,60,20170429,102113,OOSTERDAM,OOSTERDAM,,NAME:b6b0a370257c,False
+Passenger/20170430-69/011712.wav,Passenger,matched,exact_date_time,high,69,60,20170430,011712,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20170503c-70/201813.wav,Passenger,matched,exact_date_time,high,70,69,20170503,201813,SALISH EAGLE,SALISH EAGLE,,NAME:d52a8f40e6e5,False
+Passenger/20170506a-71/114552.wav,Passenger,matched,exact_date_time,high,71,60,20170506,114552,CORAL PRINCESS,CORAL PRINCESS,,NAME:c9307fd7705a,False
+Passenger/20170508-72/035234.wav,Passenger,matched,exact_date_time,high,72,65,20170508,035234,SAFARI QUEST,SAFARI QUEST,,NAME:d397b2cb1e5f,False
+Passenger/20170508a-73/152055.wav,Passenger,matched,exact_date_time,high,73,60,20170508,152055,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20170509-74/174012.wav,Passenger,matched,exact_date_time,high,74,69,20170509,174012,SALISH EAGLE,SALISH EAGLE,,NAME:d52a8f40e6e5,False
+Passenger/20170510-75/113409.wav,Passenger,matched,exact_date_time,high,75,69,20170510,113409,ISLAND PRINCESS,ISLAND PRINCESS,,NAME:273f57f1c3cb,False
+Passenger/20170511a-76/195844.wav,Passenger,matched,exact_date_time,high,76,60,20170511,195844,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20170512a-77/113827.wav,Passenger,matched,exact_date_time,high,77,60,20170512,113827,EUROPA,EUROPA,,NAME:804d3f860f7f,False
+Passenger/20170513a-79/201854.wav,Passenger,matched,exact_date_time,high,79,60,20170513,201854,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20170514-80/060420.wav,Passenger,matched,exact_date_time,high,80,69,20170514,060420,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20170517a-82/162940.wav,Passenger,matched,exact_date_time,high,82,69,20170517,162940,SALISH EAGLE,SALISH EAGLE,,NAME:d52a8f40e6e5,False
+Passenger/20170517b-83/225337.wav,Passenger,matched,exact_date_time,high,83,60,20170517,225337,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170520a-84/174851.wav,Passenger,matched,exact_date_time,high,84,60,20170520,174851,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170522-85/110529.wav,Passenger,matched,exact_date_time,high,85,60,20170522,110529,DISNEY WONDER,DISNEY WONDER,,NAME:95b1ec354a54,False
+Passenger/20170527-86/013032.wav,Passenger,matched,exact_date_time,high,86,60,20170527,013032,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20170530a-87/165315.wav,Passenger,matched,exact_date_time,high,87,69,20170530,165315,SALISH EAGLE,SALISH EAGLE,,NAME:d52a8f40e6e5,False
+Passenger/20170601-88/112643.wav,Passenger,matched,exact_date_time,high,88,60,20170601,112643,SEABOURN SOJOURN,SEABOURN SOJOURN,,NAME:475f52553eec,False
+Passenger/20170603-89/012058.wav,Passenger,matched,exact_date_time,high,89,60,20170603,012058,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20170605-90/174603.wav,Passenger,matched,record_id_and_date,high,90,60,20170605,175102,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170605a-91/191933.wav,Passenger,matched,exact_date_time,high,91,69,20170605,191933,SALISH EAGLE,SALISH EAGLE,,NAME:d52a8f40e6e5,False
+Passenger/20170613-92/162550.wav,Passenger,matched,exact_date_time,high,92,69,20170613,162550,SALISH EAGLE,SALISH EAGLE,,NAME:d52a8f40e6e5,False
+Passenger/20170615-93/124844.wav,Passenger,matched,exact_date_time,high,93,60,20170615,124844,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170616-94/174832.wav,Passenger,matched,exact_date_time,high,94,60,20170616,174832,NORTH ISLAND,NORTH ISLAND,,NAME:6a1be01de075,False
+Passenger/20170616a-95/231343.wav,Passenger,matched,exact_date_time,high,95,60,20170616,231343,NORTH ISLAND,NORTH ISLAND,,NAME:6a1be01de075,False
+Passenger/20170617a-96/073155.wav,Passenger,matched,exact_date_time,high,96,69,20170617,073155,NORTHERN EXPEDITION,NORTHERN EXPEDITION,,NAME:96698987faf3,False
+Passenger/20170625-97/000157.wav,Passenger,matched,exact_date_time,high,97,60,20170625,000157,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20170627a-98/152638.wav,Passenger,matched,exact_date_time,high,98,60,20170627,152638,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20170629-99/012112.wav,Passenger,matched,exact_date_time,high,99,60,20170629,012112,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20170701-100/013614.wav,Passenger,matched,exact_date_time,high,100,60,20170701,013614,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20170709-101/095127.wav,Passenger,matched,exact_date_time,high,101,60,20170709,095127,SEVEN SEAS,SEVEN SEAS,,NAME:a3d33f132069,False
+Passenger/20170715-102/041047.wav,Passenger,matched,exact_date_time,high,102,60,20170715,041047,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20170716-103/111744.wav,Passenger,matched,exact_date_time,high,103,60,20170716,111744,THE WORLD,THE WORLD,,NAME:ef36a42adac1,False
+Passenger/20170720a-104/110917.wav,Passenger,matched,exact_date_time,high,104,60,20170720,110917,CRYSTAL SERENITY,CRYSTAL SERENITY,,NAME:57a753175514,False
+Passenger/20170723-105/095606.wav,Passenger,matched,record_id_and_date,high,105,69,20170723,100302,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20170725-106/143547.wav,Passenger,matched,exact_date_time,high,106,60,20170725,143547,SALISH RAVEN,SALISH RAVEN,,NAME:44a1c264f838,False
+Passenger/20170729a-107/151035.wav,Passenger,matched,exact_date_time,high,107,60,20170729,151035,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170802-108/230730.wav,Passenger,matched,exact_date_time,high,108,60,20170802,230730,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20170803-109/231129.wav,Passenger,matched,exact_date_time,high,109,60,20170803,231129,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20170808-110/113313.wav,Passenger,matched,exact_date_time,high,110,60,20170808,113313,CRYSTAL SERENITY,CRYSTAL SERENITY,,NAME:57a753175514,False
+Passenger/20170826a-111/043132.wav,Passenger,matched,exact_date_time,high,111,60,20170826,043132,MALASPINA,MALASPINA,,NAME:2d63fb2a6a82,False
+Passenger/20170827-112/033909.wav,Passenger,matched,exact_date_time,high,112,69,20170827,033909,COLUMBIA,COLUMBIA,,NAME:4cf58332b857,False
+Passenger/20170905-113/224957.wav,Passenger,matched,exact_date_time,high,113,60,20170905,224957,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20170906-114/104632.wav,Passenger,matched,exact_date_time,high,114,60,20170906,104632,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170906-115/104632.wav,Passenger,matched,record_id_and_date,high,115,60,20170906,104822,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170912a-116/184302.wav,Passenger,matched,exact_date_time,high,116,60,20170912,184302,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170912a-117/184302.wav,Passenger,matched,record_id_and_date,high,117,60,20170912,184852,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20170912b-118/201835.wav,Passenger,matched,exact_date_time,high,118,60,20170912,201835,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20170915-119/210154.wav,Passenger,matched,exact_date_time,high,119,60,20170915,210154,NORTHERN ADVENTURE,NORTHERN ADVENTURE,,NAME:475fbc93197e,False
+Passenger/20170925-120/101039.wav,Passenger,matched,exact_date_time,high,120,60,20170925,101039,OOSTERDAM,OOSTERDAM,,NAME:b6b0a370257c,False
+Passenger/20171001-121/105017.wav,Passenger,matched,exact_date_time,high,121,69,20171001,105017,EURODAM 245206000,EURODAM,245206000,MMSI:245206000,False
+Passenger/20171007-122/015806.wav,Passenger,matched,record_id_and_date,high,122,69,20171007,015956,KENNICOTT,KENNICOTT,,NAME:6d8198e89988,False
+Passenger/20171012-123/165340.wav,Passenger,matched,exact_date_time,high,123,69,20171012,165340,SALISH EAGLE,SALISH EAGLE,,NAME:d52a8f40e6e5,False
+Passenger/20171017-124/095628.wav,Passenger,matched,exact_date_time,high,124,69,20171017,095628,EURODAM 245206000,EURODAM,245206000,MMSI:245206000,False
+Passenger/20171020a-125/201024.wav,Passenger,matched,exact_date_time,high,125,60,20171020,201024,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20171105-126/235036.wav,Passenger,matched,exact_date_time,high,126,60,20171105,235036,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20171106-127/044551.wav,Passenger,matched,exact_date_time,high,127,65,20171106,044551,SAFARI QUEST,SAFARI QUEST,,NAME:d397b2cb1e5f,False
+Passenger/20171106a-128/184906.wav,Passenger,matched,exact_date_time,high,128,60,20171106,184906,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20171110-129/224141.wav,Passenger,matched,exact_date_time,high,129,60,20171110,224141,LOMAIVITI PRINCESS,LOMAIVITI PRINCESS,,NAME:ac5271faa543,False
+Passenger/20171116-130/161921.wav,Passenger,matched,exact_date_time,high,130,60,20171116,161921,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20171120-131/163321.wav,Passenger,matched,exact_date_time,high,131,60,20171120,163321,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20171122-132/071915.wav,Passenger,matched,exact_date_time,high,132,60,20171122,071915,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20171207-133/162949.wav,Passenger,matched,exact_date_time,high,133,60,20171207,162949,SALISH RAVEN,SALISH RAVEN,,NAME:44a1c264f838,False
+Passenger/20171208d-134/023937.wav,Passenger,matched,exact_date_time,high,134,60,20171208,023937,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20171210-135/021603.wav,Passenger,matched,exact_date_time,high,135,60,20171210,021603,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20171229-136/201102.wav,Passenger,matched,record_id_and_date,high,136,60,20171229,201301,BOWEN QUEEN,BOWEN QUEEN,,NAME:5cdf69eccb08,False
+Passenger/20180120-139/191134.wav,Passenger,matched,exact_date_time,high,139,60,20180120,191134,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180125-140/071504.wav,Passenger,matched,exact_date_time,high,140,60,20180125,071504,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20180202-141/134746.wav,Passenger,matched,exact_date_time,high,141,60,20180202,134746,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180205-142/230715.wav,Passenger,matched,exact_date_time,high,142,60,20180205,230715,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20180213-143/234934.wav,Passenger,matched,exact_date_time,high,143,60,20180213,234934,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180215-144/185044.wav,Passenger,matched,exact_date_time,high,144,60,20180215,185044,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180219-145/034422.wav,Passenger,matched,exact_date_time,high,145,60,20180219,034422,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180307-146/075607.wav,Passenger,matched,exact_date_time,high,146,60,20180307,075607,SALISH RAVEN,SALISH RAVEN,,NAME:44a1c264f838,False
+Passenger/20180313a-147/181647.wav,Passenger,matched,exact_date_time,high,147,60,20180313,181647,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180320-148/103759.wav,Passenger,matched,exact_date_time,high,148,60,20180320,103759,MAYNE QUEEN,MAYNE QUEEN,,NAME:6dd310d689ab,False
+Passenger/20180326-149/180641.wav,Passenger,matched,exact_date_time,high,149,60,20180326,180641,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180329-150/181312.wav,Passenger,matched,exact_date_time,high,150,60,20180329,181312,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180330-151/032743.wav,Passenger,matched,exact_date_time,high,151,60,20180330,032743,NORTHERN ADVENTURE,NORTHERN ADVENTURE,,NAME:475fbc93197e,False
+Passenger/20180406-152/135944.wav,Passenger,matched,exact_date_time,high,152,69,20180406,135944,COASTAL CELEBRATION,COASTAL CELEBRATION,,NAME:1cc8bfdb25e2,False
+Passenger/20180406a-153/151655.wav,Passenger,matched,exact_date_time,high,153,60,20180406,151655,SALISH RAVEN,SALISH RAVEN,,NAME:44a1c264f838,False
+Passenger/20180412-154/110230.wav,Passenger,matched,exact_date_time,high,154,60,20180412,110230,WESTERDAM,WESTERDAM,,NAME:13d1f5d04ad2,False
+Passenger/20180420-155/033310.wav,Passenger,matched,exact_date_time,high,155,60,20180420,033310,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180426-156/114757.wav,Passenger,matched,exact_date_time,high,156,60,20180426,114757,SALISH RAVEN,SALISH RAVEN,,NAME:44a1c264f838,False
+Passenger/20180501-157/112008.wav,Passenger,matched,exact_date_time,high,157,60,20180501,112008,CARNIVAL LEGEND,CARNIVAL LEGEND,,NAME:090036cade0f,False
+Passenger/20180502-158/030648.wav,Passenger,matched,exact_date_time,high,158,60,20180502,030648,MAYNE QUEEN,MAYNE QUEEN,,NAME:6dd310d689ab,False
+Passenger/20180503-159/153434.wav,Passenger,matched,exact_date_time,high,159,60,20180503,153434,SALISH RAVEN,SALISH RAVEN,,NAME:44a1c264f838,False
+Passenger/20180505-160/063136.wav,Passenger,matched,exact_date_time,high,160,60,20180505,063136,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180505a-161/101511.wav,Passenger,matched,exact_date_time,high,161,60,20180505,101511,NIEUW AMSTERDAM,NIEUW AMSTERDAM,,NAME:cfe6aed11cb5,False
+Passenger/20180506-162/054035.wav,Passenger,matched,exact_date_time,high,162,60,20180506,054035,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20180506a-163/105313.wav,Passenger,matched,exact_date_time,high,163,60,20180506,105313,ZAANDAM 246442000,ZAANDAM,246442000,MMSI:246442000,False
+Passenger/20180506b-164/113050.wav,Passenger,matched,exact_date_time,high,164,60,20180506,113050,NOORDAM,NOORDAM,,NAME:2ee705e3bc5c,False
+Passenger/20180511-165/101015.wav,Passenger,matched,exact_date_time,high,165,69,20180511,101015,CELEBRITY SOLSTICE,CELEBRITY SOLSTICE,,NAME:3c44b7853956,False
+Passenger/20180513-166/084039.wav,Passenger,matched,exact_date_time,high,166,60,20180513,084039,RADIANCE OF,RADIANCE OF,,NAME:8b251ee42ba7,False
+Passenger/20180514-167/181453.wav,Passenger,matched,exact_date_time,high,167,60,20180514,181453,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180518-168/031804.wav,Passenger,matched,exact_date_time,high,168,60,20180518,031804,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180519-169/012744.wav,Passenger,matched,exact_date_time,high,169,60,20180519,012744,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20180520-170/120550.wav,Passenger,matched,exact_date_time,high,170,65,20180520,120550,SAFARI QUEST,SAFARI QUEST,,NAME:d397b2cb1e5f,False
+Passenger/20180522-171/064727.wav,Passenger,matched,exact_date_time,high,171,60,20180522,064727,SAFARI EXPLORER,SAFARI EXPLORER,,NAME:2bc9fdd5da2b,False
+Passenger/20180524-172/225612.wav,Passenger,matched,exact_date_time,high,172,60,20180524,225612,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180617-173/201949.wav,Passenger,matched,exact_date_time,high,173,60,20180617,201949,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20180619-174/062048.wav,Passenger,matched,exact_date_time,high,174,60,20180619,062048,COASTAL RENAISSANCE,COASTAL RENAISSANCE,,NAME:6e93fdff983b,False
+Passenger/20180630-175/094326.wav,Passenger,matched,exact_date_time,high,175,60,20180630,094326,SEVEN SEAS,SEVEN SEAS,,NAME:a3d33f132069,False
+Passenger/20180630a-176/200100.wav,Passenger,matched,exact_date_time,high,176,69,20180630,200100,QUADRA QUEEN,QUADRA QUEEN,,NAME:afc7aff2731c,False
+Passenger/20180703-177/221012.wav,Passenger,matched,exact_date_time,high,177,60,20180703,221012,ICEBERG,ICEBERG,,NAME:ec2b627fd541,False
+Passenger/20180711-178/094820.wav,Passenger,matched,exact_date_time,high,178,60,20180711,094820,SEVEN SEAS,SEVEN SEAS,,NAME:a3d33f132069,False
+Passenger/20180722-179/181231.wav,Passenger,matched,exact_date_time,high,179,60,20180722,181231,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180821-18/153439.wav,Passenger,matched,exact_date_time,high,18,60,20180821,153439,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20180827-180/182309.wav,Passenger,matched,exact_date_time,high,180,60,20180827,182309,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180828a-181/125034.wav,Passenger,matched,exact_date_time,high,181,60,20180828,125034,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180905a-19/211808.wav,Passenger,matched,exact_date_time,high,19,69,20180905,211808,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20180905b-182/061547.wav,Passenger,matched,exact_date_time,high,182,60,20180905,061547,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20180905c-183/212331.wav,Passenger,matched,exact_date_time,high,183,69,20180905,212331,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20180912-25/034620.wav,Passenger,matched,exact_date_time,high,25,60,20180912,034620,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180913-184/181821.wav,Passenger,matched,exact_date_time,high,184,60,20180913,181821,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180914-185/182348.wav,Passenger,matched,exact_date_time,high,185,69,20180914,182348,SPIRIT OF,SPIRIT OF,,NAME:6577956387bd,True
+Passenger/20180915-78/062231.wav,Passenger,matched,exact_date_time,high,78,60,20180915,062231,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20180917-81/035007.wav,Passenger,matched,exact_date_time,high,81,60,20180917,035007,QUEEN OF,QUEEN OF,,NAME:e9468dec673d,True
+Passenger/20180921-186/111213.wav,Passenger,matched,exact_date_time,high,186,69,20180921,111213,CELEBRITY SOLSTICE,CELEBRITY SOLSTICE,,NAME:3c44b7853956,False
+Passenger/20180922-187/124737.wav,Passenger,matched,exact_date_time,high,187,60,20180922,124737,NATGEO SEABIRD,NATGEO SEABIRD,,NAME:fb4f6ae05173,False
+Passenger/20180923-188/012316.wav,Passenger,matched,exact_date_time,high,188,60,20180923,012316,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180925-189/012450.wav,Passenger,matched,exact_date_time,high,189,60,20180925,012450,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20180926-190/011928.wav,Passenger,matched,exact_date_time,high,190,60,20180926,011928,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Passenger/20180926a-191/012514.wav,Passenger,matched,exact_date_time,high,191,60,20180926,012514,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20180929-192/012612.wav,Passenger,matched,exact_date_time,high,192,60,20180929,012612,COASTAL INSPIRATION,COASTAL INSPIRATION,,NAME:f772cd8e276b,False
+Passenger/20181003-193/012519.wav,Passenger,matched,exact_date_time,high,193,60,20181003,012519,V2V EMPRESS,V2V EMPRESS,,NAME:743d3e63e1be,False
+Tank/20160509-1/123109.wav,Tank,matched,exact_date_time,high,1,89,20160509,123109,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20160511-2/2.wav,Tank,matched,record_id_and_date,high,2,80,20160511,030034,CHERRY GALAXY,CHERRY GALAXY,,NAME:c70b18da6c17,False
+Tank/20160515-3/020119.wav,Tank,matched,exact_date_time,high,3,89,20160515,020119,CHAMPION EBONY,CHAMPION EBONY,,NAME:185f42088a3b,False
+Tank/20160516-4/134837.wav,Tank,matched,exact_date_time,high,4,80,20160516,134837,ESER K,ESER K,,NAME:81db2a73ba92,False
+Tank/20160519-5/5.wav,Tank,matched,record_id_and_date,high,5,80,20160519,123958,LYNDA VICTORY,LYNDA VICTORY,,NAME:43e4c255b356,False
+Tank/20160526-6/6.wav,Tank,matched,record_id_and_date,high,6,89,20160526,193813,CHAMPION EBONY,CHAMPION EBONY,,NAME:185f42088a3b,False
+Tank/20160531-7/142749.wav,Tank,matched,exact_date_time,high,7,80,20160531,142749,CHEMBULK NEW,CHEMBULK NEW,,NAME:e3335e3db1c5,False
+Tank/20160601-8/8.wav,Tank,matched,record_id_and_date,high,8,89,20160601,142520,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20160602-9/9.wav,Tank,matched,record_id_and_date,high,9,80,20160602,203639,SONGA RUBY,SONGA RUBY,,NAME:8f684d432bca,False
+Tank/20160602a-10/10.wav,Tank,matched,record_id_and_date,high,10,80,20160602,225434,NAVE ORBIT,NAVE ORBIT,,NAME:2b9e227fbb9d,False
+Tank/20160604-11/171238.wav,Tank,matched,exact_date_time,high,11,80,20160604,171238,CHAMPION CORNELIA,CHAMPION CORNELIA,,NAME:26e5f8adfaaa,False
+Tank/20160612-12/12.wav,Tank,matched,record_id_and_date,high,12,89,20160612,211030,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20160613-13/13.wav,Tank,matched,record_id_and_date,high,13,80,20160613,061037,HIGH ENDURANCE,HIGH ENDURANCE,,NAME:61c49e48beb3,False
+Tank/20160615-14/14.wav,Tank,matched,record_id_and_date,high,14,82,20160615,063659,ARGENT SUNRISE,ARGENT SUNRISE,,NAME:c73665fcee95,False
+Tank/20160616-15/214515.wav,Tank,matched,exact_date_time,high,15,82,20160616,214515,ARGENT DAISY,ARGENT DAISY,,NAME:41a0ab2cec86,False
+Tank/20160617-16/225229.wav,Tank,matched,exact_date_time,high,16,82,20160617,225229,LOUIS P,LOUIS P,,NAME:4da84da50f77,False
+Tank/20160619-17/173821.wav,Tank,matched,exact_date_time,high,17,80,20160619,173821,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20160619a-18/18.wav,Tank,matched,record_id_and_date,high,18,80,20160619,215854,OVERSEAS ATHENS,OVERSEAS ATHENS,,NAME:d84ec0bd649c,False
+Tank/20160625-19/19.wav,Tank,matched,record_id_and_date,high,19,81,20160625,141954,CARIBBEAN SPIRIT,CARIBBEAN SPIRIT,,NAME:a19655c7e341,False
+Tank/20160702-20/20.wav,Tank,matched,record_id_and_date,high,20,82,20160702,225342,CHEMICAL AQUARIUS,CHEMICAL AQUARIUS,,NAME:53145a3a8bee,False
+Tank/20160703-21/21.wav,Tank,matched,date_and_duration,medium,22,84,20160703,163943,ARGENT DAISY,ARGENT DAISY,,NAME:41a0ab2cec86,False
+Tank/20160704-22/111311.wav,Tank,matched,exact_date_time,high,23,80,20160704,111311,OVERSEAS ATHENS,OVERSEAS ATHENS,,NAME:d84ec0bd649c,False
+Tank/20160710-23/104049.wav,Tank,matched,exact_date_time,high,24,80,20160710,104049,HIGH ENDURANCE,HIGH ENDURANCE,,NAME:61c49e48beb3,False
+Tank/20160710a-24/24.wav,Tank,matched,date_and_duration,medium,25,80,20160710,214304,NINA VICTORY,NINA VICTORY,,NAME:c704202fce17,False
+Tank/20160714-25/111759.wav,Tank,matched,exact_date_time,high,27,89,20160714,111759,GINGA COUGAR,GINGA COUGAR,,NAME:d300a40d9e9f,False
+Tank/20160714a-26/141202.wav,Tank,matched,exact_date_time,high,28,80,20160714,141202,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20160724-27/025459.wav,Tank,matched,exact_date_time,high,29,80,20160724,025459,HIGH ENDURANCE,HIGH ENDURANCE,,NAME:61c49e48beb3,False
+Tank/20160808-28/203415.wav,Tank,matched,exact_date_time,high,30,80,20160808,203415,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20160810-29/29.wav,Tank,matched,date_and_duration,medium,31,82,20160810,173536,ARGENT SUNRISE,ARGENT SUNRISE,,NAME:c73665fcee95,False
+Tank/20160810a-30/30.wav,Tank,matched,date_and_duration,medium,32,89,20160810,215541,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20160823-31/041452.wav,Tank,matched,exact_date_time,high,33,80,20160823,041452,EMMA VICTORY,EMMA VICTORY,,NAME:8beedeaaf506,False
+Tank/20160829-32/32.wav,Tank,matched,date_and_duration,medium,34,80,20160829,015402,CHAMPION CORNELIA,CHAMPION CORNELIA,,NAME:26e5f8adfaaa,False
+Tank/20160831-33/33.wav,Tank,matched,date_and_duration,medium,35,89,20160831,210639,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20160904-34/005747.wav,Tank,matched,exact_date_time,high,36,80,20160904,005747,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20160906-35/35.wav,Tank,matched,date_and_duration,medium,37,89,20160906,083920,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20160907-36/094356.wav,Tank,matched,exact_date_time,high,38,80,20160907,094356,YANKUL SILVER,YANKUL SILVER,,NAME:242d5ab8c950,False
+Tank/20160910-37/190037.wav,Tank,matched,exact_date_time,high,39,82,20160910,190037,FUJI GALAXY,FUJI GALAXY,,NAME:55db029d8de0,False
+Tank/20160924-38/38.wav,Tank,matched,date_and_duration,medium,40,89,20160924,023333,ARGENT DAISY,ARGENT DAISY,,NAME:41a0ab2cec86,False
+Tank/20160927-39/39.wav,Tank,matched,date_and_duration,medium,41,80,20160927,081031,ARDMORE CHEYENNE,ARDMORE CHEYENNE,,NAME:a92c1518168a,False
+Tank/20161002-40/130331.wav,Tank,matched,exact_date_time,high,42,80,20161002,130331,CHEMBULK NEW,CHEMBULK NEW,,NAME:e3335e3db1c5,False
+Tank/20161005-41/41.wav,Tank,matched,date_and_duration,medium,43,89,20161005,075627,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20161009-42/42.wav,Tank,matched,date_and_duration,medium,44,89,20161009,151318,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20161021-43/43.wav,Tank,matched,date_and_duration,medium,45,80,20161021,204409,CHEMBULK MINNEAPOLIS,CHEMBULK MINNEAPOLIS,,NAME:2a242976cd9e,False
+Tank/20161022-44/030503.wav,Tank,matched,exact_date_time,high,46,80,20161022,030503,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20161024-45/061514.wav,Tank,matched,exact_date_time,high,47,89,20161024,061514,CHERRY GALAXY,CHERRY GALAXY,,NAME:c70b18da6c17,False
+Tank/20161027-46/145435.wav,Tank,matched,exact_date_time,high,48,80,20161027,145435,SILVER MUNA,SILVER MUNA,,NAME:80224c0e63db,False
+Tank/20161030-47/47.wav,Tank,matched,date_and_duration,medium,49,89,20161030,043924,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20161101-48/48.wav,Tank,matched,same_date_duration_assignment,medium,50,89,20161101,053459,OCEAN RELIANCE,OCEAN RELIANCE,,NAME:25e992f03eef,False
+Tank/20161101a-49/49.wav,Tank,matched,same_date_duration_assignment,medium,51,80,20161101,230021,WORLD HARMONY,WORLD HARMONY,,NAME:c8b47720a542,False
+Tank/20161106-50/50.wav,Tank,matched,date_and_duration,medium,52,82,20161106,200001,CHERRY GALAXY,CHERRY GALAXY,,NAME:c70b18da6c17,False
+Tank/20161107-51/170102.wav,Tank,matched,exact_date_time,high,53,82,20161107,170102,NAVIG8 AQUAMARINE,NAVIG8 AQUAMARINE,,NAME:795f93d22a04,False
+Tank/20161110-52/005212.wav,Tank,matched,exact_date_time,high,54,80,20161110,005212,ARGENT SUNRISE,ARGENT SUNRISE,,NAME:c73665fcee95,False
+Tank/20161113-237/174452.wav,Tank,matched,exact_date_time,high,55,82,20161113,174452,NAVIG8 AQUAMARINE,NAVIG8 AQUAMARINE,,NAME:795f93d22a04,False
+Tank/20161113a-53/212239.wav,Tank,matched,exact_date_time,high,56,89,20161113,212239,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20161121-54/094048.wav,Tank,matched,exact_date_time,high,57,82,20161121,094048,ARGENT DAISY,ARGENT DAISY,,NAME:41a0ab2cec86,False
+Tank/20161123-55/171423.wav,Tank,matched,exact_date_time,high,58,82,20161123,171423,BUNGA LOTUS,BUNGA LOTUS,,NAME:41832589d836,False
+Tank/20161124-56/095256.wav,Tank,matched,exact_date_time,high,59,83,20161124,095256,LOUIS P,LOUIS P,,NAME:4da84da50f77,False
+Tank/20161125-57/202025.wav,Tank,matched,exact_date_time,high,60,80,20161125,202025,ARGENT SUNRISE,ARGENT SUNRISE,,NAME:c73665fcee95,False
+Tank/20161128-58/005608.wav,Tank,matched,exact_date_time,high,61,80,20161128,005608,CHAMPION ISTRA,CHAMPION ISTRA,,NAME:6dfcba65add2,False
+Tank/20161206-59/221722.wav,Tank,matched,exact_date_time,high,62,80,20161206,221722,CHEMBULK NEW,CHEMBULK NEW,,NAME:e3335e3db1c5,False
+Tank/20161207-60/090131.wav,Tank,matched,exact_date_time,high,63,84,20161207,090131,MTM LONDON,MTM LONDON,,NAME:d543903933df,False
+Tank/20161208-61/135535.wav,Tank,matched,exact_date_time,high,64,82,20161208,135535,FUJI GALAXY,FUJI GALAXY,,NAME:55db029d8de0,False
+Tank/20161208a-62/200744.wav,Tank,matched,exact_date_time,high,65,89,20161208,200744,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20161211-63/204245.wav,Tank,matched,exact_date_time,high,66,80,20161211,204245,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20161215-64/025503.wav,Tank,matched,exact_date_time,high,67,81,20161215,025503,GINGA TIGER,GINGA TIGER,,NAME:e26de5f02cf6,False
+Tank/20161218-65/134000.wav,Tank,matched,exact_date_time,high,68,80,20161218,134000,STI QUEENS,STI QUEENS,,NAME:20ca4f871efe,False
+Tank/20161226-66/123224.wav,Tank,matched,exact_date_time,high,70,89,20161226,123224,THELMA,THELMA,,NAME:5e113b145850,False
+Tank/20161227-67/034311.wav,Tank,matched,exact_date_time,high,71,80,20161227,034311,TORM CAMILLA,TORM CAMILLA,,NAME:b78a374f9098,False
+Tank/20170102-68/001752.wav,Tank,matched,exact_date_time,high,72,82,20170102,001752,GULF STREAM,GULF STREAM,,NAME:847e5d06798c,False
+Tank/20170119-69/153739.wav,Tank,matched,exact_date_time,high,73,82,20170119,153739,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20170120-70/070941.wav,Tank,matched,exact_date_time,high,74,80,20170120,070941,BOCHEM LONDON,BOCHEM LONDON,,NAME:efb765ecb3c2,False
+Tank/20170121-71/234906.wav,Tank,matched,exact_date_time,high,75,89,20170121,234906,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20170122-72/031957.wav,Tank,matched,exact_date_time,high,76,82,20170122,031957,CHEMBULK HONGKONG,CHEMBULK HONGKONG,,NAME:5a6ef80edeef,False
+Tank/20170122a-73/032130.wav,Tank,matched,exact_date_time,high,77,82,20170122,032130,CHEMBULK HONGKONG,CHEMBULK HONGKONG,,NAME:5a6ef80edeef,False
+Tank/20170122b-74/050415.wav,Tank,matched,exact_date_time,high,78,82,20170122,050415,BOCHEM SINGAPURA,BOCHEM SINGAPURA,,NAME:ec90066b4592,False
+Tank/20170124-75/085359.wav,Tank,matched,exact_date_time,high,79,89,20170124,085359,TORM ASLAUG,TORM ASLAUG,,NAME:6b1675ae186a,False
+Tank/20170203-76/002153.wav,Tank,matched,exact_date_time,high,80,80,20170203,002153,ESER K,ESER K,,NAME:81db2a73ba92,False
+Tank/20170204-77/232817.wav,Tank,matched,exact_date_time,high,81,80,20170204,232817,SILVER SAWSAN,SILVER SAWSAN,,NAME:55662369b772,False
+Tank/20170205-78/163939.wav,Tank,matched,exact_date_time,high,82,80,20170205,163939,HIGH MERCURY,HIGH MERCURY,,NAME:7a87842a0e9c,False
+Tank/20170206-79/081843.wav,Tank,matched,exact_date_time,high,83,89,20170206,081843,GINGA PANTHER,GINGA PANTHER,,NAME:b71894c87019,False
+Tank/20170209-80/040238.wav,Tank,matched,exact_date_time,high,85,82,20170209,040238,FUJI GALAXY,FUJI GALAXY,,NAME:55db029d8de0,False
+Tank/20170216-81/035911.wav,Tank,matched,exact_date_time,high,86,80,20170216,035911,HIGH MERCURY,HIGH MERCURY,,NAME:7a87842a0e9c,False
+Tank/20170219-82/104435.wav,Tank,matched,exact_date_time,high,87,80,20170219,104435,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170227-83/235904.wav,Tank,matched,exact_date_time,high,88,80,20170227,235904,GINGA LION,GINGA LION,,NAME:c5972e2bd31d,False
+Tank/20170301-84/230755.wav,Tank,matched,exact_date_time,high,89,80,20170301,230755,CHAMPION TERN,CHAMPION TERN,,NAME:2b6840f9510d,False
+Tank/20170309-85/095437.wav,Tank,matched,exact_date_time,high,90,80,20170309,095437,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170317-86/072019.wav,Tank,matched,exact_date_time,high,91,80,20170317,072019,NAVIG8 AMBER,NAVIG8 AMBER,,NAME:4b4695c25480,False
+Tank/20170326-87/022836.wav,Tank,matched,exact_date_time,high,92,82,20170326,022836,CHERRY GALAXY,CHERRY GALAXY,,NAME:c70b18da6c17,False
+Tank/20170326a-88/203852.wav,Tank,matched,exact_date_time,high,93,80,20170326,203852,CITRUS EXPRESS,CITRUS EXPRESS,,NAME:c99cf3ee0627,False
+Tank/20170326b-89/231111.wav,Tank,matched,exact_date_time,high,94,80,20170326,231111,ALFRED N,ALFRED N,,NAME:dabeccecf421,False
+Tank/20170327-90/112002.wav,Tank,matched,exact_date_time,high,95,80,20170327,112002,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170327a-91/224310.wav,Tank,matched,exact_date_time,high,96,82,20170327,224310,GINGA LEOPARD,GINGA LEOPARD,,NAME:91a1b362b56f,False
+Tank/20170403-92/044833.wav,Tank,matched,exact_date_time,high,97,80,20170403,044833,KERALA,KERALA,,NAME:b09c81286f3a,False
+Tank/20170403a-93/102955.wav,Tank,matched,exact_date_time,high,98,80,20170403,102955,ALFRED N,ALFRED N,,NAME:dabeccecf421,False
+Tank/20170404-94/061416.wav,Tank,matched,exact_date_time,high,99,80,20170404,061416,CHAMPION TRADER,CHAMPION TRADER,,NAME:8eb5a69f27b2,False
+Tank/20170409-95/031833.wav,Tank,matched,exact_date_time,high,100,89,20170409,031833,CHEMBULK LINDY,CHEMBULK LINDY,,NAME:0b2a9743e484,False
+Tank/20170412-96/114857.wav,Tank,matched,exact_date_time,high,101,89,20170412,114857,NESTOS 636012507,NESTOS,636012507,MMSI:636012507,False
+Tank/20170413-97/112445.wav,Tank,matched,exact_date_time,high,102,80,20170413,112445,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20170419-98/021347.wav,Tank,matched,exact_date_time,high,103,89,20170419,021347,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20170420-99/170815.wav,Tank,matched,exact_date_time,high,104,80,20170420,170815,KAIMON GALAXY,KAIMON GALAXY,,NAME:ed8e80896825,False
+Tank/20170421-100/010738.wav,Tank,matched,exact_date_time,high,105,80,20170421,010738,HAFNIA MALACCA,HAFNIA MALACCA,,NAME:2693e6e1124a,False
+Tank/20170421a-101/064626.wav,Tank,matched,exact_date_time,high,106,82,20170421,064626,FUJI GALAXY,FUJI GALAXY,,NAME:55db029d8de0,False
+Tank/20170425-102/231243.wav,Tank,matched,exact_date_time,high,107,80,20170425,231243,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170507-103/213103.wav,Tank,matched,exact_date_time,high,108,81,20170507,213103,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20170509-104/105420.wav,Tank,matched,exact_date_time,high,109,83,20170509,105420,RIO DAUPHIN,RIO DAUPHIN,,NAME:7968c496c16c,False
+Tank/20170510-105/041848.wav,Tank,matched,exact_date_time,high,110,80,20170510,041848,SILVER ETREMA,SILVER ETREMA,,NAME:fd443e7290c0,False
+Tank/20170511-106/050253.wav,Tank,matched,exact_date_time,high,111,80,20170511,050253,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170512-107/081819.wav,Tank,matched,exact_date_time,high,112,80,20170512,081819,HELLAS AVATAR,HELLAS AVATAR,,NAME:bee5ecaec18d,False
+Tank/20170516-108/201729.wav,Tank,matched,exact_date_time,high,113,82,20170516,201729,ELM GALAXY,ELM GALAXY,,NAME:5eeb72dd8823,False
+Tank/20170525-109/111532.wav,Tank,matched,exact_date_time,high,114,89,20170525,111532,GINGA LYNX,GINGA LYNX,,NAME:9233d9bcd3d6,False
+Tank/20170529-110/124845.wav,Tank,matched,exact_date_time,high,115,89,20170529,124845,CHAMPION ISTRA,CHAMPION ISTRA,,NAME:6dfcba65add2,False
+Tank/20170530-111/004426.wav,Tank,matched,exact_date_time,high,116,80,20170530,004426,SILVER ETREMA,SILVER ETREMA,,NAME:fd443e7290c0,False
+Tank/20170605-112/143212.wav,Tank,matched,exact_date_time,high,117,80,20170605,143212,NEW CONQUEST,NEW CONQUEST,,NAME:fbb69102de9c,False
+Tank/20170608-113/234244.wav,Tank,matched,exact_date_time,high,118,80,20170608,234244,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170612-114/013848.wav,Tank,matched,exact_date_time,high,119,80,20170612,013848,CHEMBULK LINDY,CHEMBULK LINDY,,NAME:0b2a9743e484,False
+Tank/20170614-115/021303.wav,Tank,matched,exact_date_time,high,120,89,20170614,021303,LIME GALAXY,LIME GALAXY,,NAME:b56dc0535b32,False
+Tank/20170621-116/221235.wav,Tank,matched,exact_date_time,high,121,82,20170621,221235,KAIMON GALAXY,KAIMON GALAXY,,NAME:ed8e80896825,False
+Tank/20170623-117/232502.wav,Tank,matched,exact_date_time,high,122,82,20170623,232502,SONGA PRIDE,SONGA PRIDE,,NAME:d58f877032df,False
+Tank/20170625-118/180527.wav,Tank,matched,exact_date_time,high,1,80,20170625,180527,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170627-119/111336.wav,Tank,matched,exact_date_time,high,2,82,20170627,111336,KAIMON GALAXY,KAIMON GALAXY,,NAME:ed8e80896825,False
+Tank/20170629-120/215813.wav,Tank,matched,exact_date_time,high,3,89,20170629,215813,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20170630-121/210742.wav,Tank,matched,exact_date_time,high,4,81,20170630,210742,ARGENT COSMOS,ARGENT COSMOS,,NAME:1a6ef0420665,False
+Tank/20170704-122/145807.wav,Tank,matched,exact_date_time,high,5,89,20170704,145807,UACC MESSILA,UACC MESSILA,,NAME:d01d92e3c399,False
+Tank/20170705-123/030515.wav,Tank,matched,exact_date_time,high,6,80,20170705,030515,CHAMPION EBONY,CHAMPION EBONY,,NAME:185f42088a3b,False
+Tank/20170711-124/000454.wav,Tank,unresolved,,none,,,,,,,,,
+Tank/20170711a-239/191933.wav,Tank,matched,exact_date_time,high,9,80,20170711,191933,ARISTAIOS,ARISTAIOS,,NAME:d6c3a53bbb7e,False
+Tank/20170712-125/013547.wav,Tank,matched,exact_date_time,high,10,80,20170712,013547,CHAMPION EBONY,CHAMPION EBONY,,NAME:185f42088a3b,False
+Tank/20170712a-126/015656.wav,Tank,matched,exact_date_time,high,11,80,20170712,015656,NORD INSPIRATION,NORD INSPIRATION,,NAME:ff48e884b477,False
+Tank/20170720-127/064114.wav,Tank,matched,exact_date_time,high,12,89,20170720,064114,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20170723-238/052014.wav,Tank,matched,exact_date_time,high,13,80,20170723,052014,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170723a-128/192900.wav,Tank,matched,exact_date_time,high,14,82,20170723,192900,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20170728-129/202445.wav,Tank,matched,exact_date_time,high,15,89,20170728,202445,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20170802-130/135021.wav,Tank,matched,exact_date_time,high,16,84,20170802,135021,ENERGY CENTURY,ENERGY CENTURY,,NAME:3014620b7e47,False
+Tank/20170815-131/215556.wav,Tank,matched,exact_date_time,high,17,84,20170815,215556,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20170818-132/060518.wav,Tank,matched,exact_date_time,high,18,89,20170818,060518,ATLANTIC LILY,ATLANTIC LILY,,NAME:0dc5c5a7225f,False
+Tank/20170822-133/172736.wav,Tank,matched,exact_date_time,high,20,89,20170822,172736,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20170824-134/194518.wav,Tank,matched,exact_date_time,high,21,82,20170824,194518,HARBOUR FASHION,HARBOUR FASHION,,NAME:f15ad091a4e4,False
+Tank/20170826-135/005931.wav,Tank,matched,exact_date_time,high,22,80,20170826,005931,NORD INSPIRATION,NORD INSPIRATION,,NAME:ff48e884b477,False
+Tank/20170828-136/215454.wav,Tank,matched,exact_date_time,high,23,89,20170828,215454,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20170901-137/205515.wav,Tank,matched,exact_date_time,high,24,80,20170901,205515,NAVIG8 AMETHYST,NAVIG8 AMETHYST,,NAME:d231a10a065d,False
+Tank/20170909-138/191109.wav,Tank,matched,exact_date_time,high,25,80,20170909,191109,GULF PEARL,GULF PEARL,,NAME:7ede4b981a3f,False
+Tank/20170920-139/232910.wav,Tank,matched,exact_date_time,high,27,80,20170920,232910,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20170923-140/064301.wav,Tank,matched,exact_date_time,high,28,82,20170923,064301,KAIMON GALAXY,KAIMON GALAXY,,NAME:ed8e80896825,False
+Tank/20171008-141/053342.wav,Tank,matched,exact_date_time,high,29,80,20171008,053342,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20171013-142/115050.wav,Tank,matched,exact_date_time,high,30,80,20171013,115050,SILVER HANNAH,SILVER HANNAH,,NAME:45c07cc56349,False
+Tank/20171014-143/115751.wav,Tank,matched,exact_date_time,high,31,80,20171014,115751,CHEMBULK LINDY,CHEMBULK LINDY,,NAME:0b2a9743e484,False
+Tank/20171015-144/090640.wav,Tank,matched,exact_date_time,high,32,89,20171015,090640,STOLT SUN,STOLT SUN,,NAME:d45cd4a6aeec,False
+Tank/20171023-145/214849.wav,Tank,matched,exact_date_time,high,33,80,20171023,214849,REINHOLD SCHULTE,REINHOLD SCHULTE,,NAME:031472330c3c,False
+Tank/20171024-146/085126.wav,Tank,matched,exact_date_time,high,34,82,20171024,085126,MTM LONDON,MTM LONDON,,NAME:d543903933df,False
+Tank/20171029-147/012439.wav,Tank,matched,exact_date_time,high,35,80,20171029,012439,CHALLENGE PRELUDE,CHALLENGE PRELUDE,,NAME:3d54200348b4,False
+Tank/20171031-148/074400.wav,Tank,matched,exact_date_time,high,36,89,20171031,074400,LIME GALAXY,LIME GALAXY,,NAME:b56dc0535b32,False
+Tank/20171108-149/011449.wav,Tank,matched,exact_date_time,high,2,80,20171108,011449,MTM SANTOS,MTM SANTOS,,NAME:8a928fb80805,False
+Tank/20171110-150/231243.wav,Tank,matched,exact_date_time,high,3,80,20171110,231243,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20171121-151/180451.wav,Tank,matched,exact_date_time,high,4,80,20171121,180451,CHEMBULK LINDY,CHEMBULK LINDY,,NAME:0b2a9743e484,False
+Tank/20171126-152/025605.wav,Tank,matched,exact_date_time,high,5,80,20171126,025605,CHAMPION ISTRA,CHAMPION ISTRA,,NAME:6dfcba65add2,False
+Tank/20171126a-153/090000.wav,Tank,matched,exact_date_time,high,6,82,20171126,090000,ARGENT SUNRISE,ARGENT SUNRISE,,NAME:c73665fcee95,False
+Tank/20171127-154/162141.wav,Tank,matched,exact_date_time,high,7,80,20171127,162141,OMODOS,OMODOS,,NAME:69a83a3361a7,False
+Tank/20171128-155/013710.wav,Tank,matched,exact_date_time,high,8,80,20171128,013710,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20171204-156/222708.wav,Tank,matched,exact_date_time,high,9,89,20171204,222708,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20171207-157/150539.wav,Tank,matched,exact_date_time,high,10,80,20171207,150539,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20171208-158/193936.wav,Tank,matched,exact_date_time,high,11,80,20171208,193936,TORM EMILIE,TORM EMILIE,,NAME:b24020859808,False
+Tank/20171216-159/160715.wav,Tank,matched,exact_date_time,high,13,89,20171216,160715,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20171220-240/222041.wav,Tank,unresolved,,none,,,,,,,,,
+Tank/20171222-160/141803.wav,Tank,matched,exact_date_time,high,15,82,20171222,141803,ARGENT ASTER,ARGENT ASTER,,NAME:178b0849abd1,False
+Tank/20171222a-161/152008.wav,Tank,matched,exact_date_time,high,16,82,20171222,152008,SC CAPRICORN,SC CAPRICORN,,NAME:e87e1f9338a8,False
+Tank/20171223-162/150450.wav,Tank,matched,exact_date_time,high,17,80,20171223,150450,NORD STEADY,NORD STEADY,,NAME:8c6cc95c2aa3,False
+Tank/20171230-163/032310.wav,Tank,matched,exact_date_time,high,18,82,20171230,032310,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20171230a-164/195035.wav,Tank,matched,exact_date_time,high,20,81,20171230,195035,SEAWAYS VISAYAS,SEAWAYS VISAYAS,,NAME:8d97cac1669c,False
+Tank/20171230b-165/032319.wav,Tank,matched,exact_date_time,high,19,82,20171230,032319,AMAGI GALAXY,AMAGI GALAXY,,NAME:6399040c812e,False
+Tank/20180117-166/054518.wav,Tank,matched,exact_date_time,high,22,80,20180117,054518,NAVE ORBIT,NAVE ORBIT,,NAME:2b9e227fbb9d,False
+Tank/20180119-167/055815.wav,Tank,matched,exact_date_time,high,23,80,20180119,055815,GULF PEARL,GULF PEARL,,NAME:7ede4b981a3f,False
+Tank/20180119a-168/055857.wav,Tank,matched,exact_date_time,high,24,80,20180119,055857,GULF PEARL,GULF PEARL,,NAME:7ede4b981a3f,False
+Tank/20180120-169/125003.wav,Tank,matched,exact_date_time,high,25,80,20180120,125003,CHALLENGE PRELUDE,CHALLENGE PRELUDE,,NAME:3d54200348b4,False
+Tank/20180120a-170/211000.wav,Tank,matched,exact_date_time,high,26,81,20180120,211000,MAERSK TOKYO,MAERSK TOKYO,,NAME:79991b5c0c0d,False
+Tank/20180121-171/222956.wav,Tank,matched,exact_date_time,high,27,80,20180121,222956,NAVIG8 AMETRINE,NAVIG8 AMETRINE,,NAME:c66a4869ffbb,False
+Tank/20180129-172/025531.wav,Tank,matched,exact_date_time,high,28,80,20180129,025531,XANTHOS,XANTHOS,,NAME:ca3e5dea3c74,False
+Tank/20180130-173/054907.wav,Tank,matched,exact_date_time,high,29,80,20180130,054907,CABO DE,CABO DE,,NAME:a1f911bbcba8,True
+Tank/20180203-174/232020.wav,Tank,matched,exact_date_time,high,30,80,20180203,232020,UACC RAS,UACC RAS,,NAME:e96b59dda5d5,False
+Tank/20180206-175/104114.wav,Tank,matched,exact_date_time,high,31,89,20180206,104114,ZAO GALAXY,ZAO GALAXY,,NAME:032d8664fa71,False
+Tank/20180206a-176/131726.wav,Tank,matched,time_and_duration_date_mismatch,medium,84,82,20170206,131726,CHERRY GALAXY,CHERRY GALAXY,,NAME:c70b18da6c17,False
+Tank/20180208-177/234708.wav,Tank,matched,exact_date_time,high,32,82,20180208,234708,ARGENT SUNRISE,ARGENT SUNRISE,,NAME:c73665fcee95,False
+Tank/20180211-178/180933.wav,Tank,matched,exact_date_time,high,33,80,20180211,180933,MELATI 5,MELATI 5,,NAME:5e66854eb321,False
+Tank/20180221-179/020619.wav,Tank,matched,exact_date_time,high,34,89,20180221,020619,SONGA PRIDE,SONGA PRIDE,,NAME:d58f877032df,False
+Tank/20180226-180/033811.wav,Tank,matched,exact_date_time,high,35,80,20180226,033811,NAVE SEXTANS,NAVE SEXTANS,,NAME:a4f6d2c1a2e1,False
+Tank/20180303-181/060850.wav,Tank,matched,exact_date_time,high,36,80,20180303,060850,PAMISOS 636014809,PAMISOS,636014809,MMSI:636014809,False
+Tank/20180311-182/212409.wav,Tank,matched,exact_date_time,high,37,80,20180311,212409,CABO DE,CABO DE,,NAME:a1f911bbcba8,True
+Tank/20180314-183/155725.wav,Tank,matched,exact_date_time,high,38,80,20180314,155725,OTTO H,OTTO H,,NAME:8fafd91b2a1f,False
+Tank/20180314a-184/171300.wav,Tank,matched,exact_date_time,high,39,85,20180314,171300,NORDISLE,NORDISLE,,NAME:7815e0813ac6,False
+Tank/20180316-185/163653.wav,Tank,matched,exact_date_time,high,40,80,20180316,163653,PELICAN STATE,PELICAN STATE,,NAME:5fb811b8ddee,False
+Tank/20180316a-186/174010.wav,Tank,matched,exact_date_time,high,41,89,20180316,174010,TORM AMALIE,TORM AMALIE,,NAME:5524943b1cfa,False
+Tank/20180402-187/060415.wav,Tank,matched,exact_date_time,high,44,82,20180402,060415,ARPEGGIO,ARPEGGIO,,NAME:6a2417886a39,False
+Tank/20180405-188/025825.wav,Tank,matched,exact_date_time,high,45,80,20180405,025825,SELECAO,SELECAO,,NAME:be0d81c40024,False
+Tank/20180411-189/081047.wav,Tank,matched,exact_date_time,high,46,80,20180411,081047,CHEMBULK LINDY,CHEMBULK LINDY,,NAME:0b2a9743e484,False
+Tank/20180411a-190/193519.wav,Tank,matched,exact_date_time,high,47,80,20180411,193519,SEAVOYAGER,SEAVOYAGER,,NAME:fd845bd14ff5,False
+Tank/20180413-191/212814.wav,Tank,matched,exact_date_time,high,48,89,20180413,212814,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20180417-192/005456.wav,Tank,matched,exact_date_time,high,49,89,20180417,005456,FG ROTTERDAM,FG ROTTERDAM,,NAME:2a56f04c7948,False
+Tank/20180418-193/004704.wav,Tank,matched,exact_date_time,high,50,82,20180418,004704,NAVIG8 ALMANDINE,NAVIG8 ALMANDINE,,NAME:adc6787ca778,False
+Tank/20180421-194/025328.wav,Tank,matched,exact_date_time,high,51,89,20180421,025328,NAVIG8 STELLAR,NAVIG8 STELLAR,,NAME:6063953258fe,False
+Tank/20180422-195/171202.wav,Tank,matched,exact_date_time,high,52,80,20180422,171202,CARIBBEAN SPIRIT,CARIBBEAN SPIRIT,,NAME:a19655c7e341,False
+Tank/20180422a-196/171529.wav,Tank,unresolved,,none,,,,,,,,,
+Tank/20180422b-197/171240.wav,Tank,unresolved,,none,,,,,,,,,
+Tank/20180423-198/063301.wav,Tank,matched,exact_date_time,high,55,80,20180423,063301,AZALEA GALAXY,AZALEA GALAXY,,NAME:2216f45edfe1,False
+Tank/20180425-199/083048.wav,Tank,matched,exact_date_time,high,56,80,20180425,083048,TORM CARINA,TORM CARINA,,NAME:2e018e965d06,False
+Tank/20180430-200/033225.wav,Tank,matched,exact_date_time,high,57,80,20180430,033225,AMERICAN FREEDOM,AMERICAN FREEDOM,,NAME:9867f4342b01,False
+Tank/20180506-201/014248.wav,Tank,matched,exact_date_time,high,58,80,20180506,014248,CABO KAMUI,CABO KAMUI,,NAME:8184cd8e7d77,False
+Tank/20180507-202/212341.wav,Tank,matched,exact_date_time,high,59,83,20180507,212341,CTG MAGNESIUM,CTG MAGNESIUM,,NAME:27db51022dde,False
+Tank/20180508-203/232237.wav,Tank,matched,exact_date_time,high,60,81,20180508,232237,SEAWAYS VISAYAS,SEAWAYS VISAYAS,,NAME:8d97cac1669c,False
+Tank/20180509-204/124919.wav,Tank,matched,exact_date_time,high,61,89,20180509,124919,AQUALEADER,AQUALEADER,,NAME:26199ab6dc0b,False
+Tank/20180510-205/062026.wav,Tank,matched,exact_date_time,high,62,84,20180510,062026,LOUIS P,LOUIS P,,NAME:4da84da50f77,False
+Tank/20180515-206/031557.wav,Tank,matched,exact_date_time,high,63,80,20180515,031557,CHAMPION ISTRA,CHAMPION ISTRA,,NAME:6dfcba65add2,False
+Tank/20180515a-207/224627.wav,Tank,matched,exact_date_time,high,64,80,20180515,224627,GREEN SKY,GREEN SKY,,NAME:05a8fc61bca3,False
+Tank/20180519-208/103407.wav,Tank,matched,exact_date_time,high,65,80,20180519,103407,KERALA,KERALA,,NAME:b09c81286f3a,False
+Tank/20180520-209/130618.wav,Tank,matched,exact_date_time,high,66,80,20180520,130618,HERMIONE,HERMIONE,,NAME:86b9db5589f8,False
+Tank/20180523-210/171217.wav,Tank,matched,exact_date_time,high,67,80,20180523,171217,INTREPID SEAHAWK,INTREPID SEAHAWK,,NAME:b82f3b14d5a6,False
+Tank/20180529-211/093622.wav,Tank,matched,exact_date_time,high,69,80,20180529,093622,ARISTOKLIS,ARISTOKLIS,,NAME:971fe27165cb,False
+Tank/20180602-212/172529.wav,Tank,matched,exact_date_time,high,70,80,20180602,172529,M/T CHAMPION,M/T CHAMPION,,NAME:bcb60f241f87,False
+Tank/20180604-213/122139.wav,Tank,matched,exact_date_time,high,71,80,20180604,122139,HODAKA GALAXY,HODAKA GALAXY,,NAME:ca08af7f5e8c,False
+Tank/20180607-214/124208.wav,Tank,matched,exact_date_time,high,72,89,20180607,124208,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20180610-215/135143.wav,Tank,matched,exact_date_time,high,74,80,20180610,135143,BW LIBRA,BW LIBRA,,NAME:2be8279446f1,False
+Tank/20180612-216/032309.wav,Tank,matched,exact_date_time,high,75,82,20180612,032309,NAVIG8 AMESSI,NAVIG8 AMESSI,,NAME:f2200e429cf7,False
+Tank/20180612a-217/230757.wav,Tank,matched,exact_date_time,high,76,82,20180612,230757,NAEBA GALAXY,NAEBA GALAXY,,NAME:916ed0081116,False
+Tank/20180616-218/225427.wav,Tank,matched,exact_date_time,high,77,80,20180616,225427,CHEMBULK LINDY,CHEMBULK LINDY,,NAME:0b2a9743e484,False
+Tank/20180618-219/031247.wav,Tank,matched,exact_date_time,high,78,80,20180618,031247,TAVROPOS 636016731,TAVROPOS,636016731,MMSI:636016731,False
+Tank/20180629-220/001835.wav,Tank,matched,exact_date_time,high,79,80,20180629,001835,PANAGIA THALASSINI,PANAGIA THALASSINI,,NAME:141f46d52577,False
+Tank/20180630-221/173807.wav,Tank,matched,exact_date_time,high,80,80,20180630,173807,SERENE SEA,SERENE SEA,,NAME:23376891fdb8,False
+Tank/20180702-222/172918.wav,Tank,matched,exact_date_time,high,81,89,20180702,172918,NORD SUPREME,NORD SUPREME,,NAME:7ce62400c970,False
+Tank/20180703-223/143323.wav,Tank,matched,exact_date_time,high,82,80,20180703,143323,PANAGIA THALASSINI,PANAGIA THALASSINI,,NAME:141f46d52577,False
+Tank/20180705-224/144030.wav,Tank,matched,time_and_duration_date_mismatch,medium,7,89,20170705,144030,MAERSK TIANJIN,MAERSK TIANJIN,,NAME:ab48f691adae,False
+Tank/20180710-225/065625.wav,Tank,matched,exact_date_time,high,84,89,20180710,065625,FAIRCHEM FILLY,FAIRCHEM FILLY,,NAME:cd988f840bd9,False
+Tank/20180710a-226/070051.wav,Tank,unresolved,,none,,,,,,,,,
+Tank/20180725-227/013354.wav,Tank,matched,exact_date_time,high,87,80,20180725,013354,ARISTOKLIS,ARISTOKLIS,,NAME:971fe27165cb,False
+Tank/20180725a-228/222512.wav,Tank,matched,exact_date_time,high,88,89,20180725,222512,NAVIG8 STELLAR,NAVIG8 STELLAR,,NAME:6063953258fe,False
+Tank/20180725b-229/233127.wav,Tank,matched,exact_date_time,high,89,80,20180725,233127,BOCHEM LONDON,BOCHEM LONDON,,NAME:efb765ecb3c2,False
+Tank/20180821-230/005202.wav,Tank,matched,exact_date_time,high,95,80,20180821,005202,THOMAS ZAFIRAS,THOMAS ZAFIRAS,,NAME:437b8f4c2949,False
+Tank/20180822-231/142019.wav,Tank,matched,exact_date_time,high,96,89,20180822,142019,SONGA PRIDE,SONGA PRIDE,,NAME:d58f877032df,False
+Tank/20180826-232/010604.wav,Tank,matched,exact_date_time,high,97,80,20180826,010604,CHAMPION TIDE,CHAMPION TIDE,,NAME:646f1f60be88,False
+Tank/20180904-233/183908.wav,Tank,matched,exact_date_time,high,99,80,20180904,183908,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20180914-234/024440.wav,Tank,matched,exact_date_time,high,100,82,20180914,024440,SM OSPREY,SM OSPREY,,NAME:55f5bf9fe883,False
+Tank/20180915-235/150156.wav,Tank,matched,exact_date_time,high,101,80,20180915,150156,KIRKEHOLMEN,KIRKEHOLMEN,,NAME:b0a3134494fd,False
+Tank/20180927-236/173410.wav,Tank,unresolved,,none,,,,,,,,,
+Tug/20171104-1/200959.wav,Tug,matched,exact_date_time,high,1,52,20171104,200959,SEASPAN QUEEN,SEASPAN QUEEN,,NAME:f594d20f8f44,False
+Tug/20171105-2/052000.wav,Tug,matched,exact_date_time,high,2,52,20171105,052000,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171105b-3/231504.wav,Tug,matched,exact_date_time,high,3,52,20171105,231504,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171106-4/144640.wav,Tug,matched,exact_date_time,high,4,52,20171106,144640,GLENDALE,GLENDALE,,NAME:2277ac081ef4,False
+Tug/20171106a-5/162112.wav,Tug,matched,exact_date_time,high,5,52,20171106,162112,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171107a-6/095309.wav,Tug,matched,exact_date_time,high,6,52,20171107,095309,JOSE NARVAEZ,JOSE NARVAEZ,,NAME:530ec09df1e6,False
+Tug/20171111-7/025236.wav,Tug,matched,exact_date_time,high,7,52,20171111,025236,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171114-8/072235.wav,Tug,matched,exact_date_time,high,8,52,20171114,072235,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171115-9/9.wav,Tug,matched,record_id_and_date,high,9,52,20171115,133938,MILLENNIUMSTAR,MILLENNIUMSTAR,,NAME:4bac4b7f0764,False
+Tug/20171116-10/065145.wav,Tug,matched,exact_date_time,high,10,52,20171116,065145,SEASPAN OSPREY,SEASPAN OSPREY,,NAME:b355e2dfcc9a,False
+Tug/20171116a-11/221717.wav,Tug,matched,exact_date_time,high,11,52,20171116,221717,OCEAN BETTY,OCEAN BETTY,,NAME:fd338e8c446e,False
+Tug/20171118-12/082934.wav,Tug,matched,exact_date_time,high,12,52,20171118,082934,OCEAN BETTY,OCEAN BETTY,,NAME:fd338e8c446e,False
+Tug/20171118a-13/141340.wav,Tug,matched,exact_date_time,high,13,52,20171118,141340,JOSE NARVAEZ,JOSE NARVAEZ,,NAME:530ec09df1e6,False
+Tug/20171118b-14/161506.wav,Tug,matched,exact_date_time,high,14,52,20171118,161506,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171118c-15/185844.wav,Tug,matched,exact_date_time,high,15,52,20171118,185844,OCEAN BETTY,OCEAN BETTY,,NAME:fd338e8c446e,False
+Tug/20171118d-16/234607.wav,Tug,matched,exact_date_time,high,16,52,20171118,234607,SEA IMP,SEA IMP,,NAME:b96db21689b1,False
+Tug/20171120-17/034014.wav,Tug,matched,exact_date_time,high,17,52,20171120,034014,SEASPAN QUEEN,SEASPAN QUEEN,,NAME:f594d20f8f44,False
+Tug/20171120a-18/054508.wav,Tug,matched,exact_date_time,high,18,52,20171120,054508,JOSE NARVAEZ,JOSE NARVAEZ,,NAME:530ec09df1e6,False
+Tug/20171121-19/101117.wav,Tug,matched,exact_date_time,high,19,52,20171121,101117,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171122a-20/124609.wav,Tug,matched,exact_date_time,high,20,52,20171122,124609,NORTH ARM,NORTH ARM,,NAME:2bb710940cf2,False
+Tug/20171123-21/035104.wav,Tug,matched,exact_date_time,high,21,52,20171123,035104,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171124-22/012051.wav,Tug,matched,exact_date_time,high,22,52,20171124,012051,JOSE NARVAEZ,JOSE NARVAEZ,,NAME:530ec09df1e6,False
+Tug/20171127-23/065148.wav,Tug,matched,exact_date_time,high,23,52,20171127,065148,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171127a-24/105442.wav,Tug,matched,exact_date_time,high,24,52,20171127,105442,CALVIN,CALVIN,,NAME:f44c274a3c68,False
+Tug/20171128-25/052238.wav,Tug,matched,exact_date_time,high,25,52,20171128,052238,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171128a-26/103033.wav,Tug,matched,exact_date_time,high,26,52,20171128,103033,CALVIN,CALVIN,,NAME:f44c274a3c68,False
+Tug/20171128b-27/120847.wav,Tug,matched,exact_date_time,high,27,52,20171128,120847,ARCTIC TAGLU,ARCTIC TAGLU,,NAME:8b98a80a469f,False
+Tug/20171128c-28/190038.wav,Tug,matched,exact_date_time,high,28,52,20171128,190038,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171128d-29/193239.wav,Tug,matched,exact_date_time,high,29,52,20171128,193239,SEASPAN QUEEN,SEASPAN QUEEN,,NAME:f594d20f8f44,False
+Tug/20171129-30/011700.wav,Tug,matched,exact_date_time,high,30,52,20171129,011700,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171130a-31/211648.wav,Tug,matched,exact_date_time,high,31,52,20171130,211648,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171201-32/024235.wav,Tug,matched,exact_date_time,high,32,52,20171201,024235,ISLAND TUGGER,ISLAND TUGGER,,NAME:94d44191d9c4,False
+Tug/20171201b-33/082249.wav,Tug,matched,exact_date_time,high,33,52,20171201,082249,OCEAN BETTY,OCEAN BETTY,,NAME:fd338e8c446e,False
+Tug/20171201c-34/123228.wav,Tug,matched,exact_date_time,high,34,52,20171201,123228,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171201d-35/125826.wav,Tug,matched,exact_date_time,high,35,52,20171201,125826,SEA IMP,SEA IMP,,NAME:b96db21689b1,False
+Tug/20171201e-36/190230.wav,Tug,matched,exact_date_time,high,36,52,20171201,190230,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171202-37/071515.wav,Tug,matched,exact_date_time,high,37,52,20171202,071515,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171202a-38/145149.wav,Tug,matched,exact_date_time,high,38,52,20171202,145149,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171203-39/032822.wav,Tug,matched,exact_date_time,high,39,52,20171203,032822,OCEAN GORDON,OCEAN GORDON,,NAME:074c82332261,False
+Tug/20171203a-40/40.wav,Tug,matched,record_id_and_date,high,40,52,20171203,113510,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171203c-41/194116.wav,Tug,matched,exact_date_time,high,41,52,20171203,194116,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171204-42/034437.wav,Tug,matched,exact_date_time,high,42,52,20171204,034437,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171204a-43/081356.wav,Tug,matched,exact_date_time,high,43,52,20171204,081356,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171205-44/145246.wav,Tug,matched,exact_date_time,high,44,52,20171205,145246,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171207-45/004027.wav,Tug,matched,exact_date_time,high,45,52,20171207,004027,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171207a-46/052942.wav,Tug,matched,exact_date_time,high,46,52,20171207,052942,OCEAN GORDON,OCEAN GORDON,,NAME:074c82332261,False
+Tug/20171207b-47/114556.wav,Tug,matched,exact_date_time,high,47,52,20171207,114556,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171209-48/041322.wav,Tug,matched,exact_date_time,high,48,52,20171209,041322,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171210-49/49.wav,Tug,matched,record_id_and_date,high,49,52,20171210,132956,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171212a-50/094549.wav,Tug,matched,exact_date_time,high,50,52,20171212,094549,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171213-51/065742.wav,Tug,matched,exact_date_time,high,51,52,20171213,065742,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171213a-52/071716.wav,Tug,matched,exact_date_time,high,52,52,20171213,071716,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171214a-53/184639.wav,Tug,matched,exact_date_time,high,53,52,20171214,184639,CAPTAIN COOK,CAPTAIN COOK,,NAME:3cd3baec66d8,False
+Tug/20171215-54/005343.wav,Tug,matched,exact_date_time,high,54,52,20171215,005343,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171215a-55/103412.wav,Tug,matched,exact_date_time,high,55,52,20171215,103412,ISLAND TUGGER,ISLAND TUGGER,,NAME:94d44191d9c4,False
+Tug/20171215e-56/170639.wav,Tug,matched,exact_date_time,high,56,52,20171215,170639,SEASPAN EAGLE,SEASPAN EAGLE,,NAME:80c5c986d823,False
+Tug/20171217-58/020446.wav,Tug,matched,exact_date_time,high,58,52,20171217,020446,CALVIN,CALVIN,,NAME:f44c274a3c68,False
+Tug/20171217a-59/050224.wav,Tug,matched,exact_date_time,high,59,52,20171217,050224,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171219a-60/210546.wav,Tug,matched,exact_date_time,high,60,52,20171219,210546,OCEAN BETTY,OCEAN BETTY,,NAME:fd338e8c446e,False
+Tug/20171221-61/114923.wav,Tug,matched,exact_date_time,high,61,52,20171221,114923,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171221a-62/144544.wav,Tug,matched,exact_date_time,high,62,52,20171221,144544,JOSE NARVAEZ,JOSE NARVAEZ,,NAME:530ec09df1e6,False
+Tug/20171223b-63/233721.wav,Tug,matched,exact_date_time,high,63,52,20171223,233721,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171225-64/015934.wav,Tug,matched,exact_date_time,high,64,52,20171225,015934,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171226-65/043830.wav,Tug,matched,exact_date_time,high,65,52,20171226,043830,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False
+Tug/20171227a-66/110853.wav,Tug,matched,exact_date_time,high,66,52,20171227,110853,CALVIN,CALVIN,,NAME:f44c274a3c68,False
+Tug/20171229a-67/195709.wav,Tug,matched,exact_date_time,high,67,52,20171229,195709,SEASPAN COMMANDER,SEASPAN COMMANDER,,NAME:c8566fa48cab,False
+Tug/20171229b-68/200347.wav,Tug,matched,exact_date_time,high,68,52,20171229,200347,CALVIN,CALVIN,,NAME:f44c274a3c68,False
+Tug/20171230a-69/163503.wav,Tug,matched,exact_date_time,high,69,52,20171230,163503,OCEAN BETTY,OCEAN BETTY,,NAME:fd338e8c446e,False
+Tug/20171231a-70/215301.wav,Tug,matched,exact_date_time,high,70,52,20171231,215301,SEASPAN RAVEN,SEASPAN RAVEN,,NAME:3e410987c62c,False

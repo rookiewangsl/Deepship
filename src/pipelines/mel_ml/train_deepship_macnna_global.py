@@ -201,6 +201,7 @@ def _validate_g_series_experiment_config(
     if experiment.get("experiment_id") not in {
         "macnna_global_v1",
         "macnna_global_l20_v1",
+        "macnna_global_l20_repeats_v1",
     }:
         raise ValueError("Unexpected G-series experiment config")
     features = experiment["features"]
@@ -224,7 +225,6 @@ def _validate_g_series_experiment_config(
         "attention_gate_init": adapter["gate_init"],
         "training_sampling": training.get("training_sampling", "fixed_anchor"),
         "train_samples_per_epoch": training.get("train_samples_per_epoch"),
-        "seed": training["seed"],
         "batch_size": training["batch_size"],
         "eval_batch_size": training["eval_batch_size"],
         "epochs": training["epochs"],
@@ -247,6 +247,14 @@ def _validate_g_series_experiment_config(
         for field, expected_value in expected.items()
         if actual.get(field) != expected_value
     ]
+    allowed_seeds = training.get("model_seeds")
+    if allowed_seeds is None:
+        allowed_seeds = [training["seed"]]
+    if config.seed not in {int(seed) for seed in allowed_seeds}:
+        mismatches.append(
+            f"seed: expected one of {[int(seed) for seed in allowed_seeds]!r}, "
+            f"got {config.seed!r}"
+        )
     for field in ("max_train_batches", "max_eval_batches"):
         if actual.get(field) is not None:
             mismatches.append(f"{field}: expected None, got {actual.get(field)!r}")

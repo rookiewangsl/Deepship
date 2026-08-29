@@ -1,9 +1,10 @@
 # DeepShip 轻量全局注意力架构实验计划
 
 最后更新：2026-08-29  
-状态：3 s 的 G0/G0-C/G1 seed 42 已完成；G1 未优于纯 CNN 或容量对照。由于 3 s 输入经 CNN 后仅
-约 50 个时间 token，且局部卷积感受野已接近整个片段，这一结果不能充分检验长程注意力。当前执行
-唯一一次共同 20 s 的 L20 受控复核；代码、冻结配置与测试正在完成服务器 smoke 前验收
+状态：3 s 与 20 s 的 G0/G0-C/G1 seed 42 均已完成。L20 的 G1 在 validation vessel macro-F1
+上出现正趋势，但 recording 指标下降且单 split bootstrap 区间跨零，不能形成稳定结论。当前执行
+冻结的 `3 个 vessel split × 3 个训练 seed × 3 个模型` DeepShip-only 重复矩阵；现有
+split42/seed42 三项复用，新增 24 项 validation-only 正式实验。
 
 ## 1. 研究问题与边界
 
@@ -115,6 +116,12 @@ seed 数和新增 G 系列训练配方可能不同。
 运行 10 s 中间点、G1-L2、G2、head/hidden-size 搜索或二维全局注意力。L20 若仍不通过保留门，
 G 分支停止；若通过，才建议补 seed 43/44，不能直接宣称确定性提升。
 
+L20 seed 42 的 validation vessel macro-F1 为 G0/G0-C/G1=
+**0.6261/0.6440/0.6741**；G1 相对 G0/G0-C 分别为 +4.80/+3.01 pp。对应 recording
+macro-F1 为 **0.6187/0.5798/0.5604**，G1 相对 G0 下降 5.83 pp，因此没有通过原始双指标门。
+同 vessel 配对 bootstrap 的 G1−G0 vessel 区间为约 [−10.12,+20.30] pp，`P(Δ>0)=0.747`；
+这只能说明存在值得复核的趋势，不能证明注意力有效。
+
 ## 4. 数据、输入和公平比较
 
 已完成的 3 s G0/G0-C/G1 固定：
@@ -152,6 +159,10 @@ G0-L20 与 G0-3s 的差值单独解释为时长收益。若未来需要纯时长
 - CLI：`scripts/train/train_deepship_macnna_global.py`；
 - 统一 runner：`scripts/train/run_macnna_global_seed42.sh`；
 - L20 runner：`scripts/train/run_macnna_global_l20_seed42.sh`；
+- 重复 split 构建：`scripts/prepare/build_deepship_repeat_splits.py`；
+- 重复单项/矩阵 runner：`scripts/train/run_macnna_global_l20_repeat.sh` 与
+  `scripts/train/run_macnna_global_l20_repeat_matrix.sh`；
+- 重复结果汇总：`scripts/eval/summarize_macnna_global_l20_repeats.py`；
 - 参数/FLOPs 审计：`scripts/eval/audit_macnna_variants.py`；
 - 冻结配置：`configs/experiments/macnna_global_v1.json` 与
   `configs/experiments/macnna_global_l20_v1.json`。
@@ -199,8 +210,10 @@ AdamW；三模型不得使用不同优化器或 scheduler。优化器决定不�
 → G0-C-L20 seed 42
 → G1-L20 seed 42
 → validation vessel/recording paired bootstrap 与容量、成本比较
-→ 只有 G1-L20 同时超过两个 L20 对照，vessel 至少 +1 pp 且 recording 最多下降 1 pp，才补 seed 43/44
-→ 未通过则停止 G 分支，不进入 G1-L2/G2/更多上下文搜索
+→ seed42 出现 vessel 正趋势但 recording 下降、区间跨零
+→ 完成 split/model seed 42/43/44 的 3×3 全交叉重复；每个 cell 均运行 G0/G0-C/G1
+→ 分层 bootstrap 先重采样 vessel split，再在 split 内重采样训练 seed
+→ 根据均值、split 一致性、区间和 recording 代价判定；不进入 G1-L2/G2/更多上下文搜索
 ```
 
 L20 三个正式实验顺序运行，避免 GPU 并发使吞吐和峰值显存失去可比性。训练上限、early stopping、
@@ -220,9 +233,16 @@ accuracy。辅助指标：segment macro-F1/accuracy、每类 recall、ECE 或 Br
 4. 提升不能只由一个类别 recall 驱动；
 5. 无训练不稳定、非有限 loss 或明显校准恶化。
 
-满足保留门后运行至少 3 个 seed，并在完全相同 validation vessel 上做 class-stratified paired
-bootstrap。最终支持“全局注意力有帮助”至少需要多 seed 平均为正，且 paired bootstrap 大部分
-差值为正；由于 validation vessel 数量有限，不把单 seed 的小幅波动写成确定性结论。
+正式重复矩阵固定 split seed 42/43/44 与 model seed 42/43/44，三种模型完全配对。先在每个
+split 内计算三训练 seed 的平均差，再对 split→seed 两层做 hierarchical bootstrap。支持“全局
+注意力有帮助”至少要求：G1−G0 vessel 平均不少于 +1 pp、G1 平均高于 G0-C、三个 split 至少
+两个平均为正、recording 相对 G0 平均下降不超过 1 pp，并报告区间和 `P(Δ>0)`。若 vessel 改善但
+recording 持续下降，则结论是存在聚合层级权衡，而不是无条件有效。
+
+三个 split 的 Cargo/Passenger/Tank validation 组构成明显变化；由于 Tug 仅有 16 个船名组且
+当前固定容量预算存在唯一可行的最小容量组合，三个 split 的 6 个 Tug validation 组相同。因此
+跨 split 结论主要降低前三类的划分随机性；Tug 的不确定性仍由训练 seed、逐类结果和后续独立
+MMSI 外测体现，不能声称已完全消除 Tug 数据不足。
 
 ## 7. 结果解释矩阵
 
@@ -249,6 +269,19 @@ bootstrap。最终支持“全局注意力有帮助”至少需要多 seed 平�
 4. 在 DeepShip 上冻结两条线的候选模型后，再进入 PORTIA development；封存 test 只运行一次。
 5. ONC 10～20 h 自监督只有在通用预训练已显示内部价值、但 PORTIA development 暴露明显域偏移
    时才启动。没有内部迁移收益时，不用更多无标签数据救活该路线。
+
+### 8.1 有船舶身份标注数据对注意力结论的作用
+
+- PORTIA 固定 3 s，只验证短窗跨域分类，不验证 L20 长程注意力；
+- Oceanship-FG 有大量 MMSI，但公开样本约 4～5 s；它适合在增加独立船数后复核短上下文模型，
+  若要复核 L20 必须回溯 ONC 连续录音；
+- Belgian AIS 数据为 10 s 非重叠窗口并提供匿名船 ID。只有相邻连续性、四类独立船数和单船纯度
+  审计通过后，才作为 L20 首选跨水域复现；
+- DeuteroNoise 有连续长录音和人工单船筛选，但目标四类不均衡，只作为辅助长上下文证据。
+
+外部数据不能代替 DeepShip 内部 G0/G0-C/G1 的架构归因，因为水域、设备、标签质量和船型分布
+同时变化。先完成 DeepShip-only 重复；只有内部方向稳定后，才冻结模型并在一个合格外部数据集
+上做一次独立复现。
 
 ## 9. 参考结构依据
 
