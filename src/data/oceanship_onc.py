@@ -274,13 +274,14 @@ def query_archive_candidates(
     onc_client: object,
     *,
     device_codes: Sequence[str] = DEFAULT_DEVICE_CODES,
+    extension: str = "wav",
 ) -> list[dict[str, object]]:
     results: list[dict[str, object]] = []
     for candidate in candidates:
         for device_code in device_codes:
             params = {
                 "deviceCode": device_code,
-                "extension": "wav",
+                "extension": extension,
                 "dateFrom": candidate["query_from_utc"],
                 "dateTo": candidate["query_to_utc"],
             }

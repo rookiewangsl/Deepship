@@ -80,10 +80,15 @@ class OceanshipONCTests(unittest.TestCase):
                 return {"files": [f"{params['deviceCode']}_sample.wav"]}
 
         client = FakeONC()
-        archive_rows = query_archive_candidates(candidates[:1], client, device_codes=["A", "B"])
+        archive_rows = query_archive_candidates(
+            candidates[:1],
+            client,
+            device_codes=["A", "B"],
+            extension="txt",
+        )
         self.assertEqual(len(archive_rows), 2)
         self.assertTrue(all(call[1] for call in client.calls))
-        self.assertEqual(client.calls[0][0]["extension"], "wav")
+        self.assertEqual(client.calls[0][0]["extension"], "txt")
 
     def test_cli_input_and_outputs_round_trip(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

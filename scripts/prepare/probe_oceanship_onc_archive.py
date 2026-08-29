@@ -21,13 +21,14 @@ from src.data.oceanship_onc import (  # noqa: E402
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Query the ONC archive for raw WAV files surrounding a small Oceanship-FG "
-            "candidate list. This command only writes a filename index and never downloads audio."
+            "Query the ONC archive for files surrounding a small Oceanship-FG candidate "
+            "list. This command only writes a filename index and never downloads data."
         )
     )
     parser.add_argument("--candidate-csv", required=True)
     parser.add_argument("--output-csv", required=True)
     parser.add_argument("--device-codes", nargs="+", default=list(DEFAULT_DEVICE_CODES))
+    parser.add_argument("--extension", default="wav")
     return parser
 
 
@@ -48,7 +49,12 @@ def main() -> None:
     candidates = read_probe_candidates(args.candidate_csv)
     try:
         client = ONC(showWarning=True)
-        rows = query_archive_candidates(candidates, client, device_codes=args.device_codes)
+        rows = query_archive_candidates(
+            candidates,
+            client,
+            device_codes=args.device_codes,
+            extension=args.extension,
+        )
     except Exception as error:
         raise SystemExit(f"ONC archive query failed: {redact_onc_error(error)}") from None
     write_archive_index(args.output_csv, rows)
