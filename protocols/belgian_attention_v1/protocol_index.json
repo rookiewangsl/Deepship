@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "experiment_id": "belgian_attention_v1",
+  "fold_seed": 42,
+  "folds": [
+    {
+      "fold": 1,
+      "manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
+      "counts": {
+        "train": {
+          "Cargo": 5139,
+          "Passenger": 116,
+          "Tank": 2489,
+          "Tug": 132
+        },
+        "val": {
+          "Cargo": 2582,
+          "Passenger": 59,
+          "Tank": 1223,
+          "Tug": 66
+        }
+      },
+      "train_dates": 47,
+      "val_dates": 22,
+      "date_overlap": []
+    },
+    {
+      "fold": 2,
+      "manifest_sha256": "e99e8c7e1a185e8a735a7691bb5e99d813d483a9349e49180d0f05317323b5a9",
+      "counts": {
+        "train": {
+          "Cargo": 5090,
+          "Passenger": 116,
+          "Tank": 2488,
+          "Tug": 134
+        },
+        "val": {
+          "Cargo": 2631,
+          "Passenger": 59,
+          "Tank": 1224,
+          "Tug": 64
+        }
+      },
+      "train_dates": 45,
+      "val_dates": 24,
+      "date_overlap": []
+    },
+    {
+      "fold": 3,
+      "manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
+      "counts": {
+        "train": {
+          "Cargo": 5213,
+          "Passenger": 118,
+          "Tank": 2447,
+          "Tug": 130
+        },
+        "val": {
+          "Cargo": 2508,
+          "Passenger": 57,
+          "Tank": 1265,
+          "Tug": 68
+        }
+      },
+      "train_dates": 46,
+      "val_dates": 23,
+      "date_overlap": []
+    }
+  ],
+  "sealed_test_dates": [
+    "2022-01-22",
+    "2022-02-07",
+    "2022-02-23",
+    "2022-04-18",
+    "2022-04-24",
+    "2022-05-04",
+    "2022-05-10",
+    "2022-05-20",
+    "2022-09-13",
+    "2022-10-30"
+  ],
+  "development_records_excluded_for_test_date_isolation": 377,
+  "development_dates_excluded_for_test_date_isolation": [
+    "2022-02-07",
+    "2022-02-23",
+    "2022-04-24",
+    "2022-05-04"
+  ],
+  "validations": [
+    {
+      "status": "passed",
+      "checks": {
+        "manifest_hash_matches": true,
+        "paths_unique": true,
+        "test_absent": true,
+        "dates_disjoint": true,
+        "all_classes_present": true
+      },
+      "calculated_manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
+      "recorded_manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
+      "date_overlap": []
+    },
+    {
+      "status": "passed",
+      "checks": {
+        "manifest_hash_matches": true,
+        "paths_unique": true,
+        "test_absent": true,
+        "dates_disjoint": true,
+        "all_classes_present": true
+      },
+      "calculated_manifest_sha256": "e99e8c7e1a185e8a735a7691bb5e99d813d483a9349e49180d0f05317323b5a9",
+      "recorded_manifest_sha256": "e99e8c7e1a185e8a735a7691bb5e99d813d483a9349e49180d0f05317323b5a9",
+      "date_overlap": []
+    },
+    {
+      "status": "passed",
+      "checks": {
+        "manifest_hash_matches": true,
+        "paths_unique": true,
+        "test_absent": true,
+        "dates_disjoint": true,
+        "all_classes_present": true
+      },
+      "calculated_manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
+      "recorded_manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
+      "date_overlap": []
+    }
+  ],
+  "eligible_record_count": 13627
+}

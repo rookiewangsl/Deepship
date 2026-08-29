@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "checks": {
+    "manifest_hash_matches": true,
+    "paths_unique": true,
+    "test_absent": true,
+    "dates_disjoint": true,
+    "all_classes_present": true
+  },
+  "calculated_manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
+  "recorded_manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
+  "date_overlap": []
+}

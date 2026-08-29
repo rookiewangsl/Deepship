@@ -276,8 +276,10 @@ MMSI 外测体现，不能声称已完全消除 Tug 数据不足。
 - Oceanship-FG 有大量 MMSI，但公开样本约 4～5 s；它适合在增加独立船数后复核短上下文模型，
   若要复核 L20 必须按 [`oceanship_onc_reconstruction_plan.md`](oceanship_onc_reconstruction_plan.md)
   的分阶段准入门回溯 ONC 连续录音；
-- Belgian AIS 数据为 10 s 非重叠窗口并提供匿名船 ID。只有相邻连续性、四类独立船数和单船纯度
-  审计通过后，才作为 L20 首选跨水域复现；
+- Belgian AIS 公开数据为 10 s 非重叠窗口，但匿名 `mmsi` 不能作为跨 AIS 文件稳定的船舶身份，
+  且公开片段通常不相邻，因此不构造伪 L20 或 vessel-disjoint split。它按照
+  [`belgian_public_attention_plan.md`](belgian_public_attention_plan.md) 只做四分类 G0/G1 的
+  date-disjoint 跨水域复现；已申请的五天连续数据另行审计真实身份与连续性；
 - DeuteroNoise 有连续长录音和人工单船筛选，但目标四类不均衡，只作为辅助长上下文证据。
 
 外部数据不能代替 DeepShip 内部 G0/G0-C/G1 的架构归因，因为水域、设备、标签质量和船型分布

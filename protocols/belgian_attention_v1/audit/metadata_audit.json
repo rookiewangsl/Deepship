@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "metadata_path": "/tmp/belgian_public_meta/metadata_database.csv",
+  "metadata_sha256": "de6180ed8c8235465493889621b61951acf15d47222deee083ab362dfd7d5da3",
+  "metadata_rows": 28341,
+  "metadata_unique_paths": 28144,
+  "metadata_duplicate_paths": 197,
+  "conflicting_duplicate_paths_count": 0,
+  "conflicting_duplicate_paths_examples": [],
+  "unassigned_metadata_paths": 648,
+  "official_paths_missing_metadata_count": 0,
+  "official_paths_missing_metadata_examples": [],
+  "official_split": {
+    "line_counts": {
+      "train": 21932,
+      "val": 2933,
+      "test": 2747
+    },
+    "listed_unique_paths": 27554,
+    "unique_paths": 27496,
+    "same_split_duplicate_lines": 0,
+    "cross_split_paths_count": 58,
+    "cross_split_paths_examples": [
+      "GardenCity_15811_test/G_15811_2022-01-22_16-27-16_152-076789_Cargo_constrained-by-her-draught_12-1_9605.wav",
+      "GardenCity_15811_test/G_15811_2022-01-22_16-32-23_215-298599_Cargo_constrained-by-her-draught_12-0_7949.wav",
+      "GardenCity_15811_test/G_15811_2022-01-22_16-37-30_258-211001_Cargo_constrained-by-her-draught_11-9_6787.wav",
+      "GardenCity_15811_test/G_15811_2022-01-22_17-18-24_33-33184_Cargo_constrained-by-her-draught_11-3_11049.wav",
+      "GardenCity_15811_test/G_15811_2022-01-22_17-28-38_100-339127_Cargo_constrained-by-her-draught_11-4_14395.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_03-55-35_148-479779_Cargo_constrained-by-her-draught_13-9_4885.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_21-28-58_52-082747_Cargo_constrained-by-her-draught_8-5_8161.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_21-34-04_65-505024_Cargo_constrained-by-her-draught_8-5_6900.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_21-39-11_117-157906_Cargo_constrained-by-her-draught_8-4_5572.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_21-44-18_172-119877_Cargo_constrained-by-her-draught_8-5_4395.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_21-49-25_253-832187_Cargo_constrained-by-her-draught_8-5_3494.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_21-54-32_206-291428_Cargo_constrained-by-her-draught_8-5_3284.wav",
+      "GardenCity_15811_test/G_15811_2022-05-04_21-59-38_81-913588_Cargo_constrained-by-her-draught_8-4_3361.wav",
+      "GardenCity_15811_val/G_15811_2022-02-11_05-02-03_187-57483_Cargo_constrained-by-her-draught_11-0_6241.wav",
+      "GardenCity_15811_val/G_15811_2022-02-11_05-07-10_251-514702_Cargo_constrained-by-her-draught_10-7_4766.wav",
+      "GardenCity_15811_val/G_15811_2022-02-11_05-12-17_304-543361_Cargo_constrained-by-her-draught_10-8_4012.wav",
+      "GardenCity_15811_val/G_15811_2022-02-11_05-17-24_117-610039_Cargo_constrained-by-her-draught_10-8_3952.wav",
+      "Grafton_15810_test/G_15810_2022-01-22_17-43-57_229-879895_Tanker_constrained-by-her-draught_13-2_6755.wav",
+      "Grafton_15810_test/G_15810_2022-01-22_17-43-57_590-672553_Tanker_constrained-by-her-draught_13-9_4510.wav",
+      "Grafton_15810_test/G_15810_2022-01-22_17-54-11_338-509511_Tanker_constrained-by-her-draught_13-7_2757.wav"
+    ],
+    "cross_split_policy": "exclude from all protocol splits"
+  },
+  "filters": {
+    "class_map": {
+      "Cargo": "Cargo",
+      "Tanker": "Tank",
+      "Passenger": "Passenger",
+      "Tug": "Tug",
+      "Towing": "Tug",
+      "Large-Towing": "Tug"
+    },
+    "max_distance_km": 5.0,
+    "duplicate_policy": "exclude paths with conflicting supervision; keep one identical row"
+  },
+  "excluded_non_target": {
+    "Anti-pollution-equipment": 3,
+    "Diving": 1,
+    "Dredging": 1279,
+    "Fishing": 2158,
+    "High-Speed-Craft": 629,
+    "Law-Enforcement": 25,
+    "Military": 25,
+    "Other": 1321,
+    "Pilot": 1429,
+    "Pleasure-Craft": 80,
+    "Reserved": 115,
+    "S&R": 7,
+    "Sailing": 126
+  },
+  "excluded_distance_by_class": {
+    "Cargo": 3975,
+    "Passenger": 105,
+    "Tank": 2507,
+    "Tug": 84
+  },
+  "excluded_missing": {},
+  "eligible_records": 13627,
+  "eligible_by_official_split_and_class": {
+    "train": {
+      "Cargo": 7098,
+      "Passenger": 158,
+      "Tank": 3388,
+      "Tug": 188
+    },
+    "val": {
+      "Cargo": 882,
+      "Passenger": 17,
+      "Tank": 439,
+      "Tug": 13
+    },
+    "test": {
+      "Cargo": 880,
+      "Passenger": 39,
+      "Tank": 483,
+      "Tug": 42
+    }
+  },
+  "eligible_unique_dates_by_split": {
+    "train": 69,
+    "val": 10,
+    "test": 10
+  },
+  "eligible_stations": {
+    "GardenCity": 5615,
+    "Grafton": 8012
+  }
+}
