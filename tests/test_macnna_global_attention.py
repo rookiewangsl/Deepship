@@ -14,6 +14,8 @@ from src.models.ma_cnn_a import (
     TemporalAxialAdapter,
     build_macnna_model,
     expand_time_padding_mask,
+    feature_time_padding_mask,
+    post_cnn_time_steps,
 )
 
 
@@ -82,6 +84,32 @@ class MACNNAGlobalAttentionTests(unittest.TestCase):
         self.assertEqual(expanded.shape, (6, 3))
         torch.testing.assert_close(expanded[:3], mask[0].expand(3, 3))
         torch.testing.assert_close(expanded[3:], mask[1].expand(3, 3))
+
+    def test_long_context_time_lengths_match_the_cnn_geometry(self) -> None:
+        self.assertEqual(post_cnn_time_steps(94), 50)
+        self.assertEqual(post_cnn_time_steps(626), 316)
+        mask = feature_time_padding_mask(
+            torch.tensor([626, 313]),
+            total_input_time_steps=626,
+        )
+        self.assertEqual(mask.shape, (2, 316))
+        self.assertFalse(mask[0].any())
+        self.assertEqual(int((~mask[1]).sum()), 159)
+
+    def test_g0_masked_pooling_ignores_padded_feature_values(self) -> None:
+        torch.manual_seed(5)
+        model = MACNNAClassifier(num_classes=4).eval()
+        features = torch.randn(2, HEAD_CHANNELS, 5, 12)
+        changed = features.clone()
+        changed[..., 8:] = torch.randn_like(changed[..., 8:]) * 1000
+        mask = torch.zeros(2, 12, dtype=torch.bool)
+        mask[:, 8:] = True
+
+        with torch.no_grad():
+            reference = model.classify_features(features, time_padding_mask=mask)
+            comparison = model.classify_features(changed, time_padding_mask=mask)
+
+        torch.testing.assert_close(reference, comparison)
 
     def test_masked_values_cannot_change_unmasked_g1_outputs(self) -> None:
         torch.manual_seed(7)

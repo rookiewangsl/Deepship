@@ -1,12 +1,13 @@
 # DeepShip 预训练 Conformer、轻量全局注意力与外部评测计划
 
 最后更新：2026-08-29
-状态：B3 工程基线与第二版组级选模管线已验证。第二版 F0、F1b、F0-S1 和 F0-S2 已完成。
+状态：B3 工程基线与第二版组级选模管线已验证。第二版 F0、F1b、F0-S1、F0-S2 和 F1a 已完成。
 F1b 明显过拟合，不进入 last-8。S1 显著改善 recording、但未改善 vessel；S2 将主优化方向转为
 未见船名后，validation vessel macro-F1 提高到 0.5625，并且 recording 未低于 F0-S0，因此通过
-预设点估计幅度门。当前只运行一次 F1a last-2＋S2，检查极轻量表征适配是否还能增加收益。
-G0/G0-C/G1 的阶段 2B 架构、validation-only 训练管线和核心测试已实现，等待迁移线冻结后按顺序
-smoke 和正式训练。test 继续封存，不参与开发期选模。大型 scratch Conformer 已从必做矩阵删除；
+预设点估计幅度门。F1a last-2＋S2 将 vessel macro-F1 提高到 0.6435、recording 保持 0.4380，
+因此作为当前迁移候选，但单 seed vessel 配对区间仍跨零。3 s G0/G0-C/G1 已完成，G1 未优于两个
+对照；当前执行共同 20 s 的 L20 受控复核，判断 3 s 近全局卷积感受野是否掩盖了注意力价值。
+test 继续封存，不参与开发期选模。大型 scratch Conformer 已从必做矩阵删除；
 轻量全局注意力是与通用预训练迁移并行的核心研究线，而不是 raw Conformer 失败后的临时补救
 
 ## 0. 当前实施状态
@@ -66,11 +67,17 @@ F0-S2 在 epoch 4 取得最佳 validation vessel macro-F1 **0.5625**、recording
 训练分布目标确实不同：S1 强化录音等权，S2 强化船舶等权。S2 按预先冻结的点估计门通过，但
 50 艘 validation vessel 的区间仍跨零，单 seed 不能写成确定性提升。
 
-F1a 的两 batch smoke 已完成：解冻最后 2 个 Conformer block 后可训练参数为 51,248,901，训练/
-验证 loss、全部优化器浮点状态均有限，峰值显存 3.59 GiB；正式任务已启动。G 系列已实现 G0
-数值等价重构、G0-C 局部容量对照和 G1 shared temporal axial attention。当前实际参数量分别为
+F1a 最佳 checkpoint 位于 epoch 2：validation vessel macro-F1 为 **0.6435**、recording macro-F1
+为 **0.4380**。相对 F0-S2，vessel 增加 0.0810，50,000 次 paired bootstrap 的 95% 区间为
+[−0.0513,+0.2292]，`P(Δ>0)=0.8849`；recording 增加 0.0020，区间为
+[−0.0844,+0.0882]。它通过预设单 seed 点估计门，但不能写成确定性提升，也不再扩大解冻。
+
+G 系列已实现 G0 数值等价重构、G0-C 局部容量对照和 G1 shared temporal axial attention。参数量分别为
 532,166、679,593 和 694,057；G0-C/G1 新增参数差 8.93%，前向 FLOPs 差 8.53%，满足冻结的
-10%/15% 匹配门。尚未完成的是服务器真实数据 smoke、三个正式 G run、E1 推理读取器，以及仅在
+10%/15% 匹配门。3 s 正式结果的 vessel macro-F1 为 **0.5822/0.5855/0.5132**，recording 为
+**0.5694/0.6127/0.4910**，G1 未通过门。由于 3 s 输入经 CNN 后仅约 50 个时间位置且局部感受野
+已接近全片段，当前只补共同 20 s 的 L20 三模型复核。尚未完成的是 L20 真实数据 smoke、三个
+L20 正式 run、E1 推理读取器，以及仅在
 证据触发时才进行的 10～20 h 水声自监督原型。recording-level MIL、真实背景混合、双前端和
 大规模水声自监督不属于本项目完成条件，统一降级为未来工作。
 
@@ -79,12 +86,11 @@ F1a 的两 batch smoke 已完成：解冻最后 2 个 Conformer block 后可训�
 ```text
 冻结新版 F0/F1b/S1 的 validation 诊断，不恢复 F1b、不运行 last-8
 完成 F0-S2 vessel-balanced 动态裁剪和 validation paired bootstrap
-→ S2 已通过点估计门；当前运行唯一一次 F1a last-2＋S2
-→ F1a 只有相对 F0-S2 的 vessel 再提高至少 1 pp 且 recording 不退化才保留
+→ S2 已通过点估计门；F1a last-2＋S2 已完成并通过单 seed 点估计门
 → 无论 F1a 结果如何，不再扩大解冻层数或运行大型 scratch
 → 冻结最低成本、validation 最好的 B3 配置并形成通用预训练迁移阶段结论
-→ 无论 raw Conformer 是否超过 CNN，都运行受控的 G0/G0-C/G1 轻量注意力核心比较
-→ G1 只有同时优于 G0 与容量对照 G0-C，vessel 至少 +1 pp 且 recording 不退化，才补多 seed
+→ 3 s G0/G0-C/G1 已完成，G1 未通过；执行唯一共同 L20 复核
+→ G1-L20 只有同时优于 G0-L20 与 G0-C-L20，vessel 至少 +1 pp 且 recording 最多下降 1 pp，才补多 seed
 → 两条内部研究线均冻结后进入 PORTIA development
 → 只有“通用预训练内部显示价值、但外部明显不足”时才启动 10～20 h ONC 自监督原型
 → 原型没有稳定改善即停止，不扩展到 100～500 h
@@ -503,8 +509,8 @@ B4 不是固定下一阶段，也不是在已经完成监督微调的 B3 权重�
 ### 8.2 两条并行研究线与架构结论边界
 
 B 系列用于比较完整系统，不能把预训练 raw Conformer 与 Mel CNN 的差值全部归因于 Transformer
-架构。G 系列无论 B3 结果好坏都执行核心 G0/G0-C/G1：它用相同 log-Mel、3 s 上下文、训练数据
-和预算，比较纯 CNN、容量匹配对照和轻量 temporal self-attention。
+架构。G 系列使用相同 log-Mel、相同上下文、训练数据和预算，比较纯 CNN、容量匹配对照和轻量
+temporal self-attention。3 s 核心比较已完成；L20 复核仍保持三模型内部严格同配方。
 
 因此两条线分别形成结论：
 
@@ -520,8 +526,10 @@ G 系列是 CNN/attention 混合架构，只支持“全局注意力”结论，
 3/10/20/30 s 全网格：只有最佳 B3/B3-S 已接近或优于 CNN、并值得继续优化成本时，才补一个 10 s
 效率对照；若 20 s 相对 10 s 的主指标提升不足 1 pp，则选择 10 s。30 s 默认删除。
 
-G 系列第一轮严格使用共同 3 s 输入回答架构问题。只有 G1 通过核心保留门，才让 G0/G0-C/G1
-共同改为 10 s；因此不会把输入时长收益误计为注意力收益。
+G 系列 3 s 首轮显示 G1 不占优，但事后感受野审计发现 3 s 经 CNN 后只有约 50 个时间位置，局部
+路径已接近覆盖全片段。因此只增加一次共同 20 s 复核，三模型均为约 316 个 CNN 后时间位置。
+L20 内部的 G1−G0/G0-C 可以归因于结构；3 s 与 L20 同时改变了时长、采样和优化器，跨配方差值
+不能单独归因于时长。10 s、30 s 和完整上下文网格删除。
 
 ### 8.4 微调策略消融 F
 
@@ -564,7 +572,7 @@ G 系列从条件诊断升级为核心研究线，但首轮严格限制为三个
 
 | ID | 配置 | 唯一新增因素 | 回答的问题 |
 |---|---|---|---|
-| G0 | 当前 MA-CNN-A，3 s、64-bin log-Mel | 无 | 统一新训练配方下的强 CNN 基线 |
+| G0 | 当前 MA-CNN-A，共同上下文的 64-bin log-Mel | 无 | 统一训练配方下的强 CNN 基线 |
 | G0-C | G0＋参数匹配的 temporal Conv/MLP block | 与 G1 近似的新增容量/FLOPs，不含 MHSA | 单纯增加容量是否足以解释收益 |
 | G1 | G0＋1 层 gated temporal axial Conformer-lite block | 保留完整时频图并加入全局时间 self-attention | 全局交互是否提供独立组级收益 |
 
@@ -574,10 +582,11 @@ G1 在现有 `refine_time/refine_freq` 后、全局池化前保留完整 `[B,C,F
 一个 block。注意力前不平均频率，最终复用 G0 的全局池化与分类器。预计总参数约 0.68～0.75 M，
 实际实现后报告精确参数和 FLOPs。
 
-第一轮固定相同 vessel-name manifest、3 s log-Mel、优化器、总 step 和 validation vessel
-macro-F1 选模。只有 G1 相对 G0 至少 +1 pp、同时优于 G0-C 且 recording 不退化，才补多 seed。
-多 seed 仍为正后，才允许在“两层 attention、time/frequency axial attention、共同 10 s 上下文”
-中选择一个下一项；无稳定组级收益即停止架构扩展，不复现大型 AST/MGAE/UATR。
+3 s 首轮固定相同 vessel-name manifest、S0、SGD、总 step 和 validation vessel macro-F1 选模，
+结果为 G0/G0-C/G1 vessel **0.5822/0.5855/0.5132**，G1 未通过。唯一 L20 复核固定相同 manifest、
+20 s、S2 动态采样、AdamW、有效 batch 16 和总预算。只有 G1-L20 相对 G0-L20 至少 +1 pp、同时
+优于 G0-C-L20 且 recording 最多下降 1 pp，才补多 seed；否则停止架构扩展，不运行 G1-L2、G2
+或大型 AST/MGAE/UATR。
 
 ### 8.7 条件触发的小规模自监督原型 D
 
@@ -620,7 +629,8 @@ CNN 全量标签水平。
 | G1 与 G0-C 提升相近 | 不进入 G2 | 收益更可能来自新增容量而非全局注意力 |
 | G1 只提高 recording、不提高 vessel | 停止或只允许共同上下文诊断 | 全局模块利用录音规律，但未改善未见船名泛化 |
 | G1 相对 G0/G0-C 没有稳定组级收益 | 停止架构扩展 | 当前输入、数据和协议不支持轻量全局注意力优势 |
-| 10/20 s 优于 3 s，且严格 group 指标同步改善 | 保留最佳上下文 | 中长时船舶声学动态有效 |
+| G1-3s 未通过且 3 s 局部感受野近全局 | 只运行共同 G0/G0-C/G1-L20 | 区分短输入限制与注意力设计无效 |
+| G1-L20 仍不优于 L20 两个对照 | 停止 G 分支 | 当前严格协议不支持该轻量全局注意力设计 |
 | B3/B3-S 内部接近/优于 CNN，但 PORTIA development 明显不足 | 启动一次 10～20 h 多站点 ONC 领域自监督 | 存在值得验证的语音—水声域偏移 |
 | D1 没有稳定改善 2～3 pp，或另一项指标退化 | 停止水声自监督，不扩容 | 当前 SSL 目标或数据选择不成立 |
 | D1 显示稳定正趋势 | 将其记录为原型结果；大规模扩容列入未来工作 | 水声领域适配有进一步研究价值 |
@@ -869,9 +879,9 @@ checkpoint 留在外置盘或训练服务器。
 - 已完成 S1 的确定性 recording-balanced 动态裁剪、暴露报告和 CPU 等待统计；
 - S1 显著改善 recording 指标，但 vessel 主指标仅增加 0.73 pp；
 - 已完成 S2；其 vessel macro-F1 为 0.5625，按预设点估计门通过，但 paired bootstrap 区间跨零；
-- 当前正在运行唯一一次 F1a；它不改变 S2 数据分布，只检查解冻最后 2 个 block 的边际价值；
-- F1a 使用 `scripts/train/run_conformer_f1a_s2_seed42.sh`，与 F0-S2 相比只把冻结 encoder 改为
-  解冻最后 2 个 block；正式运行仍为 8 epoch 上限、patience 3，且不读取 test；
+- 已完成唯一一次 F1a；它不改变 S2 数据分布，只检查解冻最后 2 个 block 的边际价值；
+- F1a vessel macro-F1 为 0.6435、recording 为 0.4380；相对 F0-S2 vessel +8.10 pp，但 paired
+  区间跨零。它作为单 seed 迁移候选保留，不继续扩大解冻，也不读取 test；
 - 全部选择只使用 validation recording/vessel 指标，不根据 DeepShip test 反复调参；
 - 不运行大型 scratch；若最佳 raw Conformer 不优于小型 CNN，直接记录迁移成本/收益负结论；
 - 冻结 B3 系列最终 checkpoint、采样、损失和聚合规则。
@@ -884,13 +894,14 @@ checkpoint 留在外置盘或训练服务器。
 - 已实现 G0、G0-C 和 G1，不修改正在运行的 Conformer checkout；
 - G1 保留完整时频图并使用 1 层共享 temporal axial Conformer-lite；G0-C 使用相同投影、频率位置
   信息和门控融合，仅以局部/扩张时间卷积替换 MHSA，并匹配新增参数和计算量；
-- 三组固定 3 s log-Mel、S0 anchor、优化器、总 step 和 validation vessel macro-F1 选模；
-- 已通过本地数值回归、mask、窄频带、梯度、resume、参数/FLOPs 和无 test 读取测试；服务器真实
-  数据 smoke 仍需在 F1a 冻结后执行，然后顺序运行 seed 42；
-- G1 只有相对 G0 至少 +1 pp、优于 G0-C 且 recording 不退化，才补 seed 43/44 和 paired
+- 3 s 三组已完成：G1 的 vessel/recording 均低于 G0/G0-C；
+- 已冻结唯一 L20 复核：三组共同使用 20 s log-Mel、S2、AdamW、有效 batch 16、相同总预算和
+  validation vessel macro-F1 选模；短录音的 padded Mel/CNN 时间位置统一 mask；
+- 3 s 已通过数值回归、窄频带、梯度、resume、参数/FLOPs 和无 test 读取测试；L20 新增动态
+  log-Mel、padding mask、梯度累积与优化器测试，服务器真实数据 smoke 后顺序运行 seed 42；
+- G1-L20 只有相对 G0-L20 至少 +1 pp、优于 G0-C-L20 且 recording 最多下降 1 pp，才补 seed 43/44 和 paired
   bootstrap；
-- 多 seed 仍为正后，才允许在两层 attention、双轴 attention 或共同 10 s 上下文中选择一项；
-  否则停止 G 分支。
+- 若 L20 不通过即停止 G 分支，不再运行两层 attention、双轴 attention 或更多上下文点。
 
 验收：能够区分额外容量与全局时间注意力；所有比较使用相同输入、训练和选模协议；结论用词限定
 为轻量全局注意力，不泛化为所有纯 Transformer。详细验收见

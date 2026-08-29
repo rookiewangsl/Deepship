@@ -68,7 +68,10 @@ class TinyMACNNA(nn.Module):
         return sum(parameter.numel() for parameter in self.parameters())
 
 
-def synthetic_dataloaders(config: pipeline.GlobalAttentionTrainConfig):
+def synthetic_dataloaders(
+    config: pipeline.GlobalAttentionTrainConfig,
+    **_kwargs,
+):
     rows = segments()
     train = SyntheticMelDataset(rows, return_index=False)
     val = SyntheticMelDataset(rows, return_index=True)
@@ -191,7 +194,7 @@ class MACNNAGlobalTrainingTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             used_loaders = {}
 
-            def build_and_capture(config):
+            def build_and_capture(config, **_kwargs):
                 loaders, report = synthetic_dataloaders(config)
                 used_loaders.update(loaders)
                 return loaders, report
@@ -268,6 +271,60 @@ class MACNNAGlobalTrainingTests(unittest.TestCase):
                     attention_num_heads=4,
                 )
             )
+        with self.assertRaisesRegex(ValueError, "positive train_samples_per_epoch"):
+            pipeline.validate_config(
+                pipeline.GlobalAttentionTrainConfig(
+                    training_sampling="vessel_balanced_dynamic",
+                )
+            )
+
+    def test_long_context_optimizer_and_accumulation_configuration(self) -> None:
+        config = pipeline.GlobalAttentionTrainConfig(
+            training_sampling="vessel_balanced_dynamic",
+            train_samples_per_epoch=14_000,
+            clip_duration=20.0,
+            optimizer="adamw",
+            learning_rate=3e-4,
+            weight_decay=1e-2,
+            gradient_accumulation_steps=4,
+            max_grad_norm=1.0,
+        )
+        pipeline.validate_config(config)
+        model = nn.Linear(4, 4)
+        optimizer = pipeline._build_optimizer(model, config)
+        self.assertIsInstance(optimizer, torch.optim.AdamW)
+        self.assertEqual(optimizer.param_groups[0]["weight_decay"], 1e-2)
+
+    def test_gradient_accumulation_steps_on_full_and_partial_windows(self) -> None:
+        model = TinyMACNNA("g0")
+        dataset = SyntheticMelDataset(segments(), return_index=False)
+        loader = DataLoader(dataset, batch_size=1, shuffle=False)
+        config = self.config(
+            "unused",
+            model_variant="g0",
+            batch_size=1,
+            gradient_accumulation_steps=3,
+            max_grad_norm=1.0,
+        )
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+
+        with patch.object(optimizer, "step", wraps=optimizer.step) as step:
+            loss, accuracy, rows = pipeline.run_epoch(
+                model,
+                loader,
+                nn.CrossEntropyLoss(),
+                config,
+                epoch=1,
+                phase="train",
+                progress=pipeline.TrainingProgress(None),
+                optimizer=optimizer,
+            )
+
+        self.assertEqual(step.call_count, 2)
+        self.assertTrue(torch.isfinite(torch.tensor(loss)))
+        self.assertGreaterEqual(accuracy, 0.0)
+        self.assertEqual(rows, [])
+        self.assertTrue(all(torch.isfinite(parameter).all() for parameter in model.parameters()))
 
     def test_progress_truncates_narrow_terminal_without_wrapping(self) -> None:
         terminal = StringIO()

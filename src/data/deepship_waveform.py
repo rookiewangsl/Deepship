@@ -157,6 +157,82 @@ class DeepShipWaveformSegmentDataset(Dataset):
         return waveform, source_sample_rate
 
 
+class DeepShipMelWindowDataset(Dataset):
+    """Convert deterministic fixed or dynamic waveform windows to masked log-Mel.
+
+    Padding is always placed at the end of the waveform.  The returned valid
+    Mel-frame count lets MA-CNN-A ignore padded time positions after its CNN
+    front-end while preserving the original fixed-duration tensor shape.
+    """
+
+    def __init__(
+        self,
+        segments: list[SegmentRecord],
+        *,
+        data_root: str | Path,
+        sample_rate: int = 16_000,
+        clip_duration: float = 20.0,
+        n_fft: int = 1024,
+        hop_length: int = 512,
+        win_length: int = 1024,
+        n_mels: int = 64,
+        return_index: bool = False,
+        dynamic_crop: bool = False,
+    ) -> None:
+        if hop_length <= 0:
+            raise ValueError("hop_length must be positive")
+        self.segments = segments
+        self.return_index = return_index
+        self.hop_length = hop_length
+        self.waveform_dataset = DeepShipWaveformSegmentDataset(
+            segments,
+            data_root=data_root,
+            sample_rate=sample_rate,
+            clip_duration=clip_duration,
+            normalize=False,
+            remove_dc=False,
+            return_index=return_index,
+            dynamic_crop=dynamic_crop,
+        )
+        self.mel_transform = torchaudio.transforms.MelSpectrogram(
+            sample_rate=sample_rate,
+            n_fft=n_fft,
+            hop_length=hop_length,
+            win_length=win_length,
+            n_mels=n_mels,
+            power=2.0,
+            center=True,
+        )
+        self.to_db = torchaudio.transforms.AmplitudeToDB(stype="power")
+
+    @property
+    def dynamic_crop(self) -> bool:
+        return self.waveform_dataset.dynamic_crop
+
+    def __len__(self) -> int:
+        return len(self.waveform_dataset)
+
+    def __getitem__(
+        self,
+        index: int | tuple[int, int],
+    ) -> tuple[torch.Tensor, int, int] | tuple[torch.Tensor, int, int, int]:
+        row = self.waveform_dataset[index]
+        if self.return_index:
+            waveform, sample_mask, label, segment_index = row
+        else:
+            waveform, sample_mask, label = row
+            segment_index = None
+        valid_samples = int(sample_mask.sum().item())
+        mel = self.to_db(self.mel_transform(waveform.unsqueeze(0)))
+        valid_mel_frames = min(mel.size(-1), valid_samples // self.hop_length + 1)
+        if valid_mel_frames < mel.size(-1):
+            mel[..., valid_mel_frames:] = 0.0
+        if self.return_index:
+            assert segment_index is not None
+            return mel, label, segment_index, valid_mel_frames
+        return mel, label, valid_mel_frames
+
+
 def recording_representatives(segments: list[SegmentRecord]) -> list[SegmentRecord]:
     """Return one validated, stable representative for every recording."""
 

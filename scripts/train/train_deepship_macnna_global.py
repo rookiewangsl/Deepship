@@ -42,11 +42,21 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--attention-temporal-kernel-size", type=int, default=15)
     parser.add_argument("--attention-dropout", type=float, default=0.1)
     parser.add_argument("--attention-gate-init", type=float, default=-2.0)
+    parser.add_argument(
+        "--training-sampling",
+        choices=("fixed_anchor", "vessel_balanced_dynamic"),
+        default="fixed_anchor",
+    )
+    parser.add_argument("--train-samples-per-epoch", type=int, default=None)
     parser.add_argument("--epochs", type=int, default=100)
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--eval-batch-size", type=int, default=None)
+    parser.add_argument("--optimizer", choices=("sgd", "adamw"), default="sgd")
     parser.add_argument("--learning-rate", type=float, default=1e-2)
     parser.add_argument("--momentum", type=float, default=0.9)
+    parser.add_argument("--weight-decay", type=float, default=0.0)
+    parser.add_argument("--gradient-accumulation-steps", type=int, default=1)
+    parser.add_argument("--max-grad-norm", type=float, default=None)
     parser.add_argument("--min-learning-rate", type=float, default=1e-5)
     parser.add_argument("--warmup-epochs", type=int, default=10)
     parser.add_argument("--early-stopping-patience", type=int, default=10)
@@ -95,6 +105,8 @@ def main() -> None:
         attention_temporal_kernel_size=args.attention_temporal_kernel_size,
         attention_dropout=args.attention_dropout,
         attention_gate_init=args.attention_gate_init,
+        training_sampling=args.training_sampling,
+        train_samples_per_epoch=args.train_samples_per_epoch,
         clip_duration=args.clip_duration,
         samples_per_class=args.samples_per_class,
         train_per_class=args.train_per_class,
@@ -109,8 +121,12 @@ def main() -> None:
         batch_size=args.batch_size,
         eval_batch_size=args.eval_batch_size,
         epochs=args.epochs,
+        optimizer=args.optimizer,
         learning_rate=args.learning_rate,
         momentum=args.momentum,
+        weight_decay=args.weight_decay,
+        gradient_accumulation_steps=args.gradient_accumulation_steps,
+        max_grad_norm=args.max_grad_norm,
         min_learning_rate=args.min_learning_rate,
         warmup_epochs=args.warmup_epochs,
         early_stopping_patience=args.early_stopping_patience,

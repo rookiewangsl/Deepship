@@ -24,6 +24,11 @@ from src.data.deepship import (
     segment_record_from_dict,
 )
 from src.data.deepship_audit import load_experiment_config
+from src.data.deepship_waveform import (
+    DeepShipMelWindowDataset,
+    VesselBalancedEpochSampler,
+    recording_representatives,
+)
 from src.data.deepship_protocol_validation import (
     load_split_manifest,
     validate_protocol_manifest,
@@ -51,6 +56,7 @@ from src.models.ma_cnn_a import (
     MACNNABaseClassifier,
     THREE_BRANCH_KERNEL_SIZES,
     build_macnna_model,
+    feature_time_padding_mask,
 )
 from src.pipelines.mel_ml.isolation_experiment import enforce_training_config
 from src.pipelines.mel_ml.train_deepship_macnna import (
@@ -83,6 +89,8 @@ class GlobalAttentionTrainConfig:
     attention_temporal_kernel_size: int = 15
     attention_dropout: float = 0.1
     attention_gate_init: float = -2.0
+    training_sampling: str = "fixed_anchor"
+    train_samples_per_epoch: int | None = None
     clip_duration: float = 3.0
     samples_per_class: int = 5000
     train_per_class: int = 3500
@@ -97,8 +105,12 @@ class GlobalAttentionTrainConfig:
     batch_size: int = 16
     eval_batch_size: int | None = None
     epochs: int = 100
+    optimizer: str = "sgd"
     learning_rate: float = 1e-2
     momentum: float = 0.9
+    weight_decay: float = 0.0
+    gradient_accumulation_steps: int = 1
+    max_grad_norm: float | None = None
     min_learning_rate: float = 1e-5
     warmup_epochs: int = 10
     early_stopping_patience: int = 10
@@ -129,6 +141,15 @@ def validate_config(config: GlobalAttentionTrainConfig) -> None:
         raise ValueError("attention_d_model must be divisible by attention_num_heads")
     if config.attention_ffn_expansion <= 0:
         raise ValueError("attention_ffn_expansion must be positive")
+    if config.training_sampling not in {"fixed_anchor", "vessel_balanced_dynamic"}:
+        raise ValueError("training_sampling must be fixed_anchor or vessel_balanced_dynamic")
+    if config.training_sampling == "fixed_anchor" and config.train_samples_per_epoch is not None:
+        raise ValueError("train_samples_per_epoch is only supported for dynamic sampling")
+    if config.training_sampling != "fixed_anchor":
+        if config.train_samples_per_epoch is None or config.train_samples_per_epoch <= 0:
+            raise ValueError("Dynamic sampling requires a positive train_samples_per_epoch")
+        if config.highpass_freq is not None:
+            raise ValueError("Long-context dynamic Mel windows do not support highpass filtering")
     for name, value in (
         ("attention_position_kernel_size", config.attention_position_kernel_size),
         ("attention_temporal_kernel_size", config.attention_temporal_kernel_size),
@@ -143,6 +164,18 @@ def validate_config(config: GlobalAttentionTrainConfig) -> None:
         raise ValueError("eval_batch_size must be positive")
     if config.epochs <= 0:
         raise ValueError("epochs must be positive")
+    if config.optimizer not in {"sgd", "adamw"}:
+        raise ValueError("optimizer must be sgd or adamw")
+    if not math.isfinite(config.learning_rate) or config.learning_rate <= 0:
+        raise ValueError("learning_rate must be positive and finite")
+    if not math.isfinite(config.weight_decay) or config.weight_decay < 0:
+        raise ValueError("weight_decay must be finite and non-negative")
+    if config.gradient_accumulation_steps <= 0:
+        raise ValueError("gradient_accumulation_steps must be positive")
+    if config.max_grad_norm is not None and (
+        not math.isfinite(config.max_grad_norm) or config.max_grad_norm <= 0
+    ):
+        raise ValueError("max_grad_norm must be positive and finite")
     if config.num_workers < 0:
         raise ValueError("num_workers must be non-negative")
     if config.prefetch_factor <= 0:
@@ -165,7 +198,10 @@ def _validate_g_series_experiment_config(
     config: GlobalAttentionTrainConfig,
     experiment: dict[str, object],
 ) -> list[str]:
-    if experiment.get("experiment_id") != "macnna_global_v1":
+    if experiment.get("experiment_id") not in {
+        "macnna_global_v1",
+        "macnna_global_l20_v1",
+    }:
         raise ValueError("Unexpected G-series experiment config")
     features = experiment["features"]
     adapter = experiment["shared_adapter"]
@@ -186,12 +222,18 @@ def _validate_g_series_experiment_config(
         "attention_temporal_kernel_size": adapter["temporal_kernel_size"],
         "attention_dropout": adapter["dropout"],
         "attention_gate_init": adapter["gate_init"],
+        "training_sampling": training.get("training_sampling", "fixed_anchor"),
+        "train_samples_per_epoch": training.get("train_samples_per_epoch"),
         "seed": training["seed"],
         "batch_size": training["batch_size"],
         "eval_batch_size": training["eval_batch_size"],
         "epochs": training["epochs"],
+        "optimizer": training.get("optimizer", "sgd"),
         "learning_rate": training["learning_rate"],
         "momentum": training["momentum"],
+        "weight_decay": training.get("weight_decay", 0.0),
+        "gradient_accumulation_steps": training.get("gradient_accumulation_steps", 1),
+        "max_grad_norm": training.get("max_grad_norm"),
         "min_learning_rate": training["min_learning_rate"],
         "warmup_epochs": training["warmup_epochs"],
         "early_stopping_patience": training["early_stopping_patience"],
@@ -210,7 +252,7 @@ def _validate_g_series_experiment_config(
             mismatches.append(f"{field}: expected None, got {actual.get(field)!r}")
     if mismatches and not config.allow_experiment_overrides:
         raise ValueError(
-            "Training configuration differs from frozen macnna_global_v1. "
+            "Training configuration differs from the frozen G-series experiment. "
             "Use --allow-experiment-overrides only for smoke/debug runs:\n- "
             + "\n- ".join(mismatches)
         )
@@ -230,6 +272,8 @@ def _configure_dataloader_worker(_worker_id: int) -> None:
 
 def build_dataloaders(
     config: GlobalAttentionTrainConfig,
+    *,
+    allow_protocol_overrides: bool = False,
 ) -> tuple[dict[str, DataLoader], dict[str, object]]:
     if config.split_manifest is not None:
         if config.experiment_config is None:
@@ -239,7 +283,7 @@ def build_dataloaders(
         enforce_training_config(
             asdict(config),
             experiment,
-            allow_overrides=config.allow_experiment_overrides,
+            allow_overrides=config.allow_experiment_overrides or allow_protocol_overrides,
         )
         protocol_root = manifest_path.parent.parent
         audit_report = json.loads(
@@ -283,24 +327,73 @@ def build_dataloaders(
         )
         split_report["protocol"] = "segment_level"
 
-    dataset_kwargs = dict(
-        data_root=config.data_root,
-        sample_rate=TARGET_SAMPLE_RATE,
-        clip_duration=config.clip_duration,
-        n_fft=config.n_fft,
-        hop_length=config.hop_length,
-        win_length=config.win_length,
-        n_mels=config.n_mels,
-        highpass_freq=config.highpass_freq,
-    )
-    datasets = {
-        split: DeepShipMelSegmentDataset(
-            segments,
-            return_index=(split != "train"),
-            **dataset_kwargs,
+    train_sampler = None
+    if config.training_sampling == "fixed_anchor":
+        dataset_kwargs = dict(
+            data_root=config.data_root,
+            sample_rate=TARGET_SAMPLE_RATE,
+            clip_duration=config.clip_duration,
+            n_fft=config.n_fft,
+            hop_length=config.hop_length,
+            win_length=config.win_length,
+            n_mels=config.n_mels,
+            highpass_freq=config.highpass_freq,
         )
-        for split, segments in split_segments.items()
-    }
+        datasets = {
+            split: DeepShipMelSegmentDataset(
+                segments,
+                return_index=(split != "train"),
+                **dataset_kwargs,
+            )
+            for split, segments in split_segments.items()
+        }
+        split_report["training_sampling"] = {"id": "S0", "name": "fixed_anchor"}
+    else:
+        if config.split_manifest is None:
+            raise ValueError("Dynamic sampling requires a frozen split manifest")
+        assert config.train_samples_per_epoch is not None
+        window_kwargs = dict(
+            data_root=config.data_root,
+            sample_rate=TARGET_SAMPLE_RATE,
+            clip_duration=config.clip_duration,
+            n_fft=config.n_fft,
+            hop_length=config.hop_length,
+            win_length=config.win_length,
+            n_mels=config.n_mels,
+        )
+        train_recordings = recording_representatives(split_segments["train"])
+        datasets = {
+            "train": DeepShipMelWindowDataset(
+                train_recordings,
+                return_index=False,
+                dynamic_crop=True,
+                **window_kwargs,
+            ),
+            "val": DeepShipMelWindowDataset(
+                split_segments["val"],
+                return_index=True,
+                dynamic_crop=False,
+                **window_kwargs,
+            ),
+            "test": DeepShipMelWindowDataset(
+                split_segments["test"],
+                return_index=True,
+                dynamic_crop=False,
+                **window_kwargs,
+            ),
+        }
+        train_sampler = VesselBalancedEpochSampler(
+            train_recordings,
+            epoch_samples=config.train_samples_per_epoch,
+            seed=config.seed,
+        )
+        split_report["training_sampling"] = {
+            "id": "S2",
+            "name": "vessel_balanced_dynamic",
+            "samples_per_epoch": config.train_samples_per_epoch,
+            "recording_representatives": len(train_recordings),
+            "initial_exposure": train_sampler.exposure_report(),
+        }
     pin_memory = str(config.device).startswith("cuda")
     worker_options: dict[str, object] = {}
     if config.num_workers > 0:
@@ -316,7 +409,8 @@ def build_dataloaders(
         "train": DataLoader(
             datasets["train"],
             batch_size=config.batch_size,
-            shuffle=True,
+            shuffle=train_sampler is None,
+            sampler=train_sampler,
             generator=train_generator,
             num_workers=config.num_workers,
             pin_memory=pin_memory,
@@ -468,7 +562,7 @@ def _progress_line(
 
 
 def _prediction_row(
-    dataset: DeepShipMelSegmentDataset,
+    dataset: DeepShipMelSegmentDataset | DeepShipMelWindowDataset,
     *,
     index: int,
     target: int,
@@ -509,8 +603,11 @@ def run_epoch(
     total_samples = 0
     prediction_rows: list[dict[str, object]] = []
     dataset = dataloader.dataset
-    if not is_train and not isinstance(dataset, DeepShipMelSegmentDataset):
-        raise TypeError("Validation dataset must be DeepShipMelSegmentDataset")
+    if not is_train and not isinstance(
+        dataset,
+        (DeepShipMelSegmentDataset, DeepShipMelWindowDataset),
+    ):
+        raise TypeError("Validation dataset must be a DeepShip Mel dataset")
     use_cuda = str(config.device).startswith("cuda")
     if use_cuda and torch.cuda.is_available():
         torch.cuda.synchronize(torch.device(config.device))
@@ -518,6 +615,7 @@ def run_epoch(
     started_at = time.perf_counter()
     if optimizer is not None:
         learning_rate = float(optimizer.param_groups[0]["lr"])
+        optimizer.zero_grad(set_to_none=True)
     elif learning_rate is None:
         learning_rate = 0.0
     progress.update(
@@ -541,22 +639,50 @@ def run_epoch(
             if batch_index >= batches:
                 break
             inputs, targets = batch[:2]
-            indexes = batch[2] if len(batch) > 2 else None
+            valid_mel_frames = None
+            if isinstance(dataset, DeepShipMelWindowDataset):
+                indexes = batch[2] if not is_train else None
+                valid_mel_frames = batch[-1]
+            else:
+                indexes = batch[2] if len(batch) > 2 else None
             inputs = inputs.to(config.device, non_blocking=use_cuda)
             targets = targets.to(config.device, non_blocking=use_cuda)
-            if is_train:
-                optimizer.zero_grad(set_to_none=True)
+            time_padding_mask = None
+            if valid_mel_frames is not None:
+                time_padding_mask = feature_time_padding_mask(
+                    valid_mel_frames.to(config.device, non_blocking=use_cuda),
+                    total_input_time_steps=inputs.size(-1),
+                )
             with _amp_context(config):
-                logits = model(inputs)
+                logits = (
+                    model(inputs)
+                    if time_padding_mask is None
+                    else model(inputs, time_padding_mask=time_padding_mask)
+                )
                 loss = criterion(logits, targets)
             if not bool(torch.isfinite(loss)):
                 raise FloatingPointError(f"Non-finite {phase} loss at batch {batch_index + 1}")
             if is_train:
-                loss.backward()
+                window_start = (batch_index // config.gradient_accumulation_steps) * (
+                    config.gradient_accumulation_steps
+                )
+                accumulation_window = min(
+                    config.gradient_accumulation_steps,
+                    batches - window_start,
+                )
+                (loss / accumulation_window).backward()
                 if validate_gradients and not gradients_checked:
                     validate_trainable_gradients(model)
                     gradients_checked = True
-                optimizer.step()
+                should_step = (
+                    (batch_index + 1) % config.gradient_accumulation_steps == 0
+                    or batch_index + 1 == batches
+                )
+                if should_step:
+                    if config.max_grad_norm is not None:
+                        torch.nn.utils.clip_grad_norm_(model.parameters(), config.max_grad_norm)
+                    optimizer.step()
+                    optimizer.zero_grad(set_to_none=True)
 
             batch_size = inputs.size(0)
             total_loss += float(loss.item()) * batch_size
@@ -631,6 +757,26 @@ def _build_scheduler(
         schedulers=[warmup, cosine],
         milestones=[warmup_epochs],
     )
+
+
+def _build_optimizer(
+    model: nn.Module,
+    config: GlobalAttentionTrainConfig,
+) -> torch.optim.Optimizer:
+    if config.optimizer == "sgd":
+        return torch.optim.SGD(
+            model.parameters(),
+            lr=config.learning_rate,
+            momentum=config.momentum,
+            weight_decay=config.weight_decay,
+        )
+    if config.optimizer == "adamw":
+        return torch.optim.AdamW(
+            model.parameters(),
+            lr=config.learning_rate,
+            weight_decay=config.weight_decay,
+        )
+    raise ValueError(f"Unsupported optimizer: {config.optimizer}")
 
 
 def _model_kwargs(config: GlobalAttentionTrainConfig) -> dict[str, object]:
@@ -714,6 +860,11 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
         config,
         g_series_experiment,
     )
+    base_protocol = g_series_experiment.get("base_protocol", {})
+    allow_protocol_overrides = bool(
+        isinstance(base_protocol, dict)
+        and base_protocol.get("allow_training_overrides", False)
+    )
     experiment = (
         load_experiment_config(config.experiment_config)
         if config.experiment_config is not None
@@ -723,7 +874,7 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
         enforce_training_config(
             asdict(config),
             experiment,
-            allow_overrides=config.allow_experiment_overrides,
+            allow_overrides=config.allow_experiment_overrides or allow_protocol_overrides,
         )
         if experiment is not None
         else []
@@ -763,7 +914,10 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
         encoding="utf-8",
     )
 
-    dataloaders, split_report = build_dataloaders(config)
+    dataloaders, split_report = build_dataloaders(
+        config,
+        allow_protocol_overrides=allow_protocol_overrides,
+    )
     protocol = str(split_report["protocol"])
     if config.split_manifest is None:
         split_segments = {
@@ -821,7 +975,14 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
         "added_parameters": model.num_parameters - base_parameters,
         "example_input_shape": [1, 1, config.n_mels, mel_frames],
         "pre_pool_feature_shape": feature_shape,
+        "post_cnn_time_steps": feature_shape[-1],
         "output_shape": output_shape,
+        "input_context_seconds": config.clip_duration,
+        "training_sampling": config.training_sampling,
+        "optimizer": config.optimizer,
+        "physical_batch_size": config.batch_size,
+        "gradient_accumulation_steps": config.gradient_accumulation_steps,
+        "effective_batch_size": config.batch_size * config.gradient_accumulation_steps,
     }
     (reports_dir / "model_report.json").write_text(
         json.dumps(model_report, indent=2, ensure_ascii=False) + "\n",
@@ -829,11 +990,7 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
     )
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.SGD(
-        model.parameters(),
-        lr=config.learning_rate,
-        momentum=config.momentum,
-    )
+    optimizer = _build_optimizer(model, config)
     scheduler = _build_scheduler(optimizer, config)
     history: dict[str, list[float | None]] = {
         "train_loss": [],
@@ -869,6 +1026,29 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
         )
         if checkpoint.get("model_kwargs") != _model_kwargs(config):
             raise ValueError("Resume checkpoint uses a different G-series model configuration")
+        checkpoint_config = checkpoint.get("config", {})
+        if not isinstance(checkpoint_config, dict):
+            raise ValueError("Resume checkpoint is missing a valid training configuration")
+        resume_fields = (
+            "training_sampling",
+            "train_samples_per_epoch",
+            "clip_duration",
+            "optimizer",
+            "learning_rate",
+            "weight_decay",
+            "gradient_accumulation_steps",
+            "max_grad_norm",
+        )
+        resume_mismatches = [
+            field
+            for field in resume_fields
+            if checkpoint_config.get(field) != getattr(config, field)
+        ]
+        if resume_mismatches:
+            raise ValueError(
+                "Resume checkpoint uses a different training configuration: "
+                + ", ".join(resume_mismatches)
+            )
         model.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         if scheduler is not None and checkpoint["scheduler_state_dict"] is not None:
@@ -891,6 +1071,16 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
             if dataloaders["train"].generator is None:
                 raise RuntimeError("Training DataLoader is missing its deterministic generator")
             dataloaders["train"].generator.manual_seed(config.seed + epoch)
+            train_sampler = dataloaders["train"].sampler
+            if hasattr(train_sampler, "set_epoch"):
+                train_sampler.set_epoch(epoch)
+            if hasattr(train_sampler, "exposure_report"):
+                sampling_dir = reports_dir / "sampling_audits"
+                sampling_dir.mkdir(parents=True, exist_ok=True)
+                (sampling_dir / f"epoch_{epoch:03d}.json").write_text(
+                    json.dumps(train_sampler.exposure_report(), indent=2) + "\n",
+                    encoding="utf-8",
+                )
             current_lr = float(optimizer.param_groups[0]["lr"])
             train_loss, train_acc, _ = run_epoch(
                 model,
@@ -1073,8 +1263,22 @@ def train(config: GlobalAttentionTrainConfig) -> dict[str, object]:
         ),
         "fixed_architecture": {
             "sample_rate": TARGET_SAMPLE_RATE,
+            "clip_duration_seconds": config.clip_duration,
+            "n_mels": config.n_mels,
+            "mel_frames": mel_frames,
+            "post_cnn_time_steps": feature_shape[-1],
             "kernel_sizes": list(THREE_BRANCH_KERNEL_SIZES),
             "model_kwargs": _model_kwargs(config),
+        },
+        "training_protocol": {
+            "sampling": config.training_sampling,
+            "train_samples_per_epoch": config.train_samples_per_epoch,
+            "optimizer": config.optimizer,
+            "learning_rate": config.learning_rate,
+            "weight_decay": config.weight_decay,
+            "physical_batch_size": config.batch_size,
+            "gradient_accumulation_steps": config.gradient_accumulation_steps,
+            "effective_batch_size": config.batch_size * config.gradient_accumulation_steps,
         },
         "experiment_config_mismatches": config_mismatches,
         "g_series_config_mismatches": g_series_config_mismatches,

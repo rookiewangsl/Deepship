@@ -6,9 +6,11 @@ import unittest
 
 import numpy as np
 import soundfile as sf
+import torch
 
-from src.data.deepship import SegmentRecord
+from src.data.deepship import DeepShipMelSegmentDataset, SegmentRecord
 from src.data.deepship_waveform import (
+    DeepShipMelWindowDataset,
     DeepShipWaveformSegmentDataset,
     RecordingBalancedEpochSampler,
     VesselBalancedEpochSampler,
@@ -121,6 +123,73 @@ class DeepShipWaveformDatasetTests(unittest.TestCase):
             self.assertEqual(int(second_mask.sum()), 5)
             with self.assertRaisesRegex(ValueError, "explicit deterministic crop seed"):
                 dataset[0]
+
+    def test_long_mel_window_zeroes_padding_and_returns_valid_frame_count(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            root = Path(temporary_dir)
+            audio_path = root / "Cargo" / "example.wav"
+            audio_path.parent.mkdir(parents=True)
+            sample_rate = 16_000
+            waveform = np.sin(
+                2 * np.pi * 200 * np.arange(sample_rate, dtype=np.float32) / sample_rate
+            )
+            sf.write(audio_path, waveform, sample_rate)
+            dataset = DeepShipMelWindowDataset(
+                [self._segment(start_frame=0, num_frames=sample_rate, sample_rate=sample_rate)],
+                data_root=root,
+                sample_rate=sample_rate,
+                clip_duration=2.0,
+                n_fft=64,
+                win_length=64,
+                hop_length=16,
+                n_mels=8,
+                return_index=True,
+            )
+
+            mel, label, index, valid_frames = dataset[0]
+
+            self.assertEqual(mel.shape, (1, 8, 2001))
+            self.assertEqual(valid_frames, 1001)
+            self.assertEqual(label, 0)
+            self.assertEqual(index, 0)
+            self.assertTrue(torch.isfinite(mel).all())
+            self.assertTrue(mel[..., valid_frames:].eq(0).all())
+
+    def test_full_fixed_window_matches_existing_log_mel_preprocessing(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary_dir:
+            root = Path(temporary_dir)
+            audio_path = root / "Cargo" / "example.wav"
+            audio_path.parent.mkdir(parents=True)
+            sample_rate = 16_000
+            waveform = np.sin(
+                2 * np.pi * 320 * np.arange(sample_rate, dtype=np.float32) / sample_rate
+            )
+            sf.write(audio_path, waveform, sample_rate)
+            rows = [
+                self._segment(
+                    start_frame=0,
+                    num_frames=sample_rate,
+                    sample_rate=sample_rate,
+                )
+            ]
+            common = dict(
+                data_root=root,
+                sample_rate=sample_rate,
+                clip_duration=1.0,
+                n_fft=64,
+                win_length=64,
+                hop_length=16,
+                n_mels=8,
+            )
+            existing = DeepShipMelSegmentDataset(rows, **common)
+            windowed = DeepShipMelWindowDataset(rows, **common)
+
+            expected, expected_label = existing[0]
+            actual, actual_label, valid_frames = windowed[0]
+
+            torch.testing.assert_close(actual, expected)
+            self.assertEqual(actual_label, expected_label)
+            self.assertEqual(valid_frames, expected.size(-1))
 
     def test_recording_representatives_are_stable_and_validate_metadata(self) -> None:
         later = self._segment(

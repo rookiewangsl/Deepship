@@ -14,6 +14,41 @@ MACNNA_MODEL_VARIANTS = ("g0", "g0_c", "g1")
 MACNNAModelVariant = Literal["g0", "g0_c", "g1"]
 
 
+def post_cnn_time_steps(input_time_steps: int | torch.Tensor) -> int | torch.Tensor:
+    """Return MA-CNN-A's pre-pooling time length for a Mel-frame length.
+
+    The first temporal convolution downsamples by two.  The later branch
+    temporal convolution and the shared refinement convolution each add one
+    position because the original architecture uses even kernels with
+    ``padding=kernel_size // 2``.
+    """
+
+    if isinstance(input_time_steps, torch.Tensor):
+        if bool((input_time_steps <= 0).any()):
+            raise ValueError("input_time_steps must be positive")
+        return torch.div(input_time_steps, 2, rounding_mode="floor") + 3
+    if input_time_steps <= 0:
+        raise ValueError("input_time_steps must be positive")
+    return input_time_steps // 2 + 3
+
+
+def feature_time_padding_mask(
+    valid_input_time_steps: torch.Tensor,
+    *,
+    total_input_time_steps: int,
+) -> torch.Tensor:
+    """Build a post-CNN padding mask from valid Mel-frame counts."""
+
+    if valid_input_time_steps.dim() != 1:
+        raise ValueError("valid_input_time_steps must be one-dimensional")
+    total_output_steps = int(post_cnn_time_steps(total_input_time_steps))
+    valid_output_steps = post_cnn_time_steps(valid_input_time_steps.to(dtype=torch.long))
+    assert isinstance(valid_output_steps, torch.Tensor)
+    valid_output_steps = valid_output_steps.clamp(min=0, max=total_output_steps)
+    positions = torch.arange(total_output_steps, device=valid_output_steps.device)
+    return positions.unsqueeze(0) >= valid_output_steps.unsqueeze(1)
+
+
 class ConvBNReLU(nn.Module):
     def __init__(
         self,
@@ -199,8 +234,23 @@ class MACNNABaseClassifier(nn.Module):
         fused = self.refine_time(fused)
         return self.refine_freq(fused)
 
-    def classify_features(self, features: torch.Tensor) -> torch.Tensor:
-        pooled = self.pool(features).flatten(1)
+    def classify_features(
+        self,
+        features: torch.Tensor,
+        time_padding_mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        if time_padding_mask is None:
+            pooled = self.pool(features).flatten(1)
+        else:
+            expected = (features.size(0), features.size(-1))
+            if time_padding_mask.shape != expected:
+                raise ValueError(
+                    "time_padding_mask must match pre-pooling features: "
+                    f"expected {expected}, got {tuple(time_padding_mask.shape)}"
+                )
+            valid = (~time_padding_mask.bool())[:, None, None, :].to(features.dtype)
+            denominator = valid.sum(dim=(2, 3)).clamp_min(1.0) * features.size(2)
+            pooled = (features * valid).sum(dim=(2, 3)) / denominator
         return self.classifier(pooled)
 
     @property
@@ -218,9 +268,10 @@ class MACNNAClassifier(MACNNABaseClassifier):
         x: torch.Tensor,
         time_padding_mask: torch.Tensor | None = None,
     ) -> torch.Tensor:
-        if time_padding_mask is not None:
-            raise ValueError("G0 does not accept a feature-level time padding mask")
-        return self.classify_features(self.extract_features(x))
+        return self.classify_features(
+            self.extract_features(x),
+            time_padding_mask=time_padding_mask,
+        )
 
 
 class FrequencyCoordinateEmbedding(nn.Module):
@@ -557,7 +608,7 @@ class MACNNATemporalClassifier(MACNNABaseClassifier):
     ) -> torch.Tensor:
         features = self.extract_features(x)
         features = self.temporal_adapter(features, time_padding_mask=time_padding_mask)
-        return self.classify_features(features)
+        return self.classify_features(features, time_padding_mask=time_padding_mask)
 
 
 def build_macnna_model(

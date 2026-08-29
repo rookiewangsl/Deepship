@@ -1,8 +1,9 @@
 # DeepShip 轻量全局注意力架构实验计划
 
 最后更新：2026-08-29  
-状态：结构与首轮配置已冻结；F0-S2 已完成，F1a 正式训练进行中；G 系列本地工程与核心测试已完成，
-等待服务器真实数据 smoke 和顺序正式训练
+状态：3 s 的 G0/G0-C/G1 seed 42 已完成；G1 未优于纯 CNN 或容量对照。由于 3 s 输入经 CNN 后仅
+约 50 个时间 token，且局部卷积感受野已接近整个片段，这一结果不能充分检验长程注意力。当前执行
+唯一一次共同 20 s 的 L20 受控复核；代码、冻结配置与测试正在完成服务器 smoke 前验收
 
 ## 1. 研究问题与边界
 
@@ -28,7 +29,7 @@ G 系列是 CNN/attention 混合架构，不等同于纯 Transformer，也不是
 
 ## 2. 基础网络与新增信息路径
 
-当前 MA-CNN-A 约 532,166 个参数，使用 16 kHz、3 s、64-bin log-Mel。三条非对称卷积分支分别
+当前 MA-CNN-A 约 532,166 个参数，使用 16 kHz、64-bin log-Mel。三条非对称卷积分支分别
 使用 8/16/32 的时间和频率卷积核；现有 `PaperAttentionFusion` 根据全局池化结果重标定通道，
 但不允许相距较远的时间位置直接交互。因此它是 channel attention，不是时间全局 self-attention。
 
@@ -70,7 +71,10 @@ log-Mel [B, 1, F, T]
 分别为 147,427/161,891，相对差 8.93%。在 `[1,1,64,94]` 输入上用 PyTorch flop counter 得到
 G0/G0-C/G1 前向 FLOPs 约为 1.767/2.274/2.095 G（对应近似 MACs 为其一半），G0-C 与 G1
 相差 8.53%。参数与计算量均达到预设 10%/15% 匹配门。CPU 延迟不作为最终部署结论；服务器
-GPU 峰值显存和推理时延仍由正式审计补充。
+GPU 峰值显存和推理时延仍由正式审计补充。3 s 输入产生 94 个 Mel 帧、CNN 后约 50 个时间位置；
+20 s 输入产生 626 个 Mel 帧、CNN 后约 316 个时间位置。L20 不改变三种模型之间的结构差异，但让
+G1 的全局路径明显超过 G0-C 的有限局部感受野。L20 本地 CPU 前向审计得到 G0/G0-C/G1 约
+11.34/14.54/13.41 GFLOPs；G0-C 与 G1 的 FLOPs 差 8.43%，参数与计算匹配门在长输入下仍满足。
 
 首轮不使用二维全局注意力，也不在注意力前平均频率。3 s 特征图即可能产生约千级时频 token；
 直接对 `F'×T'` 做二次复杂度注意力既增加成本，也把频率和时间当成同质维度。时间轴向注意力的
@@ -96,21 +100,24 @@ G0-C 使用与 G1 完全相同的 pointwise projection、频率坐标 embedding�
 G0 必须在新管线下重跑。不能直接把历史 CNN 数字作为唯一对照，因为历史 run 的 checkpoint 选择、
 seed 数和新增 G 系列训练配方可能不同。
 
-### 3.2 条件扩展
+### 3.2 唯一上下文复核：L20
 
-| ID | 触发条件 | 变化 | 停止条件 |
-|---|---|---|---|
-| G1-L2 | G1 相对 G0/G0-C 有正向趋势但容量可能不足 | temporal block 从 1 层增至 2 层 | vessel 指标无进一步提升即停止深度扩展 |
-| G2 | G1 已有稳定 vessel 收益 | 在 temporal axial attention 后增加一次 frequency-axis attention | 无额外组级收益即回到 G1 |
-| G1-C10 | G1-3s 稳定且怀疑 3 s 限制全局建模 | G0/G0-C/G1 同时改为相同 10 s 上下文 | 10 s 相对 3 s 不提高 vessel 指标即停止上下文扩展 |
-| G1-C20 | 10 s 已有稳定收益 | 三组同时改为 20 s | 20 s 相对 10 s 提升不足 1 pp 即保留 10 s |
+3 s 的 seed 42 结果已经完成：G0/G0-C/G1 的 validation vessel macro-F1 分别为
+**0.5822/0.5855/0.5132**，recording macro-F1 分别为 **0.5694/0.6127/0.4910**。G1 相对 G0
+下降 6.90 pp、相对 G0-C 下降 7.23 pp，均未通过保留门。
 
-不进入以下笛卡尔积：层数×head 数×FFN 倍率×上下文×采样×优化器。G2 也不是纯 AST/MGAE/UATR
-复现；只有轻量混合注意力已经显示价值但仍有清晰未回答问题时，才考虑单独立项频谱 Transformer。
+但该负结果存在一个事后发现的结构性限制：3 s 输入经 CNN 后仅约 50 个时间 token，而原卷积分支
+与 G0-C 的局部卷积感受野已经覆盖片段的大部分甚至全部时间范围。因此 3 s 比较能说明当前 G1
+实现不优于局部网络，却不能充分区分“全局依赖无用”和“输入根本没有额外长程关系可建模”。
+
+为回答这一剩余问题，只增加一组共同 L20 复核：G0-L20、G0-C-L20、G1-L20 全部使用相同 20 s
+输入、S2 vessel-balanced dynamic 采样、AdamW、batch/step 预算与 validation 选模。除此之外不再
+运行 10 s 中间点、G1-L2、G2、head/hidden-size 搜索或二维全局注意力。L20 若仍不通过保留门，
+G 分支停止；若通过，才建议补 seed 43/44，不能直接宣称确定性提升。
 
 ## 4. 数据、输入和公平比较
 
-第一轮 G0/G0-C/G1 固定：
+已完成的 3 s G0/G0-C/G1 固定：
 
 - `vessel_name_disjoint` 冻结 manifest 和相同 manifest hash；
 - 16 kHz、3 s、64-bin log-Mel，以及完全相同的归一化和窗口；
@@ -120,13 +127,21 @@ seed 数和新增 G 系列训练配方可能不同。
   validation loss；
 - 三个模型均保存 segment、recording、vessel 预测和混淆矩阵。
 
-采样策略与架构因素分开。第一轮使用冻结的固定 anchor（S0）以复用现有 Mel 管线并减少变量。
-F0-S2 完成后确定的 Conformer 动态采样结论，不自动迁移为 G 系列训练配置。只有核心 G1 已显示
-价值，且确有必要比较最佳完整系统时，才为 G0/G0-C/G1 同时实现相同的 recording/vessel-balanced
-在线 log-Mel 数据管线。
+L20 复核固定：
 
-如果开展 10/20 s 上下文扩展，三组必须看到相同原始录音和相同观察时长。不能用 3 s G0 与
-20 s G1 的差值归因于注意力。
+- 仍使用同一个 `vessel_name_disjoint` 冻结 manifest；train/validation/test 的船名与录音隔离不变；
+- train 使用 class→vessel→recording-balanced 动态裁剪，每 epoch 14,000 个 20 s 窗口；
+- validation 使用冻结 3 s anchor 的中心扩展 20 s，所有模型看到完全相同的固定窗口；
+- 短于 20 s 的录音在波形右侧补零，补零后的 Mel 帧清零，并在 CNN 后对 G0 池化、G0-C 局部模块
+  和 G1 attention 使用同一个时间 mask；
+- 16 kHz、64-bin log-Mel、AdamW `3e-4`、weight decay `1e-2`、warmup 5＋cosine、gradient clip 1；
+- 物理 batch 4、梯度累积 4、有效 batch 16、BF16、最多 50 epoch、patience 8；
+- validation vessel macro-F1 选模；test 继续封存。
+
+L20 三组内部的差值可以归因于网络结构，因为数据、输入、采样、优化器和预算全部相同。3 s 与
+L20 之间同时改变了时长、S0→S2 和优化器，因此跨配方差值只能称为“系统配方比较”，不能把
+G0-L20 与 G0-3s 的差值单独解释为时长收益。若未来需要纯时长因果结论，必须另加相同 S2/AdamW
+的 G0-3s 对照；当前项目不自动扩展该实验。
 
 ## 5. 训练与工程计划
 
@@ -136,8 +151,10 @@ F0-S2 完成后确定的 Conformer 动态采样结论，不自动迁移为 G 系
 - validation-only 管线：`src/pipelines/mel_ml/train_deepship_macnna_global.py`；
 - CLI：`scripts/train/train_deepship_macnna_global.py`；
 - 统一 runner：`scripts/train/run_macnna_global_seed42.sh`；
+- L20 runner：`scripts/train/run_macnna_global_l20_seed42.sh`；
 - 参数/FLOPs 审计：`scripts/eval/audit_macnna_variants.py`；
-- 冻结配置：`configs/experiments/macnna_global_v1.json`。
+- 冻结配置：`configs/experiments/macnna_global_v1.json` 与
+  `configs/experiments/macnna_global_l20_v1.json`。
 
 ### 5.1 实施前基准冻结
 
@@ -146,8 +163,8 @@ F0-S2 完成后确定的 Conformer 动态采样结论，不自动迁移为 G 系
 3. 把历史 MA-CNN-A 训练配方作为起点，但 G0/G0-C/G1 必须使用同一个优化器和 scheduler。
 4. 若 attention 使用 AdamW 才稳定，则三组全部改用 AdamW 重跑；不能只给 G1 更有利的优化器。
 
-默认先保留现有 SGD＋momentum、warmup＋cosine 配方，完成小规模 overfit/smoke 后再决定是否统一
-切换 AdamW。优化器选择只允许使用 train/validation development 证据，不能读取 test。
+3 s 首轮使用冻结的 SGD＋momentum。L20 因输入与训练动力学均改变，在运行结果前统一冻结为
+AdamW；三模型不得使用不同优化器或 scheduler。优化器决定不读取 test，也不根据 G1 单独修改。
 
 ### 5.2 代码实施顺序
 
@@ -176,16 +193,18 @@ F0-S2 完成后确定的 Conformer 动态采样结论，不自动迁移为 G 系
 ### 5.4 正式运行顺序
 
 ```text
-G0 seed 42
-→ G0-C seed 42
-→ G1 seed 42
+3 s：G0 → G0-C → G1（已完成，G1 未通过门）
+→ L20 工程测试与参数/FLOPs、显存 smoke
+→ G0-L20 seed 42
+→ G0-C-L20 seed 42
+→ G1-L20 seed 42
 → validation vessel/recording paired bootstrap 与容量、成本比较
-→ 只有 G1 同时超过 G0 和 G0-C，且 vessel 至少 +1 pp、recording 不退化，才补 seed 43/44
-→ 多 seed 仍为正时，才允许 G1-L2、G2 或共同 10 s 上下文中的一个后续实验
+→ 只有 G1-L20 同时超过两个 L20 对照，vessel 至少 +1 pp 且 recording 最多下降 1 pp，才补 seed 43/44
+→ 未通过则停止 G 分支，不进入 G1-L2/G2/更多上下文搜索
 ```
 
-首轮三个正式实验顺序运行，避免 GPU 并发使吞吐和峰值显存失去可比性。探索 seed 42 的模型训练
-上限和 early stopping patience 应在实现前根据 G0 单 epoch 时间冻结，不能看到 G1 结果后单独放宽。
+L20 三个正式实验顺序运行，避免 GPU 并发使吞吐和峰值显存失去可比性。训练上限、early stopping、
+物理 batch 和累积步数已经在结果产生前冻结，不能看到 G1-L20 后单独放宽。
 
 ## 6. 指标、统计与决策门
 
@@ -212,7 +231,8 @@ bootstrap。最终支持“全局注意力有帮助”至少需要多 seed 平�
 | G1 > G0 且 G1 > G0-C，vessel/recording 同时改善 | 轻量全局时间注意力具有独立价值 |
 | G1 与 G0-C 都以相近幅度优于 G0 | 收益主要来自容量或额外非线性，不能归因于注意力 |
 | G1 只改善 recording，不改善 vessel | 全局模块利用了录音级长时一致性，但未解决未见船名泛化 |
-| G1-3s 无效、共同 10 s 后有效 | 注意力价值依赖足够长的观察上下文 |
+| G1-3s 无效、共同 L20 后有效 | 注意力价值依赖足够长的观察上下文；需多 seed 确认 |
+| G1-3s 与 G1-L20 均不优于各自 G0/G0-C | 当前 DeepShip 严格协议不支持该轻量全局注意力设计，停止扩展 |
 | G1 不优于 G0/G0-C，raw Conformer 也不优于 CNN | 当前数据规模与协议更支持局部频谱归纳偏置；不能外推到所有 Transformer |
 | G1 优于 G0/G0-C，但 raw Conformer 不优于 CNN | 全局建模有效，主要瓶颈更可能是语音预训练/原始波形域匹配，而非注意力机制本身 |
 | raw Conformer 优于 CNN，但 G1≈G0/G0-C | 大模型收益更可能来自通用预训练或规模，不支持轻量注意力的架构归因 |

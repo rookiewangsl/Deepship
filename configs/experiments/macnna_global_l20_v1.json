@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "experiment_id": "macnna_global_l20_v1",
+  "research_question": "Does full-time-axis attention improve unseen-vessel generalization when the input is long enough to exceed the local CNN receptive field?",
+  "base_protocol": {
+    "experiment_config": "configs/experiments/isolation_comparison_v1.json",
+    "split_manifest": "protocols/isolation_comparison_v1/vessel_name_disjoint/split_manifest.json",
+    "protocol": "vessel_name_disjoint",
+    "allow_training_overrides": true,
+    "test_policy": "sealed; never evaluated during L20 development"
+  },
+  "features": {
+    "sample_rate": 16000,
+    "clip_duration_seconds": 20.0,
+    "n_fft": 1024,
+    "win_length": 1024,
+    "hop_length": 512,
+    "n_mels": 64,
+    "highpass_freq": null,
+    "short_recording_policy": "right-pad waveform, zero padded Mel frames, mask post-CNN time positions"
+  },
+  "variants": {
+    "g0": {
+      "description": "Unchanged MA-CNN-A with mask-aware pooling",
+      "expected_num_parameters": 532166
+    },
+    "g0_c": {
+      "description": "Parameter-matched local temporal control on the 20-second feature map",
+      "expected_num_parameters": 679593
+    },
+    "g1": {
+      "description": "Shared temporal axial attention over the complete 20-second feature map",
+      "expected_num_parameters": 694057
+    }
+  },
+  "shared_adapter": {
+    "d_model": 128,
+    "num_heads": 4,
+    "ffn_expansion": 2,
+    "position_kernel_size": 9,
+    "temporal_kernel_size": 15,
+    "dropout": 0.1,
+    "gate_init": -2.0
+  },
+  "training": {
+    "training_sampling": "vessel_balanced_dynamic",
+    "train_samples_per_epoch": 14000,
+    "seed": 42,
+    "batch_size": 4,
+    "eval_batch_size": 4,
+    "gradient_accumulation_steps": 4,
+    "epochs": 50,
+    "optimizer": "adamw",
+    "learning_rate": 0.0003,
+    "momentum": 0.9,
+    "weight_decay": 0.01,
+    "max_grad_norm": 1.0,
+    "min_learning_rate": 0.000001,
+    "warmup_epochs": 5,
+    "early_stopping_patience": 8,
+    "early_stopping_min_delta": 0.005,
+    "precision": "bf16",
+    "num_workers": 8,
+    "selection_metric": "validation vessel macro-F1",
+    "execution_order": [
+      "g0",
+      "g0_c",
+      "g1"
+    ]
+  },
+  "retention_gate": {
+    "g1_minus_g0_vessel_macro_f1_minimum": 0.01,
+    "g1_must_exceed_g0_c": true,
+    "recording_macro_f1_maximum_allowed_drop": 0.01,
+    "additional_seeds_only_after_gate": [
+      43,
+      44
+    ]
+  }
+}
