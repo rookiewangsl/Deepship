@@ -20,6 +20,8 @@ manifest 和实验产物仍分别位于 `src/`、`scripts/`、`protocols/`、`re
   后续项目主路线，包含通用预训练迁移、轻量全局注意力、条件领域适配、消融和 PORTIA 外测。
 - [轻量全局注意力架构实验计划](experiments/lightweight_global_attention_plan.md)：G0 CNN、G0-C
   容量对照和 G1 temporal Conformer-lite 的结构、工程测试、训练顺序与结论边界。
+- [Oceanship-FG 回溯 ONC 连续录音计划](experiments/oceanship_onc_reconstruction_plan.md)：按事件 UTC
+  和 MMSI 从 ONC 归档重建严格船舶隔离的连续 20 s 数据，包含小样本探针与批量下载准入门。
 - [录音级与船只级隔离训练路线](experiments/strict_isolation_training_plan.md)：CNN 三协议设计、冻结
   manifest、已完成结果与结论边界。
 

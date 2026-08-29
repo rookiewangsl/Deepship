@@ -274,7 +274,8 @@ MMSI 外测体现，不能声称已完全消除 Tug 数据不足。
 
 - PORTIA 固定 3 s，只验证短窗跨域分类，不验证 L20 长程注意力；
 - Oceanship-FG 有大量 MMSI，但公开样本约 4～5 s；它适合在增加独立船数后复核短上下文模型，
-  若要复核 L20 必须回溯 ONC 连续录音；
+  若要复核 L20 必须按 [`oceanship_onc_reconstruction_plan.md`](oceanship_onc_reconstruction_plan.md)
+  的分阶段准入门回溯 ONC 连续录音；
 - Belgian AIS 数据为 10 s 非重叠窗口并提供匿名船 ID。只有相邻连续性、四类独立船数和单船纯度
   审计通过后，才作为 L20 首选跨水域复现；
 - DeuteroNoise 有连续长录音和人工单船筛选，但目标四类不均衡，只作为辅助长上下文证据。
