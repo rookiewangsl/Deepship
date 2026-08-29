@@ -42,6 +42,8 @@ def audit_variant(
     timed_runs: int,
     device: str,
 ) -> dict[str, object]:
+    if str(device).startswith("cuda"):
+        torch.cuda.reset_peak_memory_stats(torch.device(device))
     model = build_macnna_model(4, model_variant=variant).to(device).eval()
     base = build_macnna_model(4, model_variant="g0")
     with torch.no_grad(), FlopCounterMode(display=False) as counter:
