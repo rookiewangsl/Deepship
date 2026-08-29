@@ -11,9 +11,15 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 DATA_ROOT="${DEEPSHIP_DATA_ROOT:-/home/slwang/deepship/datasets/DeepShip}"
+PYTHON_BIN="${DEEPSHIP_PYTHON:-python}"
 RUN_ROOT="/home/slwang/deepship/runs/conformer_sampling_v1"
 LOG_ROOT="/home/slwang/deepship/logs"
 mkdir -p "$LOG_ROOT"
+
+if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+  echo "Python executable not found: $PYTHON_BIN" >&2
+  exit 1
+fi
 
 COMMON_ARGS=(
   --data-root "$DATA_ROOT"
@@ -64,9 +70,10 @@ fi
 echo "mode=$MODE"
 echo "output_root=$OUTPUT_ROOT"
 echo "log_path=$LOG_PATH"
+echo "python_bin=$PYTHON_BIN"
 echo "test_evaluation=disabled"
 
-PYTHONUNBUFFERED=1 python scripts/train/train_deepship_conformer.py \
+PYTHONUNBUFFERED=1 "$PYTHON_BIN" scripts/train/train_deepship_conformer.py \
   "${COMMON_ARGS[@]}" \
   "${MODE_ARGS[@]}" \
   --output-root "$OUTPUT_ROOT" \
