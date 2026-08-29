@@ -21,7 +21,7 @@ manifest 和实验产物仍分别位于 `src/`、`scripts/`、`protocols/`、`re
 - [轻量全局注意力架构实验计划](experiments/lightweight_global_attention_plan.md)：G0 CNN、G0-C
   容量对照和 G1 temporal Conformer-lite 的结构、工程测试、训练顺序与结论边界。
 - [Oceanship-FG 回溯 ONC 连续录音计划](experiments/oceanship_onc_reconstruction_plan.md)：按事件 UTC
-  和 MMSI 从 ONC 归档重建严格船舶隔离的连续 20 s 数据，包含小样本探针与批量下载准入门。
+  和 MMSI 检验 ONC 连续 20 s 重建；探针已发现结构性时空错配，监督扩充路线已停止。
 - [录音级与船只级隔离训练路线](experiments/strict_isolation_training_plan.md)：CNN 三协议设计、冻结
   manifest、已完成结果与结论边界。
 
@@ -35,6 +35,8 @@ manifest 和实验产物仍分别位于 `src/`、`scripts/`、`protocols/`、`re
 ## 调研与分析 `research/`
 
 - [DeepShip 文献基准](research/deepship_literature_benchmarks.md)：不同隔离协议下结果的可比边界。
+- [Oceanship-FG/ONC 时空一致性验证](research/oceanship_onc_spatiotemporal_validation.md)：水听器、
+  近场 AIS 和 FG 标签源的 12 候选对照，以及停止监督扩充的证据。
 - [拖曳式 DAS 分布式光缆水听器摘要](research/das_towed_distributed_hydrophone_summary.md)：传感原理、
   域偏移和接入 DeepShip 路线。
 
