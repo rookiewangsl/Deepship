@@ -1,2 +1,3 @@
 # Optional, isolated environment for Oceanship-FG -> ONC archive reconstruction.
 onc>=2.6,<3
+pyais>=2.20,<3

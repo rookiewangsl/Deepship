@@ -58,7 +58,10 @@ def main() -> None:
     except Exception as error:
         raise SystemExit(f"ONC archive query failed: {redact_onc_error(error)}") from None
     write_archive_index(args.output_csv, rows)
-    print(f"Queried {len(candidates)} events; indexed {len(rows)} matching WAV archive files.")
+    print(
+        f"Queried {len(candidates)} events; indexed {len(rows)} matching "
+        f".{args.extension} archive files."
+    )
 
 
 if __name__ == "__main__":
