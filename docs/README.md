@@ -5,17 +5,21 @@ manifest 和实验产物仍分别位于 `src/`、`scripts/`、`protocols/`、`re
 
 ## 当前主线
 
-1. 从 [Conformer 实验与外测计划](experiments/conformer_experiment_plan.md) 了解研究问题、模型路线、
-   消融矩阵、决策门和可能形成的结论。
-2. 在 Linux/RTX 4070 上执行前，使用
+1. 从 [预训练 Conformer、轻量全局注意力与外测计划](experiments/conformer_experiment_plan.md)
+   了解研究问题、模型路线、消融矩阵、决策门和可能形成的结论。
+2. 轻量全局注意力的 G0/G0-C/G1 受控结构、训练顺序和停止条件见
+   [轻量全局注意力架构实验计划](experiments/lightweight_global_attention_plan.md)。
+3. 在 Linux/RTX 4070 上执行前，使用
    [Wav2Vec2-Conformer 基线运行说明](guides/conformer_baseline_linux.md) 核对环境和命令。
-3. CNN 的三种隔离协议、既有结果和公平比较边界见
+4. CNN 的三种隔离协议、既有结果和公平比较边界见
    [录音级与船名组级隔离训练路线](experiments/strict_isolation_training_plan.md)。
 
 ## 实验设计 `experiments/`
 
-- [Conformer 实验、数据与外部评测计划](experiments/conformer_experiment_plan.md)：后续项目主路线，
-  包含通用预训练、领域自监督适配、监督微调、消融和 PORTIA 外测。
+- [预训练 Conformer、轻量全局注意力与外部评测计划](experiments/conformer_experiment_plan.md)：
+  后续项目主路线，包含通用预训练迁移、轻量全局注意力、条件领域适配、消融和 PORTIA 外测。
+- [轻量全局注意力架构实验计划](experiments/lightweight_global_attention_plan.md)：G0 CNN、G0-C
+  容量对照和 G1 temporal Conformer-lite 的结构、工程测试、训练顺序与结论边界。
 - [录音级与船只级隔离训练路线](experiments/strict_isolation_training_plan.md)：CNN 三协议设计、冻结
   manifest、已完成结果与结论边界。
 
