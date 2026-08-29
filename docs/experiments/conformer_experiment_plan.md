@@ -1,10 +1,11 @@
 # DeepShip Conformer 实验、数据与外部评测计划
 
 最后更新：2026-08-28
-状态：B3 工程基线与第二版组级选模管线已验证。第二版 F0 已完成；F1b 在完成 5 个 epoch、进入
-第 6 个 epoch 后因明显过拟合主动停止。两者在 validation vessel macro-F1 上没有可辨认差异，
-因此不进入 last-8。下一项是保持 F0 和每 epoch 14,000 个样本预算不变，检验 S1
-recording-balanced 动态裁剪；test 默认封存，不参与开发期选模
+状态：B3 工程基线与第二版组级选模管线已验证。第二版 F0、F1b 和 F0-S1 已完成。F1b 明显
+过拟合，不进入 last-8。F0-S1 recording-balanced 动态裁剪显著改善 recording 指标，但 vessel
+主指标只提高 0.73 pp，未达到预设的 1 pp 幅度门。由于 S1 仍存在显著的类内 vessel 暴露差异，
+下一项是在 F0 和每 epoch 14,000 个样本预算不变时检验 S2 vessel-balanced 动态裁剪；test 默认
+封存，不参与开发期选模
 
 ## 0. 当前实施状态
 
@@ -38,6 +39,7 @@ loss 继续下降而 validation loss 上升到 2 以上，形成明确过拟合�
   warmup＋cosine 调度；
 - S1 class→recording-balanced 动态裁剪：每次裁剪由显式 seed 决定，worker 数和断点续训不改变
   窗口；每 epoch 保存 recording/vessel 暴露、重复率、吞吐和 DataLoader 等待占比；
+- S2 class→vessel→recording-balanced 动态裁剪及其确定性暴露审计；
 - validation/test 保持冻结 anchor，validation 可使用独立 batch size；开发期默认不读取 test，
   最终方案冻结后才显式开启；
 - 服务器 Python/CUDA/RTX 4070、DeepShip 路径、冻结 manifest 和 Hugging Face 缓存预检；
@@ -47,7 +49,12 @@ loss 继续下降而 validation loss 上升到 2 以上，形成明确过拟合�
   官方 MD5 校验和分卷感知的解压测试，再生成 WAV 索引。普通 `unzip -t` 对该分卷格式产生的
   offset/overlap 提示不能单独作为损坏结论。
 
-S2 vessel-balanced 动态采样已因 S1 预检中观察到的残余 vessel 暴露差异而实现，但尚未运行。
+F0-S1 最佳 checkpoint 位于 epoch 6：validation vessel macro-F1 为 **0.4799**、recording
+macro-F1 为 **0.5718**。相对 F0-S0，vessel macro-F1 增加 0.0073，50,000 次同 vessel 配对
+bootstrap 的 95% 区间为 [−0.1059, +0.1207]，`P(Δ>0)=0.5605`；recording macro-F1 增加
+0.1537，同 recording 配对区间为 [+0.0744, +0.2358]，`P(Δ>0)=0.99998`。该 bootstrap 只描述
+当前 validation group 的抽样不确定性，不包含训练 seed 不确定性。S1 没有通过 vessel +1 pp 的
+幅度门，但 recording 改善明确，且 S1 下单 vessel 每轮暴露仍为 24～1165 次，因此触发 S2。
 尚未实现的核心范围是 E1 模型推理读取器，以及仅在证据触发时才进行的 10～20 h 水声自监督
 原型。recording-level MIL、真实背景混合、双前端和大规模水声自监督不属于本项目完成条件，统一
 降级为未来工作。
@@ -55,11 +62,11 @@ S2 vessel-balanced 动态采样已因 S1 预检中观察到的残余 vessel 暴�
 ### 0.1 从当前训练开始的执行顺序
 
 ```text
-冻结新版 F0/F1b 的 validation 诊断，不恢复 F1b、不运行 last-8
-→ 在 F0 上运行 S1 recording-balanced 动态裁剪（8 epoch 上限、patience 3）
-→ 若 S1 主指标提高至少 1 pp 且 recording 指标不退化，保留 S1 并检查 F1a last-2
-→ S2 代码已准备，但实验仍等待 S1 结果，不与 S1 并行
-→ 若 F0-S1 仍无收益，优先做 3/10/20 s 上下文与 scratch/预训练控制，不继续盲目加深解冻
+冻结新版 F0/F1b/S1 的 validation 诊断，不恢复 F1b、不运行 last-8
+→ 在 F0 上运行 S2 vessel-balanced 动态裁剪（8 epoch 上限、patience 3）
+→ 若 S2 主指标相对 F0-S0 提高至少 1 pp 且 recording 指标不退化，保留最佳 S1/S2
+→ 只有最佳采样通过上述门，才在该采样上检查 F1a last-2
+→ 若 S2 仍无 vessel 收益，停止采样分支，进入 3/10/20 s 上下文与 scratch/预训练控制
 → 冻结最佳 B3 配置后进入 PORTIA development
 → raw Conformer 达标则跳过频谱 Transformer；不达标时最多运行一个参数匹配的 G0/G1 诊断
 → 只有“预训练优于 scratch、内部接近或优于 CNN、外部明显不足”时才启动 10～20 h ONC 自监督原型
@@ -227,11 +234,12 @@ S1/S2 的每 epoch optimizer step 数与 S0 保持一致，使比较不混入训
 第一轮不加入 probe、在线困难样本挖掘或 oversampling。若 S1/S2 已解决相邻窗口冗余，则不再
 增加 HGRS；只有组平衡后仍观察到大量低损失重复样本时，才测试固定比例的 hard＋random 采样。
 
-当前 S1 已实现，仍使用每类 3,500、合计 14,000 次 draw，使 optimizer update 数与 S0 完全相同。
+S1/S2 均已实现，仍使用每类 3,500、合计 14,000 次 draw，使 optimizer update 数与 S0 完全相同。
 类内 recording 访问次数最多相差 1；不同 epoch 使用不同、但可由 seed 复现的裁剪。真实训练集预检
 覆盖 399 条 recording 和 162 个 vessel，S1 下单 vessel 每轮暴露为 24～1165 次（median 48），
-说明 recording 平衡没有消除多录音 vessel 的影响。因此 S2 class→vessel→recording sampler 也已
-实现和测试，但仍必须先获得 S1 validation 结果，再决定是否实际运行 S2。
+说明 recording 平衡没有消除多录音 vessel 的影响。S1 已显著改善 recording macro-F1，但 vessel
+主指标只提高 0.73 pp，因此现在实际运行 S2，检查类内 vessel 等权是否能把录音级收益转化为未见
+船名泛化收益。
 
 ### 4.3 录音级训练与推理（未来工作）
 
@@ -491,16 +499,17 @@ Transformer 架构。若 raw Conformer 结果不足或结论含糊，才执行�
 | F3 | 卷积前端和 Conformer 全量微调 | 检查底层语音声学特征是否也需重构 |
 | F4 | LoRA/Adapter 等参数高效微调 | 仅在 F1 过拟合或 F2/F3 显存受限时加入 |
 
-已完成 `F0 → F1b`。当前证据不支持 F1c/last-8；先在 F0 上分离采样因素。只有 S1 使组级
-validation 改善后，才用 F1a/last-2 检查“轻量表征适配＋去冗余采样”是否优于纯冻结。F2/F3
+已完成 `F0 → F1b`。当前证据不支持 F1c/last-8；先在 F0 上分离采样因素。只有最佳 S1/S2 通过
+vessel 主指标幅度门后，才用 F1a/last-2 检查“轻量表征适配＋去冗余采样”是否优于纯冻结。F2/F3
 只有在 F1a 形成稳定增益后保留。所有 backbone 参数使用远低于 pooling/head 的学习率，避免快速
 破坏预训练表示。
 
 ### 8.5 组平衡动态采样消融 S
 
-当前以 F0-S0 为对照，先运行 F0-S1。详细定义见第 4.2 节；保持相同 optimizer step 数、20 s
-上下文、优化器、head 学习率和分类目标。S2 已因预检发现残余 vessel 暴露差异而完成代码准备，
-但不是无条件下一项：仍根据 S1 validation 结果决定是否实际运行。
+当前以 F0-S0 为对照。F0-S1 已完成；它保持相同 optimizer step 数、20 s 上下文、优化器、head
+学习率和分类目标，并将 recording macro-F1 从 0.4181 提高到 0.5718，但 vessel macro-F1 只从
+0.4726 提高到 0.4799。因为 S1 仍存在 24～1165 次的类内 vessel 暴露差异，当前运行唯一变化为
+`vessel_balanced_dynamic` 的 F0-S2。
 
 采用两级判定：
 
@@ -558,6 +567,7 @@ CNN 全量标签水平。
 |---|---|---|
 | 旧 F0 在第 14 epoch 显示明显过拟合 | 停止旧任务和 F1b 队列；切换组级选模与 step-level scheduler | 旧设置能拟合训练片段，但不能形成模型排名 |
 | 新版 F1b−F0 为 −0.76 pp，paired CI 跨零且 F1b 明显过拟合 | 不运行 last-8；以 F0 为低方差基线进入 S1 | 当前单 seed 不支持更深监督微调 |
+| F0-S1 vessel 仅 +0.73 pp、CI 跨零，但 recording +15.37 pp 且区间为正 | 因残余 vessel 暴露差异运行 F0-S2 | recording 平衡有效，但尚未证明未见船名泛化提升 |
 | F0-S1 比 F0-S0 提高至少 1 pp，recording 指标不退化 | 保留 S1，随后检查 F1a/last-2 | 去除窗口冗余有利于通用表示迁移 |
 | F0-S1 无提升且不存在明显残余 vessel 暴露偏置 | 停止 S 分支，进入上下文和预训练控制 | 采样冗余不是当前主要瓶颈 |
 | S1/S2 比 S0 提高组级 validation，且另一组级指标不退化 | 将最佳动态采样用于后续 B3/B4 | 去除窗口冗余或组规模偏置有利于迁移 |
@@ -606,7 +616,7 @@ stopping。
 5% update
 从峰值学习率的 10% 线性 warmup，之后逐 update cosine decay 到 `1e-6`。F0 与 F1b 的 head 峰值
 均先使用 `1e-4`；F1b encoder 峰值先使用 `5e-6`。early stopping patience 改为 5，并由上述组级
-主指标触发。下一项 F0-S1 缩短为最多 8 epoch、patience 3，并要求主指标至少提高 0.005 才重置
+主指标触发。F0-S1/S2 均最多 8 epoch、patience 3，并要求主指标至少提高 0.005 才重置
 早停；其余 AdamW、`weight_decay=1e-2`、BF16、有效 batch size 8、head 峰值 `1e-4` 和 gradient
 clipping 1.0 保持不变。探索候选进入下一阶段仍要求相对 F0-S0 至少提高 1 pp。
 
@@ -794,16 +804,17 @@ checkpoint 留在外置盘或训练服务器。
 - 已完成新版 F0，并在 F1b 的过拟合趋势足够明确后主动停止；不恢复 F1b，不运行 last-8；
 - 已用 paired bootstrap 确认单 seed 下 F1b 没有可辨认收益，以 F0 作为下一阶段低方差基线；
 - 开发期训练默认封存 test，仅保存 validation 最佳 checkpoint 和组级预测；
-- 待 S1 结果后决定是否进入 F1a，以及是否需要 3/10/20 s 上下文筛选。
+- 已完成 S1；它改善 recording 但未通过 vessel 幅度门，因此暂不进入 F1a。
 
 验收：现有三个 DeepShip 协议均无 group 泄漏；validation/test 使用相同聚合定义；模型选择不再
 依赖 segment accuracy；训练、resume、推理和指标可复现。
 
 ### 阶段 2：组平衡采样与关键因果对照
 
-- 已实现 S1 的确定性 recording-balanced 动态裁剪、暴露报告和 CPU 等待统计；
-- 下一项只运行 F0-S1，固定每 epoch 14,000 样本和 optimizer step 数；
-- S1 有收益时才检查 F1a；S2 由 S1 收益或残余 vessel 暴露偏置触发，不自动进入；
+- 已完成 S1 的确定性 recording-balanced 动态裁剪、暴露报告和 CPU 等待统计；
+- S1 显著改善 recording 指标，但 vessel 主指标仅增加 0.73 pp；
+- 残余 vessel 暴露偏置已触发 S2，下一项只运行 F0-S2，固定每 epoch 14,000 样本和 optimizer step 数；
+- S2 通过 vessel 幅度门后才检查 F1a；否则停止采样分支；
 - 全部选择只使用 validation recording/vessel 指标，不根据 DeepShip test 反复调参；
 - 完成 scratch 与必要的架构控制，明确收益来自通用预训练、任务适配还是上下文；
 - 若最佳 raw Conformer 达到组级性能标准，跳过 G 系列；否则最多运行一次参数匹配的 G0/G1；
