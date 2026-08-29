@@ -39,6 +39,8 @@
       "test": 500
     },
     "protocols": [
+      "segment_level",
+      "recording_disjoint",
       "vessel_name_disjoint"
     ],
     "freeze_manifest_before_training": true

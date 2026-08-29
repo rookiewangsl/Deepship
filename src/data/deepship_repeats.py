@@ -30,7 +30,6 @@ def make_repeat_experiment_config(
         "Repeated vessel-name-disjoint DeepShip partition for the L20 global-attention study."
     )
     split["split_seed"] = int(split_seed)
-    split["protocols"] = ["vessel_name_disjoint"]
     return config
 
 
