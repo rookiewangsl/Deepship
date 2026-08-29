@@ -11,6 +11,7 @@ from src.data.oceanship_onc import (
     load_fg_metadata,
     parse_fg_row,
     query_archive_candidates,
+    redact_onc_error,
     write_audit_outputs,
 )
 
@@ -29,6 +30,16 @@ def row(label: str, mmsi: int, day: int, index: int, chunk: int | None = None) -
 
 
 class OceanshipONCTests(unittest.TestCase):
+    def test_redacts_token_from_onc_error_text(self) -> None:
+        message = (
+            "Bad request: https://example.test/api?deviceCode=X&token=secret-value "
+            "and {'token': 'another-secret'}"
+        )
+        redacted = redact_onc_error(message)
+        self.assertNotIn("secret-value", redacted)
+        self.assertNotIn("another-secret", redacted)
+        self.assertEqual(redacted.count("<redacted>"), 2)
+
     def test_parses_event_timestamp_and_optional_chunk(self) -> None:
         record = parse_fg_row(row("Cargo", 123456789, 15, 7, chunk=2), "train")
         self.assertEqual(record.event_timestamp_utc, "20200715T120000.000Z")

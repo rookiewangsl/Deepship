@@ -19,6 +19,10 @@ _FG_WAV_PATTERN = re.compile(
     r"(?P<event_index>\d+)_id_(?P<scenario_id>\d+)_"
     r"typecargo_(?P<type_code>\d+)(?:_(?P<chunk_index>\d+))?\.pt$"
 )
+_ONC_TOKEN_URL_PATTERN = re.compile(r"(?i)(token=)[^&\s]+")
+_ONC_TOKEN_FIELD_PATTERN = re.compile(
+    r"(?i)(['\"]?token['\"]?\s*[:=]\s*['\"]?)[^,\s'\"]+"
+)
 
 
 def _parse_utc(value: str, *, compact: bool) -> datetime:
@@ -37,6 +41,12 @@ def _normalise_mmsi(value: str) -> str:
     if not value.isdigit():
         raise ValueError(f"Invalid MMSI: {value!r}")
     return value
+
+
+def redact_onc_error(value: object) -> str:
+    """Remove API tokens from ONC exception text before it reaches logs."""
+    text = _ONC_TOKEN_URL_PATTERN.sub(r"\1<redacted>", str(value))
+    return _ONC_TOKEN_FIELD_PATTERN.sub(r"\1<redacted>", text)
 
 
 @dataclass(frozen=True)

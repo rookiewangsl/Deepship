@@ -13,6 +13,7 @@ from src.data.oceanship_onc import (  # noqa: E402
     DEFAULT_DEVICE_CODES,
     query_archive_candidates,
     read_probe_candidates,
+    redact_onc_error,
     write_archive_index,
 )
 
@@ -45,8 +46,11 @@ def main() -> None:
         ) from error
 
     candidates = read_probe_candidates(args.candidate_csv)
-    client = ONC(showWarning=True)
-    rows = query_archive_candidates(candidates, client, device_codes=args.device_codes)
+    try:
+        client = ONC(showWarning=True)
+        rows = query_archive_candidates(candidates, client, device_codes=args.device_codes)
+    except Exception as error:
+        raise SystemExit(f"ONC archive query failed: {redact_onc_error(error)}") from None
     write_archive_index(args.output_csv, rows)
     print(f"Queried {len(candidates)} events; indexed {len(rows)} matching WAV archive files.")
 
