@@ -239,6 +239,25 @@ effective-number loss”仍不足以抵消 5,031/114/2,425/132 的类别先验�
 该实验只判断一个公平 G0 是否能摆脱单类塌缩。任一门失败即停止 Belgian 公共集模型训练；通过也
 只说明可以再设计一个完全匹配的 G1 对照，不能据单 fold/single seed 宣称注意力有效。
 
+### 9.3 严格类别均衡 batch 复核结果（2026-08-30）
+
+`belgian_training_health_v2` 已在固定提交 `44a0285` 完成 fold1/seed42/G0 的 20 个 epoch。
+20 份采样审计均记录 256 个物理 batch、每个 batch 四类各 4 条且零违规；best/last checkpoint、
+validation 预测与指标齐全，优化器状态有限，`test_evaluated=false`。
+
+最终训练 accuracy/macro-F1 分别为 0.6897/0.6720，逐类训练 F1 为 Cargo 0.4144、Passenger
+0.9039、Tank 0.5516、Tug 0.8180。最佳 validation date-balanced macro-F1 出现在 epoch 16，
+为 0.25335；相对 v1 full-data effective-number G0 的 0.19681 提高 0.05654。以 UTC date 为
+cluster 的 50,000 次同文件配对 bootstrap 给出 95% 区间 `[0.02560, 0.08667]`，
+`P(delta > 0)=0.99996`。
+
+因此，严格均衡 batch 已证明 v1 的单 Cargo 塌缩很大程度来自可修复的优化/采样失衡，而不是代码
+或标签完全不可学。不过复核没有通过预注册的全部健康门：最终 train accuracy 比 0.70 门低
+0.0103。更重要的是，最佳 validation 的 Passenger/Tug F1 仍只有 0.1125/0.0594；预测已从单
+Cargo 塌缩转为稀有类过预测，未解决 UTC 日期迁移、弱 AIS 标签与少数类覆盖不足。按预注册规则，
+Belgian 公共集分支在此停止，不运行匹配 G1，也不事后降低门槛。该结果只能支持“均衡采样改善
+G0”，不能用于判断注意力有效性。
+
 ## 10. 数据来源
 
 - Zenodo 数据集：<https://zenodo.org/records/17233667>
