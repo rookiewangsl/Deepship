@@ -13,8 +13,6 @@ manifest 和实验产物仍分别位于 `src/`、`scripts/`、`protocols/`、`re
    [Wav2Vec2-Conformer 基线运行说明](guides/conformer_baseline_linux.md) 核对环境和命令。
 4. CNN 的三种隔离协议、既有结果和公平比较边界见
    [录音级与船名组级隔离训练路线](experiments/strict_isolation_training_plan.md)。
-5. 第二水域的四分类 G0/G1 复现、日期隔离和统计门见
-   [Belgian AIS 四分类全局注意力复现实验](experiments/belgian_public_attention_plan.md)。
 
 ## 实验设计 `experiments/`
 
@@ -24,8 +22,6 @@ manifest 和实验产物仍分别位于 `src/`、`scripts/`、`protocols/`、`re
   容量对照和 G1 temporal Conformer-lite 的结构、工程测试、训练顺序与结论边界。
 - [Oceanship-FG 回溯 ONC 连续录音计划](experiments/oceanship_onc_reconstruction_plan.md)：按事件 UTC
   和 MMSI 检验 ONC 连续 20 s 重建；探针已发现结构性时空错配，监督扩充路线已停止。
-- [Belgian AIS 四分类全局注意力复现实验](experiments/belgian_public_attention_plan.md)：公开 10 s
-  数据上的 Cargo/Tank/Passenger/Tug、G0 对 G1、日期隔离、动态平衡采样和一次性 test 规则。
 - [录音级与船只级隔离训练路线](experiments/strict_isolation_training_plan.md)：CNN 三协议设计、冻结
   manifest、已完成结果与结论边界。
 
