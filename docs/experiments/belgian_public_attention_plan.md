@@ -206,6 +206,21 @@ G1−G0 为 −0.81 pp（95% 区间 −1.78～+0.10 pp）。同时两个模型�
 写成最终外部泛化结论。唯一输出根使用 `belgian_training_sanity_v1`，不得复用
 `belgian_attention_v1`。
 
+### 9.1 执行结果
+
+提交 `c94205a` 的两道前置检查均按协议完成。fold1 train-only 统计覆盖 7,702 个文件和
+154,286,464 个 log-Mel 元素，mean/std 为 −22.8803/11.4508；未读取 test。32/类的小样本检查在
+step 950 连续两次通过，最终 train loss 0.0141、accuracy 99.22%、macro-F1 99.22%，说明标签索引、
+前向、反向和 G0 容量可以记忆真实 Belgian 音频。
+
+全数据 G0 在 epoch 13 早停，最终 train accuracy 65.27%，但 train macro-F1 只有 19.75%；Cargo
+train F1 为 78.98%，Passenger/Tank/Tug 均为 0。最佳 validation date-balanced macro-F1 为
+19.68%，低于原动态平衡 fold1/seed42 G0 的 26.54%，且所有 validation 样本都被预测为 Cargo。
+因此四项 G0 学习健康门全部失败，匹配 G1 未启动。这个结果说明“完整遍历多数类 + `beta=0.999`
+effective-number loss”仍不足以抵消 5,031/114/2,425/132 的类别先验；它支持停止当前 Belgian G1
+比较，但不能单独把失败归因于弱标签或注意力结构。若未来重新打开 Belgian 分支，必须先把问题
+改写为独立预注册的长尾学习研究，而不是继续用 G1 调参挽救当前结论。
+
 ## 10. 数据来源
 
 - Zenodo 数据集：<https://zenodo.org/records/17233667>
