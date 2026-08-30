@@ -32,9 +32,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--gradient-accumulation-steps", type=int, default=2)
     parser.add_argument(
         "--sampling-strategy",
-        choices=("class_date_balanced_dynamic", "full_epoch_shuffle"),
+        choices=(
+            "class_date_balanced_dynamic",
+            "full_epoch_shuffle",
+            "strict_class_balanced_batch",
+        ),
         default="class_date_balanced_dynamic",
     )
+    parser.add_argument("--samples-per-class-per-epoch", type=int, default=None)
     parser.add_argument(
         "--loss-strategy",
         choices=("cross_entropy", "effective_number"),
@@ -42,6 +47,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--effective-number-beta", type=float, default=0.999)
     parser.add_argument("--normalization-stats-path", default=None)
+    parser.add_argument("--specaugment-frequency-mask-param", type=int, default=0)
+    parser.add_argument("--specaugment-time-mask-param", type=int, default=0)
+    parser.add_argument("--specaugment-frequency-masks", type=int, default=0)
+    parser.add_argument("--specaugment-time-masks", type=int, default=0)
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-2)
@@ -76,9 +85,14 @@ def main() -> None:
         eval_batch_size=args.eval_batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         sampling_strategy=args.sampling_strategy,
+        samples_per_class_per_epoch=args.samples_per_class_per_epoch,
         loss_strategy=args.loss_strategy,
         effective_number_beta=args.effective_number_beta,
         normalization_stats_path=args.normalization_stats_path,
+        specaugment_frequency_mask_param=args.specaugment_frequency_mask_param,
+        specaugment_time_mask_param=args.specaugment_time_mask_param,
+        specaugment_frequency_masks=args.specaugment_frequency_masks,
+        specaugment_time_masks=args.specaugment_time_masks,
         epochs=args.epochs,
         learning_rate=args.learning_rate,
         weight_decay=args.weight_decay,

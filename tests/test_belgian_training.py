@@ -8,11 +8,13 @@ import unittest
 
 import numpy as np
 import soundfile as sf
+import torch
 
 from src.data.belgian_ais import BelgianRecord, canonical_sha256
 from src.pipelines.mel_ml.train_belgian_macnna_global import (
     BelgianTrainConfig,
     _training_criterion,
+    apply_training_specaugment,
     load_experiment,
     train,
     validate_config,
@@ -20,6 +22,53 @@ from src.pipelines.mel_ml.train_belgian_macnna_global import (
 
 
 class BelgianTrainingTests(unittest.TestCase):
+    def test_health_recipe_freezes_balanced_batches_and_training_only_augmentation(self) -> None:
+        config_path = Path("configs/experiments/belgian_training_health_v2.json")
+        experiment = load_experiment(str(config_path))
+        config = BelgianTrainConfig(
+            data_root="unused",
+            output_root="unused",
+            split_manifest="unused",
+            experiment_config=str(config_path),
+            model_variant="g0",
+            seed=42,
+            sampling_strategy="strict_class_balanced_batch",
+            samples_per_class_per_epoch=1024,
+            loss_strategy="cross_entropy",
+            normalization_stats_path="train-only.json",
+            specaugment_frequency_mask_param=8,
+            specaugment_time_mask_param=24,
+            specaugment_frequency_masks=1,
+            specaugment_time_masks=1,
+            batch_size=16,
+            eval_batch_size=16,
+            gradient_accumulation_steps=2,
+            epochs=20,
+            learning_rate=3e-4,
+            weight_decay=1e-2,
+            max_grad_norm=1.0,
+            min_learning_rate=1e-6,
+            warmup_epochs=1,
+            early_stopping_patience=6,
+            early_stopping_min_delta=0.002,
+            early_stopping_start_epoch=3,
+            precision="bf16",
+            num_workers=8,
+        )
+        self.assertEqual(validate_config(config, experiment), [])
+        plain = torch.ones(4, 1, 64, 313)
+        torch.manual_seed(42)
+        augmented = apply_training_specaugment(plain, config)
+        self.assertEqual(augmented.shape, plain.shape)
+        self.assertTrue(torch.isfinite(augmented).all())
+        self.assertTrue(torch.any(augmented == 0.0))
+        disabled = BelgianTrainConfig(
+            data_root="unused",
+            output_root="unused",
+            split_manifest="unused",
+        )
+        self.assertTrue(torch.equal(apply_training_specaugment(plain, disabled), plain))
+
     def test_sanity_recipe_is_frozen_and_uses_moderate_effective_number_weights(self) -> None:
         config_path = Path("configs/experiments/belgian_training_sanity_v1.json")
         experiment = load_experiment(str(config_path))

@@ -9,12 +9,14 @@ import shutil
 import time
 
 import torch
+import torchaudio
 from torch import nn
 from torch.utils.data import DataLoader
 
 from src.data.belgian_ais import (
     BelgianMelDataset,
     BelgianRecord,
+    ClassBalancedBatchEpochSampler,
     ClassDateBalancedEpochSampler,
     FullEpochShuffleSampler,
     STRICT_AUDIO_POLICY,
@@ -73,9 +75,14 @@ class BelgianTrainConfig:
     attention_dropout: float = 0.1
     attention_gate_init: float = -2.0
     sampling_strategy: str = "class_date_balanced_dynamic"
+    samples_per_class_per_epoch: int | None = None
     loss_strategy: str = "cross_entropy"
     effective_number_beta: float = 0.999
     normalization_stats_path: str | None = None
+    specaugment_frequency_mask_param: int = 0
+    specaugment_time_mask_param: int = 0
+    specaugment_frequency_masks: int = 0
+    specaugment_time_masks: int = 0
     batch_size: int = 16
     eval_batch_size: int = 16
     gradient_accumulation_steps: int = 2
@@ -101,7 +108,11 @@ class BelgianTrainConfig:
 
 def load_experiment(path: str) -> dict[str, object]:
     payload = json.loads(resolve_path(path).read_text(encoding="utf-8"))
-    supported = {"belgian_attention_v1", "belgian_training_sanity_v1"}
+    supported = {
+        "belgian_attention_v1",
+        "belgian_training_sanity_v1",
+        "belgian_training_health_v2",
+    }
     if not isinstance(payload, dict) or payload.get("experiment_id") not in supported:
         raise ValueError("Unexpected Belgian experiment config")
     return payload
@@ -138,8 +149,21 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
     if config.sampling_strategy not in {
         "class_date_balanced_dynamic",
         "full_epoch_shuffle",
+        "strict_class_balanced_batch",
     }:
         raise ValueError("Unsupported Belgian sampling strategy")
+    if config.sampling_strategy == "strict_class_balanced_batch":
+        if config.samples_per_class_per_epoch is None:
+            raise ValueError("Balanced-batch sampling requires samples_per_class_per_epoch")
+        per_batch = config.batch_size // len(CLASS_NAMES)
+        if (
+            config.batch_size % len(CLASS_NAMES) != 0
+            or config.samples_per_class_per_epoch <= 0
+            or config.samples_per_class_per_epoch % per_batch != 0
+        ):
+            raise ValueError("Balanced-batch quotas must form complete physical batches")
+    elif config.samples_per_class_per_epoch is not None:
+        raise ValueError("samples_per_class_per_epoch is reserved for balanced batches")
     if config.loss_strategy not in {"cross_entropy", "effective_number"}:
         raise ValueError("Unsupported Belgian loss strategy")
     if not 0.0 <= config.effective_number_beta < 1.0:
@@ -148,6 +172,18 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
         raise ValueError("precision must be fp32 or bf16")
     if config.num_workers < 0:
         raise ValueError("num_workers must be non-negative")
+    for name, value in (
+        ("specaugment_frequency_mask_param", config.specaugment_frequency_mask_param),
+        ("specaugment_time_mask_param", config.specaugment_time_mask_param),
+        ("specaugment_frequency_masks", config.specaugment_frequency_masks),
+        ("specaugment_time_masks", config.specaugment_time_masks),
+    ):
+        if value < 0:
+            raise ValueError(f"{name} must be non-negative")
+    if config.specaugment_frequency_masks > 0 and config.specaugment_frequency_mask_param <= 0:
+        raise ValueError("Positive frequency masks require a positive mask parameter")
+    if config.specaugment_time_masks > 0 and config.specaugment_time_mask_param <= 0:
+        raise ValueError("Positive time masks require a positive mask parameter")
     features = experiment["features"]
     training = experiment["training"]
     adapter = experiment["shared_adapter"]
@@ -176,8 +212,19 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
         "attention_dropout": adapter["dropout"],
         "attention_gate_init": adapter["gate_init"],
         "sampling_strategy": training["sampling"],
+        "samples_per_class_per_epoch": training.get("samples_per_class_per_epoch"),
         "loss_strategy": training.get("loss", "cross_entropy"),
         "effective_number_beta": training.get("effective_number_beta", 0.999),
+        "specaugment_frequency_mask_param": training.get("specaugment", {}).get(
+            "frequency_mask_param", 0
+        ),
+        "specaugment_time_mask_param": training.get("specaugment", {}).get(
+            "time_mask_param", 0
+        ),
+        "specaugment_frequency_masks": training.get("specaugment", {}).get(
+            "frequency_masks", 0
+        ),
+        "specaugment_time_masks": training.get("specaugment", {}).get("time_masks", 0),
         "batch_size": training["batch_size"],
         "eval_batch_size": training["eval_batch_size"],
         "gradient_accumulation_steps": training["gradient_accumulation_steps"],
@@ -292,8 +339,16 @@ def build_dataloaders(config: BelgianTrainConfig):
     val_dataset = BelgianMelDataset(val_records, return_index=True, **dataset_kwargs)
     if config.sampling_strategy == "class_date_balanced_dynamic":
         sampler = ClassDateBalancedEpochSampler(train_records, seed=config.seed)
-    else:
+    elif config.sampling_strategy == "full_epoch_shuffle":
         sampler = FullEpochShuffleSampler(train_records, seed=config.seed)
+    else:
+        assert config.samples_per_class_per_epoch is not None
+        sampler = ClassBalancedBatchEpochSampler(
+            train_records,
+            batch_size=config.batch_size,
+            samples_per_class=config.samples_per_class_per_epoch,
+            seed=config.seed,
+        )
     worker_options: dict[str, object] = {}
     if config.num_workers > 0:
         worker_options = {
@@ -338,6 +393,13 @@ def build_dataloaders(config: BelgianTrainConfig):
         "loss_strategy": config.loss_strategy,
         "normalization_stats_path": config.normalization_stats_path,
         "normalization": normalization,
+        "augmentation": {
+            "frequency_mask_param": config.specaugment_frequency_mask_param,
+            "time_mask_param": config.specaugment_time_mask_param,
+            "frequency_masks": config.specaugment_frequency_masks,
+            "time_masks": config.specaugment_time_masks,
+            "training_only": True,
+        },
         "initial_sampling_audit": sampler.audit(),
         "test_evaluated": False,
     }
@@ -377,6 +439,28 @@ def _progress_line(
         f"| avg_loss={loss} | avg_acc={accuracy} | lr={learning_rate:.2e} "
         f"| samples_per_sec={rate} | gpu_peak={peak}"
     )
+
+
+def apply_training_specaugment(
+    inputs: torch.Tensor,
+    config: BelgianTrainConfig,
+) -> torch.Tensor:
+    augmented = inputs
+    for _ in range(config.specaugment_frequency_masks):
+        augmented = torchaudio.functional.mask_along_axis_iid(
+            augmented,
+            mask_param=config.specaugment_frequency_mask_param,
+            mask_value=0.0,
+            axis=2,
+        )
+    for _ in range(config.specaugment_time_masks):
+        augmented = torchaudio.functional.mask_along_axis_iid(
+            augmented,
+            mask_param=config.specaugment_time_mask_param,
+            mask_value=0.0,
+            axis=3,
+        )
+    return augmented
 
 
 def run_epoch(
@@ -420,6 +504,8 @@ def run_epoch(
             indexes = batch[2] if not is_train else None
             inputs = inputs.to(config.device, non_blocking=use_cuda)
             targets = targets.to(config.device, non_blocking=use_cuda)
+            if is_train:
+                inputs = apply_training_specaugment(inputs, config)
             with _amp_context(config):
                 logits = model(inputs)
                 loss = criterion(logits, targets)
@@ -682,7 +768,11 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
             sampler = dataloaders["train"].sampler
             if not isinstance(
                 sampler,
-                (ClassDateBalancedEpochSampler, FullEpochShuffleSampler),
+                (
+                    ClassDateBalancedEpochSampler,
+                    FullEpochShuffleSampler,
+                    ClassBalancedBatchEpochSampler,
+                ),
             ):
                 raise TypeError("Belgian training sampler is invalid")
             sampler.set_epoch(epoch)
@@ -862,6 +952,7 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
         "sampling_strategy": config.sampling_strategy,
         "loss_configuration": loss_report,
         "normalization_stats_path": config.normalization_stats_path,
+        "augmentation": split_report["augmentation"],
         "experiment_config_mismatches": mismatches,
     }
     (directories["reports"] / "run_complete.json").write_text(

@@ -221,6 +221,24 @@ effective-number loss”仍不足以抵消 5,031/114/2,425/132 的类别先验�
 比较，但不能单独把失败归因于弱标签或注意力结构。若未来重新打开 Belgian 分支，必须先把问题
 改写为独立预注册的长尾学习研究，而不是继续用 G1 调参挽救当前结论。
 
+### 9.2 严格类别均衡 batch 健康度复核（`belgian_training_health_v2`）
+
+为区分“Belgian 标签完全不可学”和“v1 的 full-data loss 仍由 Cargo 主导”，只允许一次 G0 复核：
+
+1. 保持 fold1、seed42、G0、train-only mean/std、输入、AdamW 和 validation 选模不变；继续封存 test。
+2. 每个物理 batch 固定 16 条、四类各 4 条；每类每 epoch 固定 1,024 条，共 4,096 条。Cargo/Tank
+   按冻结顺序跨 epoch 轮换，Passenger/Tug 循环重采样；每轮审计所有 256 个 batch 均严格平衡。
+3. 既然采样已严格平衡，loss 恢复普通 CE，不叠加 class weight。训练输入统一使用一次
+   frequency mask（最多 8 Mel bins）和一次 time mask（最多 24 frames）；validation 不增强。
+4. 有效 batch 32、学习率 `3e-4`、warmup 1 epoch、最多 20 epoch；早停从 epoch 3 开始，patience 6、
+   min delta 0.002。
+5. G0 健康门全部满足才允许讨论匹配 G1：最终 train accuracy ≥70%、train macro-F1 ≥60%、
+   Passenger/Tug train F1 各 ≥40%，且最佳 validation date macro-F1 至少 20.68%（超过单类塌缩
+   基线 19.68% 至少 1 pp）。
+
+该实验只判断一个公平 G0 是否能摆脱单类塌缩。任一门失败即停止 Belgian 公共集模型训练；通过也
+只说明可以再设计一个完全匹配的 G1 对照，不能据单 fold/single seed 宣称注意力有效。
+
 ## 10. 数据来源
 
 - Zenodo 数据集：<https://zenodo.org/records/17233667>

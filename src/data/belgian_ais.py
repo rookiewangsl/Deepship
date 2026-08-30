@@ -762,6 +762,128 @@ class FullEpochShuffleSampler(Sampler[int]):
         }
 
 
+class ClassBalancedBatchEpochSampler(Sampler[int]):
+    """Emit strict class-balanced physical batches with deterministic rotation."""
+
+    def __init__(
+        self,
+        records: Sequence[BelgianRecord],
+        *,
+        batch_size: int,
+        samples_per_class: int,
+        seed: int = 42,
+    ) -> None:
+        if batch_size <= 0 or batch_size % len(CLASS_NAMES) != 0:
+            raise ValueError("Balanced batch size must be positive and divisible by classes")
+        self.records = records
+        self.batch_size = int(batch_size)
+        self.samples_per_class = int(samples_per_class)
+        self.samples_per_class_per_batch = self.batch_size // len(CLASS_NAMES)
+        if (
+            self.samples_per_class <= 0
+            or self.samples_per_class % self.samples_per_class_per_batch != 0
+        ):
+            raise ValueError(
+                "samples_per_class must be positive and divisible by per-batch class quota"
+            )
+        self.seed = int(seed)
+        self.epoch = 0
+        self._ordered_by_class: dict[str, list[int]] = {}
+        for class_index, class_name in enumerate(CLASS_NAMES):
+            indexes = [
+                index for index, record in enumerate(records) if record.class_name == class_name
+            ]
+            if not indexes:
+                raise ValueError(f"Balanced batch sampler is missing {class_name}")
+            random.Random(self.seed + 104_729 * class_index).shuffle(indexes)
+            self._ordered_by_class[class_name] = indexes
+
+    def set_epoch(self, epoch: int) -> None:
+        self.epoch = int(epoch)
+
+    def __len__(self) -> int:
+        return len(CLASS_NAMES) * self.samples_per_class
+
+    def _class_epoch_indexes(self, class_name: str) -> list[int]:
+        indexes = self._ordered_by_class[class_name]
+        start = (self.epoch * self.samples_per_class) % len(indexes)
+        selected = [
+            indexes[(start + offset) % len(indexes)]
+            for offset in range(self.samples_per_class)
+        ]
+        random.Random(
+            self.seed + 1_000_003 * self.epoch + 104_729 * CLASS_TO_INDEX[class_name]
+        ).shuffle(selected)
+        return selected
+
+    def __iter__(self) -> Iterator[int]:
+        per_class = {
+            class_name: self._class_epoch_indexes(class_name) for class_name in CLASS_NAMES
+        }
+        batches = self.samples_per_class // self.samples_per_class_per_batch
+        rng = random.Random(self.seed + 1_000_003 * self.epoch)
+        ordered: list[int] = []
+        for batch_index in range(batches):
+            start = batch_index * self.samples_per_class_per_batch
+            stop = start + self.samples_per_class_per_batch
+            batch = [
+                index
+                for class_name in CLASS_NAMES
+                for index in per_class[class_name][start:stop]
+            ]
+            rng.shuffle(batch)
+            ordered.extend(batch)
+        return iter(ordered)
+
+    def audit(self) -> dict[str, object]:
+        indexes = list(iter(self))
+        selected = [self.records[index] for index in indexes]
+        physical_batches = [
+            selected[start : start + self.batch_size]
+            for start in range(0, len(selected), self.batch_size)
+        ]
+        expected = {name: self.samples_per_class_per_batch for name in CLASS_NAMES}
+        invalid_batches = [
+            batch_index
+            for batch_index, batch in enumerate(physical_batches)
+            if dict(Counter(record.class_name for record in batch)) != expected
+        ]
+        return {
+            "epoch": self.epoch,
+            "sampling": "strict_class_balanced_batch",
+            "samples": len(selected),
+            "physical_batches": len(physical_batches),
+            "batch_size": self.batch_size,
+            "samples_per_class_per_batch": self.samples_per_class_per_batch,
+            "invalid_balanced_batches": invalid_batches,
+            "unique_files": len({record.relative_path for record in selected}),
+            "duplicate_draws": len(selected)
+            - len({record.relative_path for record in selected}),
+            "by_class": dict(Counter(record.class_name for record in selected)),
+            "unique_files_by_class": {
+                name: len(
+                    {
+                        record.relative_path
+                        for record in selected
+                        if record.class_name == name
+                    }
+                )
+                for name in CLASS_NAMES
+            },
+            "unique_dates_by_class": {
+                name: len(
+                    {
+                        record.calendar_date
+                        for record in selected
+                        if record.class_name == name
+                    }
+                )
+                for name in CLASS_NAMES
+            },
+            "by_station": dict(Counter(record.station for record in selected)),
+        }
+
+
 class BelgianMelDataset(Dataset):
     def __init__(
         self,

@@ -13,6 +13,7 @@ import torch
 from src.data.belgian_ais import (
     BelgianMelDataset,
     BelgianRecord,
+    ClassBalancedBatchEpochSampler,
     ClassDateBalancedEpochSampler,
     FullEpochShuffleSampler,
     assign_date_folds,
@@ -247,6 +248,51 @@ class BelgianAISTests(unittest.TestCase):
         self.assertEqual(report["by_class"]["Cargo"], 2)
         sampler.set_epoch(1)
         self.assertNotEqual(first, list(iter(sampler)))
+
+    def test_balanced_batch_sampler_enforces_every_physical_batch(self) -> None:
+        records = []
+        for class_index, class_name in enumerate(("Cargo", "Passenger", "Tank", "Tug")):
+            count = 12 if class_name in {"Cargo", "Tank"} else 3
+            for index in range(count):
+                records.append(
+                    record(
+                        class_index * 100 + index,
+                        class_name,
+                        f"2022-07-{index % 4 + 1:02d}",
+                    )
+                )
+        sampler = ClassBalancedBatchEpochSampler(
+            records,
+            batch_size=8,
+            samples_per_class=8,
+            seed=42,
+        )
+        first = list(iter(sampler))
+        self.assertEqual(len(first), 32)
+        for start in range(0, len(first), 8):
+            counts = {
+                name: sum(records[index].class_name == name for index in first[start : start + 8])
+                for name in ("Cargo", "Passenger", "Tank", "Tug")
+            }
+            self.assertEqual(counts, {"Cargo": 2, "Passenger": 2, "Tank": 2, "Tug": 2})
+        report = sampler.audit()
+        self.assertEqual(report["invalid_balanced_batches"], [])
+        self.assertEqual(set(report["by_class"].values()), {8})
+        self.assertEqual(report["unique_files_by_class"]["Cargo"], 8)
+        self.assertEqual(report["unique_files_by_class"]["Tank"], 8)
+        self.assertEqual(report["unique_files_by_class"]["Passenger"], 3)
+        self.assertEqual(report["unique_files_by_class"]["Tug"], 3)
+        sampler.set_epoch(1)
+        second = list(iter(sampler))
+        self.assertNotEqual(first, second)
+        duplicate = ClassBalancedBatchEpochSampler(
+            records,
+            batch_size=8,
+            samples_per_class=8,
+            seed=42,
+        )
+        duplicate.set_epoch(1)
+        self.assertEqual(second, list(iter(duplicate)))
 
     def test_dataset_applies_frozen_scalar_normalization(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
