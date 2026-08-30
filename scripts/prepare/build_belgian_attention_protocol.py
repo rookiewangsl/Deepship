@@ -11,6 +11,7 @@ if str(ROOT) not in sys.path:
 
 from src.data.belgian_ais import (  # noqa: E402
     build_fold_manifests,
+    filter_strict_development_audio,
     load_belgian_records,
     validate_fold_manifest,
 )
@@ -22,6 +23,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--metadata-csv", required=True)
     parser.add_argument("--split-dir", required=True)
+    parser.add_argument(
+        "--data-root",
+        required=True,
+        help="Extracted audio root; only development audio is inspected.",
+    )
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--max-distance-km", type=float, default=5.0)
     parser.add_argument("--fold-seed", type=int, default=42)
@@ -39,11 +45,25 @@ def main() -> None:
         args.split_dir,
         max_distance_km=args.max_distance_km,
     )
-    manifests, index = build_fold_manifests(records, audit, folds=3, fold_seed=args.fold_seed)
+    records, audio_audit = filter_strict_development_audio(
+        records,
+        data_root=args.data_root,
+    )
+    manifests, index = build_fold_manifests(
+        records,
+        audit,
+        folds=3,
+        fold_seed=args.fold_seed,
+        audio_audit=audio_audit,
+    )
     audit_dir = output_root / "audit"
     audit_dir.mkdir(parents=True, exist_ok=True)
     (audit_dir / "metadata_audit.json").write_text(
         json.dumps(audit, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    (audit_dir / "development_audio_admission.json").write_text(
+        json.dumps(audio_audit, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     validations = []
@@ -71,6 +91,7 @@ def main() -> None:
     )
     index["validations"] = validations
     index["eligible_record_count"] = len(records)
+    index["strict_development_record_count"] = audio_audit["development_admitted"]
     (output_root / "protocol_index.json").write_text(
         json.dumps(index, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",

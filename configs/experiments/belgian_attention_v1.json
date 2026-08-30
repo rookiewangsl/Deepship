@@ -13,6 +13,9 @@
   },
   "features": {
     "source_sample_rate": 48000,
+    "source_duration_rule": "frames == source_sample_rate * 10",
+    "accepted_source_channels": [1, 2],
+    "source_channel_policy": "fixed_channel_0",
     "sample_rate": 16000,
     "clip_duration_seconds": 10.0,
     "n_fft": 1024,

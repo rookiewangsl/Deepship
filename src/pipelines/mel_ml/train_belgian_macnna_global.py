@@ -15,6 +15,8 @@ from src.data.belgian_ais import (
     BelgianMelDataset,
     BelgianRecord,
     ClassDateBalancedEpochSampler,
+    STRICT_AUDIO_POLICY,
+    STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION,
     record_from_dict,
     validate_fold_manifest,
 )
@@ -55,6 +57,8 @@ class BelgianTrainConfig:
     model_variant: str = "g0"
     seed: int = 42
     clip_duration: float = 10.0
+    source_sample_rate: int = 48_000
+    source_channel_policy: str = "fixed_channel_0"
     n_fft: int = 1024
     win_length: int = 1024
     hop_length: int = 512
@@ -130,6 +134,8 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
         raise TypeError("Belgian experiment config sections are invalid")
     expected = {
         "clip_duration": features["clip_duration_seconds"],
+        "source_sample_rate": features["source_sample_rate"],
+        "source_channel_policy": features["source_channel_policy"],
         "n_fft": features["n_fft"],
         "win_length": features["win_length"],
         "hop_length": features["hop_length"],
@@ -171,12 +177,24 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
     return mismatches
 
 
-def load_manifest(path: str) -> tuple[dict[str, object], list[BelgianRecord], list[BelgianRecord]]:
+def load_manifest(
+    path: str,
+    *,
+    require_strict_audio: bool = True,
+) -> tuple[dict[str, object], list[BelgianRecord], list[BelgianRecord]]:
     manifest_path = resolve_path(path)
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     validation = validate_fold_manifest(manifest)
     if validation["status"] != "passed":
         raise ValueError(f"Frozen Belgian manifest validation failed: {validation}")
+    if require_strict_audio and (
+        manifest.get("schema_version") != STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION
+        or manifest.get("audio_policy") != STRICT_AUDIO_POLICY
+    ):
+        raise ValueError(
+            "Formal Belgian runs require a schema-v2 manifest with the frozen exact-10s "
+            "fixed-channel-0 audio policy"
+        )
     train_records: list[BelgianRecord] = []
     val_records: list[BelgianRecord] = []
     for row in manifest["records"]:
@@ -195,11 +213,16 @@ def _configure_worker(_worker_id: int) -> None:
 
 
 def build_dataloaders(config: BelgianTrainConfig):
-    manifest, train_records, val_records = load_manifest(config.split_manifest)
+    manifest, train_records, val_records = load_manifest(
+        config.split_manifest,
+        require_strict_audio=not config.allow_experiment_overrides,
+    )
     dataset_kwargs = {
         "data_root": config.data_root,
         "sample_rate": TARGET_SAMPLE_RATE,
         "clip_duration": config.clip_duration,
+        "source_sample_rate": config.source_sample_rate,
+        "channel_policy": config.source_channel_policy,
         "n_fft": config.n_fft,
         "win_length": config.win_length,
         "hop_length": config.hop_length,
@@ -240,6 +263,10 @@ def build_dataloaders(config: BelgianTrainConfig):
         "protocol": manifest["protocol"],
         "fold": manifest["fold"],
         "manifest_sha256": manifest["manifest_sha256"],
+        "audio_policy": manifest.get("audio_policy"),
+        "development_audio_inventory_sha256": manifest.get(
+            "development_audio_inventory_sha256"
+        ),
         "train_records": len(train_records),
         "val_records": len(val_records),
         "train_samples_per_epoch": len(sampler),
@@ -712,4 +739,3 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
         json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     return result
-

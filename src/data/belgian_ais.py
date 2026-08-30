@@ -37,6 +37,15 @@ BELGIAN_CLASS_MAP = {
 OFFICIAL_SPLITS = ("train", "val", "test")
 TARGET_SAMPLE_RATE = 16_000
 PROTOCOL_SCHEMA_VERSION = 1
+STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION = 2
+STRICT_AUDIO_POLICY = {
+    "source_sample_rate_hz": 48_000,
+    "duration_seconds": 10.0,
+    "duration_rule": "frames == source_sample_rate_hz * duration_seconds",
+    "accepted_source_channels": [1, 2],
+    "channel_policy": "fixed_channel_0",
+    "selected_channel_index": 0,
+}
 
 
 @dataclass(frozen=True)
@@ -368,6 +377,7 @@ def build_fold_manifests(
     *,
     folds: int = 3,
     fold_seed: int = 42,
+    audio_audit: Mapping[str, object] | None = None,
 ) -> tuple[list[dict[str, object]], dict[str, object]]:
     sealed_test = [record for record in records if record.official_split == "test"]
     sealed_test_dates = {record.calendar_date for record in sealed_test}
@@ -389,7 +399,11 @@ def build_fold_manifests(
             split = "val" if assignments[record.calendar_date] == fold else "train"
             rows.append({**asdict(record), "split": split})
         body: dict[str, object] = {
-            "schema_version": PROTOCOL_SCHEMA_VERSION,
+            "schema_version": (
+                STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION
+                if audio_audit is not None
+                else PROTOCOL_SCHEMA_VERSION
+            ),
             "experiment_id": "belgian_attention_v1",
             "protocol": "utc_date_disjoint",
             "fold": fold + 1,
@@ -399,6 +413,11 @@ def build_fold_manifests(
             "test_policy": "sealed; test records are not present in development manifests",
             "records": sorted(rows, key=lambda row: (str(row["split"]), str(row["relative_path"]))),
         }
+        if audio_audit is not None:
+            body["audio_policy"] = dict(STRICT_AUDIO_POLICY)
+            body["development_audio_inventory_sha256"] = audio_audit[
+                "admitted_inventory_sha256"
+            ]
         body["manifest_sha256"] = canonical_sha256(body)
         manifests.append(body)
         counts = Counter((str(row["split"]), str(row["class_name"])) for row in rows)
@@ -439,7 +458,111 @@ def build_fold_manifests(
         ),
         "sealed_test_manifest": sealed_payload,
     }
+    if audio_audit is not None:
+        index["development_audio_policy"] = dict(STRICT_AUDIO_POLICY)
+        index["development_audio_inventory_sha256"] = audio_audit[
+            "admitted_inventory_sha256"
+        ]
+        index["sealed_test_audio_status"] = "not_inspected"
     return manifests, index
+
+
+def filter_strict_development_audio(
+    records: Sequence[BelgianRecord],
+    *,
+    data_root: str | Path,
+) -> tuple[list[BelgianRecord], dict[str, object]]:
+    """Admit exact 10 s mono/stereo development files without reading sealed test audio."""
+
+    root = resolve_path(data_root)
+    sealed_test = [record for record in records if record.official_split == "test"]
+    sealed_test_dates = {record.calendar_date for record in sealed_test}
+    shared_test_date_records = [
+        record
+        for record in records
+        if record.official_split in {"train", "val"}
+        and record.calendar_date in sealed_test_dates
+    ]
+    development = [
+        record
+        for record in records
+        if record.official_split in {"train", "val"}
+        and record.calendar_date not in sealed_test_dates
+    ]
+    admitted_paths: set[str] = set()
+    inventory: list[dict[str, object]] = []
+    rejected = Counter()
+    rejected_examples: list[dict[str, object]] = []
+    for record in development:
+        path = resolve_manifest_path(root, record.relative_path)
+        reason = ""
+        details: dict[str, object] = {"relative_path": record.relative_path}
+        if not path.is_file():
+            reason = "missing"
+        else:
+            info = sf.info(str(path))
+            details.update(
+                {
+                    "source_sample_rate_hz": int(info.samplerate),
+                    "source_channels": int(info.channels),
+                    "source_frames": int(info.frames),
+                }
+            )
+            if info.samplerate != STRICT_AUDIO_POLICY["source_sample_rate_hz"]:
+                reason = "sample_rate"
+            elif info.channels not in STRICT_AUDIO_POLICY["accepted_source_channels"]:
+                reason = "channels"
+            elif info.frames != int(info.samplerate * STRICT_AUDIO_POLICY["duration_seconds"]):
+                reason = "not_exact_10_seconds"
+        if reason:
+            rejected[reason] += 1
+            if len(rejected_examples) < 50:
+                rejected_examples.append({**details, "reason": reason})
+            continue
+        admitted_paths.add(record.relative_path)
+        inventory.append(
+            {
+                **details,
+                "selected_channel_index": STRICT_AUDIO_POLICY["selected_channel_index"],
+            }
+        )
+    inventory.sort(key=lambda row: str(row["relative_path"]))
+    inventory_payload = {
+        "audio_policy": dict(STRICT_AUDIO_POLICY),
+        "records": inventory,
+    }
+    filtered = [
+        record
+        for record in records
+        if record.official_split == "test"
+        or record.calendar_date in sealed_test_dates
+        or record.relative_path in admitted_paths
+    ]
+    admitted_records = [
+        record
+        for record in filtered
+        if record.official_split != "test" and record.calendar_date not in sealed_test_dates
+    ]
+    report = {
+        "schema_version": STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION,
+        "policy": dict(STRICT_AUDIO_POLICY),
+        "development_candidates": len(development),
+        "development_admitted": len(admitted_records),
+        "development_rejected": len(development) - len(admitted_records),
+        "retention_fraction": len(admitted_records) / max(1, len(development)),
+        "admitted_by_class": dict(Counter(record.class_name for record in admitted_records)),
+        "admitted_by_channels": dict(
+            Counter(str(row["source_channels"]) for row in inventory)
+        ),
+        "rejected_by_reason": dict(sorted(rejected.items())),
+        "rejected_examples": rejected_examples,
+        "sealed_test_records_preserved": len(sealed_test),
+        "development_records_skipped_for_test_date_isolation": len(shared_test_date_records),
+        "sealed_test_audio_status": "not_inspected",
+        "admitted_inventory_sha256": canonical_sha256(inventory_payload),
+        "inventory": inventory,
+    }
+    return filtered, report
 
 
 def validate_fold_manifest(manifest: Mapping[str, object]) -> dict[str, object]:
@@ -451,7 +574,12 @@ def validate_fold_manifest(manifest: Mapping[str, object]) -> dict[str, object]:
     val_dates = {str(row["calendar_date"]) for row in records if row["split"] == "val"}
     paths = [str(row["relative_path"]) for row in records]
     counts = Counter((str(row["split"]), str(row["class_name"])) for row in records)
+    schema_version = int(body.get("schema_version", 0))
     checks = {
+        "schema_version_supported": schema_version in {
+            PROTOCOL_SCHEMA_VERSION,
+            STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION,
+        },
         "manifest_hash_matches": bool(recorded_hash) and recorded_hash == calculated_hash,
         "paths_unique": len(paths) == len(set(paths)),
         "test_absent": all(str(row.get("official_split")) != "test" for row in records),
@@ -460,6 +588,13 @@ def validate_fold_manifest(manifest: Mapping[str, object]) -> dict[str, object]:
             counts[(split, name)] > 0 for split in ("train", "val") for name in CLASS_NAMES
         ),
     }
+    if schema_version == STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION:
+        inventory_hash = str(body.get("development_audio_inventory_sha256", ""))
+        checks["strict_audio_policy_matches"] = body.get("audio_policy") == STRICT_AUDIO_POLICY
+        checks["audio_inventory_hash_present"] = (
+            len(inventory_hash) == 64
+            and all(character in "0123456789abcdef" for character in inventory_hash)
+        )
     return {
         "status": "passed" if all(checks.values()) else "failed",
         "checks": checks,
@@ -577,12 +712,21 @@ class BelgianMelDataset(Dataset):
         hop_length: int = 512,
         win_length: int = 1024,
         n_mels: int = 64,
+        source_sample_rate: int = 48_000,
+        channel_policy: str = "fixed_channel_0",
+        require_exact_source_duration: bool = True,
         return_index: bool = False,
     ) -> None:
         self.records = list(records)
         self.data_root = resolve_path(data_root)
         self.sample_rate = int(sample_rate)
         self.clip_samples = int(round(sample_rate * clip_duration))
+        self.source_sample_rate = int(source_sample_rate)
+        self.source_clip_samples = int(round(source_sample_rate * clip_duration))
+        if channel_policy != "fixed_channel_0":
+            raise ValueError("Belgian channel_policy must be fixed_channel_0")
+        self.channel_policy = channel_policy
+        self.require_exact_source_duration = bool(require_exact_source_duration)
         self.return_index = return_index
         self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
         self.mel_transform = torchaudio.transforms.MelSpectrogram(
@@ -603,7 +747,20 @@ class BelgianMelDataset(Dataset):
         record = self.records[index]
         path = resolve_manifest_path(self.data_root, record.relative_path)
         audio, source_rate = sf.read(str(path), dtype="float32", always_2d=True)
-        waveform = torch.from_numpy(audio).transpose(0, 1).mean(dim=0, keepdim=True)
+        if source_rate != self.source_sample_rate:
+            raise ValueError(
+                f"Unexpected source sample rate for {record.relative_path}: {source_rate}"
+            )
+        if audio.shape[1] not in {1, 2}:
+            raise ValueError(
+                f"Unexpected source channels for {record.relative_path}: {audio.shape[1]}"
+            )
+        if self.require_exact_source_duration and audio.shape[0] != self.source_clip_samples:
+            raise ValueError(
+                f"Source is not exactly the frozen duration for {record.relative_path}: "
+                f"{audio.shape[0]} frames"
+            )
+        waveform = torch.from_numpy(audio[:, 0]).unsqueeze(0)
         if source_rate != self.sample_rate:
             resampler = self.resamplers.get(source_rate)
             if resampler is None:
@@ -626,7 +783,6 @@ def audit_audio_files(
     data_root: str | Path,
     expected_sample_rate: int = 48_000,
     expected_duration_seconds: float = 10.0,
-    duration_tolerance_seconds: float = 0.05,
 ) -> dict[str, object]:
     missing: list[str] = []
     mismatches: list[dict[str, object]] = []
@@ -636,18 +792,18 @@ def audit_audio_files(
             missing.append(record.relative_path)
             continue
         info = sf.info(str(path))
-        duration = info.frames / info.samplerate
         if (
             info.samplerate != expected_sample_rate
-            or info.channels != 1
-            or abs(duration - expected_duration_seconds) > duration_tolerance_seconds
+            or info.channels not in {1, 2}
+            or info.frames != int(info.samplerate * expected_duration_seconds)
         ):
             mismatches.append(
                 {
                     "relative_path": record.relative_path,
                     "sample_rate": info.samplerate,
                     "channels": info.channels,
-                    "duration_seconds": duration,
+                    "frames": info.frames,
+                    "duration_seconds": info.frames / info.samplerate,
                 }
             )
     return {
@@ -657,4 +813,5 @@ def audit_audio_files(
         "missing_examples": missing[:20],
         "metadata_mismatch_count": len(mismatches),
         "metadata_mismatch_examples": mismatches[:20],
+        "audio_policy": dict(STRICT_AUDIO_POLICY),
     }

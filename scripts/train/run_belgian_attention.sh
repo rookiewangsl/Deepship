@@ -27,7 +27,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_ROOT"
 
 PYTHON_BIN="${DEEPSHIP_PYTHON:-/home/slwang/.venvs/deepship/bin/python}"
-DATA_ROOT="${BELGIAN_DATA_ROOT:-/home/slwang/deepship/datasets/belgian_ais/audio}"
+DATA_ROOT="${BELGIAN_DATA_ROOT:-/home/slwang/deepship/datasets/belgian_ais/extracted/data_per_station_6_paper-window-6_10seconds-efficient_paper_split}"
 MANIFEST="protocols/belgian_attention_v1/fold${FOLD}/split_manifest.json"
 RUN_ROOT="/home/slwang/deepship/runs/belgian_attention_v1"
 LOG_ROOT="/home/slwang/deepship/logs"
@@ -79,4 +79,3 @@ PYTHONUNBUFFERED=1 "$PYTHON_BIN" scripts/train/train_belgian_macnna_global.py \
   --seed "$SEED" \
   "${MODE_ARGS[@]}" \
   2>&1 | tee "$LOG_PATH"
-

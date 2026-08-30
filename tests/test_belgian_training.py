@@ -65,6 +65,7 @@ class BelgianTrainingTests(unittest.TestCase):
                     model_variant="g0",
                     seed=42,
                     clip_duration=0.1,
+                    source_sample_rate=16_000,
                     n_fft=64,
                     win_length=64,
                     hop_length=32,
@@ -99,4 +100,3 @@ class BelgianTrainingTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

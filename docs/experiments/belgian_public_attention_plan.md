@@ -1,6 +1,7 @@
 # Belgian AIS 四分类全局注意力复现实验
 
-状态：协议、代码与三个 development fold 已冻结并通过本地测试；26 GB 音频归档正在服务器断点下载，尚未进行真实数据 smoke 或正式训练。
+状态：归档已完成大小/MD5 校验和解压；真实音频审计发现文件同时含单、双声道且少数时长不精确。
+因此在正式训练前将协议重新冻结为“只接纳精确 10.000 s 文件；单/双声道均固定读取 channel 0”。
 
 本实验使用公开的 Belgian AIS 标注 10 s 水声片段，在第二个水域中比较原始 CNN（G0）与加入
 shared temporal axial self-attention 的 CNN（G1）。它回答的是：**在相同数据、采样和优化预算下，
@@ -20,7 +21,8 @@ shared temporal axial self-attention 的 CNN（G1）。它回答的是：**在�
 
 1. 下载文件大小、MD5 和 Zenodo 记录一致；
 2. `file_location` 去重后再与官方 split 文件取交集，未分配路径和重复行只记录、不擅自加入；
-3. 音频路径存在，时长、声道数、采样率与元数据一致；
+3. 只接纳 `frames == 48000 × 10`、48 kHz、1 或 2 声道的 development 文件；双声道固定读取
+   channel 0，绝不做声道平均；
 4. `event_time` 可转换为 UTC 日期，且同一 UTC 日期不会跨 development fold；
 5. 每个 fold 都含四个目标类别，两个站点和多个日期；
 6. 统计每类的日期数、站点数、距离分布、活动状态和缺失字段。
@@ -69,14 +71,19 @@ shared temporal axial self-attention 的 CNN（G1）。它回答的是：**在�
 归入一个集合。5 km 四分类主集共有 13,627 条记录；为保证最终 test 与 development 日期也隔离，
 另从 development 排除了与 test 共用四个 UTC 日期的 377 条候选记录。
 
-冻结后的三个 fold 分别使用 22、24、23 个 validation 日期；每个 fold 的 train/validation 均含
+音频准入前 development 为 11,806 条；精确 10 s 准入后保留 11,533 条（97.69%），其中 5,710 条
+单声道、5,823 条双声道。类别为 Cargo 7,545、Tank 3,619、Passenger 173、Tug 196。official test
+音频没有被打开或据此筛选，继续保持封存。
+
+重新冻结后的三个 fold 分别使用 22、24、23 个 validation 日期；每个 fold 的 train/validation 均含
 四类、两个站点且日期零交叉。Passenger 和 Tug 明显稀少，因此训练使用预注册的动态平衡，验证集
 不做下采样。所有 manifest、源文件哈希和零泄漏报告保存在
 `protocols/belgian_attention_v1/`，正式训练不得依据结果更换 fold。
 
 ## 4. 输入和模型
 
-两个模型共享完全相同的输入：原生 10 s 波形在读取时转为 mono、重采样到 16 kHz，然后计算
+两个模型共享完全相同的输入：只使用精确 10 s 波形；单声道读取其唯一声道，双声道固定读取
+channel 0，再重采样到 16 kHz，然后计算
 64-bin log-Mel，`n_fft=1024`、`win_length=1024`、`hop_length=512`，并使用同一归一化。禁止为 G1
 延长、拼接或额外增强输入。
 
@@ -160,6 +167,13 @@ bootstrap，以 UTC 日期为重采样单元；同时报告三个 fold 的均值
 
 如果 Belgian 只得到点估计上升但区间跨零，结论是数据证据不足；等待五天连续子集增加独立日期、
 连续上下文和可核验身份，而不是继续搜索 G1 层数、头数或学习率。
+
+如果 Belgian 与 DeepShip 重复矩阵都不支持稳定增益，则停止 G 架构搜索，不运行 G2、更多层/头、
+只为 G1 定制的优化器或用 official test 挽救结论。项目进入收尾：冻结表现最稳健的轻量 CNN，完成
+类别/站点/距离误差分析、参数/FLOPs/吞吐对照和复现实验报告。此时可得出的结论是“当前轻量全局
+时间注意力在两套受控水声四分类实验中没有显示稳定优势”，而不是“所有 Transformer 对水声都无效”。
+已申请的五天连续子集只在需要研究真实身份隔离或更长连续上下文时作为一个预注册的补充问题，
+不再承担为 G1 寻找正结果的职责。
 
 ## 9. 数据来源
 

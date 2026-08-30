@@ -6,11 +6,17 @@ from pathlib import Path
 import tempfile
 import unittest
 
+import numpy as np
+import soundfile as sf
+import torch
+
 from src.data.belgian_ais import (
+    BelgianMelDataset,
     BelgianRecord,
     ClassDateBalancedEpochSampler,
     assign_date_folds,
     build_fold_manifests,
+    filter_strict_development_audio,
     load_belgian_records,
     validate_fold_manifest,
 )
@@ -38,6 +44,65 @@ def record(index: int, class_name: str, date: str, *, split: str = "train") -> B
 
 
 class BelgianAISTests(unittest.TestCase):
+    def test_strict_audio_filter_never_reads_test_and_accepts_mono_or_stereo(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            exact = np.zeros(480_000, dtype=np.float32)
+            rows = [
+                record(1, "Cargo", "2022-01-01"),
+                record(2, "Passenger", "2022-01-02"),
+                record(3, "Tank", "2022-01-03"),
+                record(4, "Tug", "2022-01-04"),
+                record(5, "Cargo", "2022-02-01", split="test"),
+            ]
+            for item in rows[:4]:
+                path = root / item.relative_path
+                path.parent.mkdir(parents=True, exist_ok=True)
+                if item.class_name == "Passenger":
+                    sf.write(path, np.column_stack([exact, exact]), 48_000)
+                elif item.class_name == "Tank":
+                    sf.write(path, exact[:-1], 48_000)
+                else:
+                    sf.write(path, exact, 48_000)
+            filtered, audit = filter_strict_development_audio(rows, data_root=root)
+            self.assertEqual(audit["development_admitted"], 3)
+            self.assertEqual(audit["admitted_by_channels"], {"1": 2, "2": 1})
+            self.assertEqual(audit["rejected_by_reason"], {"not_exact_10_seconds": 1})
+            self.assertEqual(audit["sealed_test_audio_status"], "not_inspected")
+            self.assertIn(rows[-1], filtered)
+
+    def test_stereo_dataset_uses_channel_zero_not_channel_mean(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            sample_rate = 8_000
+            samples = 800
+            time = np.arange(samples, dtype=np.float32) / sample_rate
+            channel_zero = 0.2 * np.sin(2 * np.pi * 440 * time)
+            channel_one = 0.8 * np.sin(2 * np.pi * 1200 * time)
+            stereo_record = record(10, "Cargo", "2022-01-01")
+            mono_record = record(11, "Cargo", "2022-01-01")
+            for item, audio in (
+                (stereo_record, np.column_stack([channel_zero, channel_one])),
+                (mono_record, channel_zero),
+            ):
+                path = root / item.relative_path
+                path.parent.mkdir(parents=True, exist_ok=True)
+                sf.write(path, audio, sample_rate)
+            dataset = BelgianMelDataset(
+                [stereo_record, mono_record],
+                data_root=root,
+                sample_rate=sample_rate,
+                source_sample_rate=sample_rate,
+                clip_duration=0.1,
+                n_fft=128,
+                win_length=128,
+                hop_length=64,
+                n_mels=16,
+            )
+            stereo_mel, _ = dataset[0]
+            mono_mel, _ = dataset[1]
+            self.assertTrue(torch.allclose(stereo_mel, mono_mel, atol=1e-5, rtol=1e-5))
+
     def test_metadata_intersection_mapping_distance_and_conflict_policy(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
