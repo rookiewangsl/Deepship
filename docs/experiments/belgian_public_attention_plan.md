@@ -175,7 +175,38 @@ bootstrap，以 UTC 日期为重采样单元；同时报告三个 fold 的均值
 已申请的五天连续子集只在需要研究真实身份隔离或更长连续上下文时作为一个预注册的补充问题，
 不再承担为 G1 寻找正结果的职责。
 
-## 9. 数据来源
+## 9. 训练健康度诊断（`belgian_training_sanity_v1`）
+
+18 个 development 单元完成后，G0/G1 的 date-balanced macro-F1 分别为 0.2561/0.2479，
+G1−G0 为 −0.81 pp（95% 区间 −1.78～+0.10 pp）。同时两个模型最终训练准确率仅约 36%～37%，
+说明原矩阵首先受到共同欠拟合混杂，不能仅凭该结果判断注意力结构本身。原矩阵及其产物保持冻结，
+不覆盖、不续训，也不读取 official test；另开以下一次性诊断协议：
+
+1. **train-only 归一化**：仅使用 fold1 的训练文件计算一个全局 log-Mel mean/std，记录原 manifest
+   哈希和统计报告哈希；validation 和 official test 均不得参与统计。
+2. **小样本记忆门**：从 fold1 train 按 `SHA256(seed=42, relative_path)` 确定性选择每类 32 条，
+   G0 使用 AdamW、学习率 `1e-3`、无 weight decay，最多 1000 个 optimizer steps。连续两次检查均须
+   达到 train accuracy ≥98%、macro-F1 ≥98%、CE loss ≤0.10。失败即说明管线或模型学习能力仍有
+   问题，暂停，不启动新的正式训练。
+3. **全数据 G0 健康度实验**：只有上一步通过才运行 fold1/seed42/G0。每轮遍历所有 train 文件
+   恰好一次并确定性 shuffle，不再用最稀类把每轮裁成 456 条；只使用一种不均衡校正——
+   `beta=0.999` 的 effective-number class-weighted CE。G0/G1 共用的输入改为 train-fold 全局标量
+   标准化。优化器仍为 AdamW、学习率 `3e-4`、有效 batch 32、BF16；warmup 缩短为 1 个完整 epoch，
+   早停从 epoch 5 才开始，patience 8、min delta 0.002，最多 30 epoch。每轮新增 train macro-F1
+   与四类 train F1 审计。
+4. **G0 学习健康门**：最终 train accuracy ≥70%、train macro-F1 ≥60%，且 Passenger/Tug 的
+   train F1 各 ≥40%。未通过则判定公开 Belgian 四分类弱标签/域偏移在当前规模下不适合作为可靠
+   注意力验证，停止 Belgian 模型搜索并整理负结果。
+5. **匹配 G1 仅在门后发生**：G0 通过后，先冻结其学习曲线和验证结果，再用完全相同的 full-data、
+   loss、normalization、优化预算运行一个 fold1/seed42/G1。若单对结果没有至少 +1 pp 的
+   date-balanced macro-F1，停止；若有，再预注册是否扩展到多 seed/fold，不能直接读取 test 或
+   事后为 G1 单独调参。
+
+该诊断回答“此前阴性是否主要由明显欠训练造成”，不是新的架构搜索，也不能把单 fold/single seed
+写成最终外部泛化结论。唯一输出根使用 `belgian_training_sanity_v1`，不得复用
+`belgian_attention_v1`。
+
+## 10. 数据来源
 
 - Zenodo 数据集：<https://zenodo.org/records/17233667>
 - 作者数据说明：<https://github.com/woutdecrop/audio_vessel_distance_categorizer/blob/main/README_dataset.md>

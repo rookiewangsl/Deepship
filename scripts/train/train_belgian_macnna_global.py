@@ -30,6 +30,18 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--batch-size", type=int, default=16)
     parser.add_argument("--eval-batch-size", type=int, default=16)
     parser.add_argument("--gradient-accumulation-steps", type=int, default=2)
+    parser.add_argument(
+        "--sampling-strategy",
+        choices=("class_date_balanced_dynamic", "full_epoch_shuffle"),
+        default="class_date_balanced_dynamic",
+    )
+    parser.add_argument(
+        "--loss-strategy",
+        choices=("cross_entropy", "effective_number"),
+        default="cross_entropy",
+    )
+    parser.add_argument("--effective-number-beta", type=float, default=0.999)
+    parser.add_argument("--normalization-stats-path", default=None)
     parser.add_argument("--epochs", type=int, default=50)
     parser.add_argument("--learning-rate", type=float, default=3e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-2)
@@ -38,6 +50,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--warmup-epochs", type=int, default=5)
     parser.add_argument("--early-stopping-patience", type=int, default=8)
     parser.add_argument("--early-stopping-min-delta", type=float, default=0.005)
+    parser.add_argument("--early-stopping-start-epoch", type=int, default=1)
     parser.add_argument("--precision", choices=("fp32", "bf16"), default="bf16")
     parser.add_argument("--num-workers", type=int, default=8)
     parser.add_argument("--prefetch-factor", type=int, default=2)
@@ -62,6 +75,10 @@ def main() -> None:
         batch_size=args.batch_size,
         eval_batch_size=args.eval_batch_size,
         gradient_accumulation_steps=args.gradient_accumulation_steps,
+        sampling_strategy=args.sampling_strategy,
+        loss_strategy=args.loss_strategy,
+        effective_number_beta=args.effective_number_beta,
+        normalization_stats_path=args.normalization_stats_path,
         epochs=args.epochs,
         learning_rate=args.learning_rate,
         weight_decay=args.weight_decay,
@@ -70,6 +87,7 @@ def main() -> None:
         warmup_epochs=args.warmup_epochs,
         early_stopping_patience=args.early_stopping_patience,
         early_stopping_min_delta=args.early_stopping_min_delta,
+        early_stopping_start_epoch=args.early_stopping_start_epoch,
         precision=args.precision,
         num_workers=args.num_workers,
         prefetch_factor=args.prefetch_factor,
@@ -85,4 +103,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

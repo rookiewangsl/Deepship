@@ -717,6 +717,51 @@ class ClassDateBalancedEpochSampler(Sampler[int]):
         }
 
 
+class FullEpochShuffleSampler(Sampler[int]):
+    """Visit every training record exactly once in a deterministic epoch shuffle."""
+
+    def __init__(self, records: Sequence[BelgianRecord], *, seed: int = 42) -> None:
+        if not records:
+            raise ValueError("Full-epoch sampler requires at least one record")
+        self.records = records
+        self.seed = int(seed)
+        self.epoch = 0
+
+    def set_epoch(self, epoch: int) -> None:
+        self.epoch = int(epoch)
+
+    def __len__(self) -> int:
+        return len(self.records)
+
+    def __iter__(self) -> Iterator[int]:
+        indexes = list(range(len(self.records)))
+        random.Random(self.seed + 1_000_003 * self.epoch).shuffle(indexes)
+        return iter(indexes)
+
+    def audit(self) -> dict[str, object]:
+        indexes = list(iter(self))
+        selected = [self.records[index] for index in indexes]
+        return {
+            "epoch": self.epoch,
+            "sampling": "full_epoch_shuffle",
+            "samples": len(selected),
+            "unique_files": len({record.relative_path for record in selected}),
+            "duplicate_draws": 0,
+            "by_class": dict(Counter(record.class_name for record in selected)),
+            "unique_dates_by_class": {
+                name: len(
+                    {
+                        record.calendar_date
+                        for record in selected
+                        if record.class_name == name
+                    }
+                )
+                for name in CLASS_NAMES
+            },
+            "by_station": dict(Counter(record.station for record in selected)),
+        }
+
+
 class BelgianMelDataset(Dataset):
     def __init__(
         self,
@@ -732,6 +777,8 @@ class BelgianMelDataset(Dataset):
         source_sample_rate: int = 48_000,
         channel_policy: str = "fixed_channel_0",
         require_exact_source_duration: bool = True,
+        normalization_mean: float | None = None,
+        normalization_std: float | None = None,
         return_index: bool = False,
     ) -> None:
         self.records = list(records)
@@ -744,6 +791,12 @@ class BelgianMelDataset(Dataset):
             raise ValueError("Belgian channel_policy must be fixed_channel_0")
         self.channel_policy = channel_policy
         self.require_exact_source_duration = bool(require_exact_source_duration)
+        if (normalization_mean is None) != (normalization_std is None):
+            raise ValueError("normalization_mean and normalization_std must be provided together")
+        if normalization_std is not None and normalization_std <= 0:
+            raise ValueError("normalization_std must be positive")
+        self.normalization_mean = normalization_mean
+        self.normalization_std = normalization_std
         self.return_index = return_index
         self.resamplers: dict[int, torchaudio.transforms.Resample] = {}
         self.mel_transform = torchaudio.transforms.MelSpectrogram(
@@ -789,6 +842,8 @@ class BelgianMelDataset(Dataset):
         elif waveform.size(-1) < self.clip_samples:
             waveform = nnf.pad(waveform, (0, self.clip_samples - waveform.size(-1)))
         mel = self.to_db(self.mel_transform(waveform))
+        if self.normalization_mean is not None and self.normalization_std is not None:
+            mel = (mel - self.normalization_mean) / self.normalization_std
         if self.return_index:
             return mel, record.label_index, index
         return mel, record.label_index

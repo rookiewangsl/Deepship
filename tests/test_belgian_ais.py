@@ -14,6 +14,7 @@ from src.data.belgian_ais import (
     BelgianMelDataset,
     BelgianRecord,
     ClassDateBalancedEpochSampler,
+    FullEpochShuffleSampler,
     assign_date_folds,
     build_fold_manifests,
     filter_strict_development_audio,
@@ -227,6 +228,61 @@ class BelgianAISTests(unittest.TestCase):
         sampler.set_epoch(1)
         second = list(iter(sampler))
         self.assertNotEqual(first, second)
+
+    def test_full_epoch_sampler_visits_every_record_once(self) -> None:
+        records = [
+            record(index, class_name, f"2022-05-{index % 5 + 1:02d}")
+            for index, class_name in enumerate(
+                ("Cargo", "Cargo", "Passenger", "Tank", "Tank", "Tank", "Tug")
+            )
+        ]
+        sampler = FullEpochShuffleSampler(records, seed=42)
+        first = list(iter(sampler))
+        self.assertEqual(sorted(first), list(range(len(records))))
+        self.assertEqual(len(set(first)), len(records))
+        report = sampler.audit()
+        self.assertEqual(report["samples"], len(records))
+        self.assertEqual(report["unique_files"], len(records))
+        self.assertEqual(report["duplicate_draws"], 0)
+        self.assertEqual(report["by_class"]["Cargo"], 2)
+        sampler.set_epoch(1)
+        self.assertNotEqual(first, list(iter(sampler)))
+
+    def test_dataset_applies_frozen_scalar_normalization(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            item = record(20, "Cargo", "2022-06-01")
+            path = root / item.relative_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            waveform = np.sin(np.linspace(0, 20, 800, dtype=np.float32))
+            sf.write(path, waveform, 8_000)
+            plain = BelgianMelDataset(
+                [item],
+                data_root=root,
+                sample_rate=8_000,
+                source_sample_rate=8_000,
+                clip_duration=0.1,
+                n_fft=128,
+                win_length=128,
+                hop_length=64,
+                n_mels=16,
+            )
+            normalized = BelgianMelDataset(
+                [item],
+                data_root=root,
+                sample_rate=8_000,
+                source_sample_rate=8_000,
+                clip_duration=0.1,
+                n_fft=128,
+                win_length=128,
+                hop_length=64,
+                n_mels=16,
+                normalization_mean=2.5,
+                normalization_std=4.0,
+            )
+            plain_mel, _ = plain[0]
+            normalized_mel, _ = normalized[0]
+            self.assertTrue(torch.allclose(normalized_mel, (plain_mel - 2.5) / 4.0))
 
     def test_date_balanced_metrics_and_paired_bootstrap(self) -> None:
         rows = []

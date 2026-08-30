@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from contextlib import nullcontext
 from dataclasses import asdict, dataclass
 import json
@@ -15,6 +16,7 @@ from src.data.belgian_ais import (
     BelgianMelDataset,
     BelgianRecord,
     ClassDateBalancedEpochSampler,
+    FullEpochShuffleSampler,
     STRICT_AUDIO_POLICY,
     STRICT_AUDIO_PROTOCOL_SCHEMA_VERSION,
     record_from_dict,
@@ -70,6 +72,10 @@ class BelgianTrainConfig:
     attention_temporal_kernel_size: int = 15
     attention_dropout: float = 0.1
     attention_gate_init: float = -2.0
+    sampling_strategy: str = "class_date_balanced_dynamic"
+    loss_strategy: str = "cross_entropy"
+    effective_number_beta: float = 0.999
+    normalization_stats_path: str | None = None
     batch_size: int = 16
     eval_batch_size: int = 16
     gradient_accumulation_steps: int = 2
@@ -81,6 +87,7 @@ class BelgianTrainConfig:
     warmup_epochs: int = 5
     early_stopping_patience: int = 8
     early_stopping_min_delta: float = 0.005
+    early_stopping_start_epoch: int = 1
     precision: str = "bf16"
     num_workers: int = 8
     prefetch_factor: int = 2
@@ -94,7 +101,8 @@ class BelgianTrainConfig:
 
 def load_experiment(path: str) -> dict[str, object]:
     payload = json.loads(resolve_path(path).read_text(encoding="utf-8"))
-    if not isinstance(payload, dict) or payload.get("experiment_id") != "belgian_attention_v1":
+    supported = {"belgian_attention_v1", "belgian_training_sanity_v1"}
+    if not isinstance(payload, dict) or payload.get("experiment_id") not in supported:
         raise ValueError("Unexpected Belgian experiment config")
     return payload
 
@@ -123,6 +131,19 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
         raise ValueError("gradient_accumulation_steps must be positive")
     if config.epochs <= 0 or config.early_stopping_patience <= 0:
         raise ValueError("Epoch and patience values must be positive")
+    if config.early_stopping_start_epoch <= 0:
+        raise ValueError("early_stopping_start_epoch must be positive")
+    if config.early_stopping_start_epoch > config.epochs:
+        raise ValueError("early_stopping_start_epoch cannot exceed epochs")
+    if config.sampling_strategy not in {
+        "class_date_balanced_dynamic",
+        "full_epoch_shuffle",
+    }:
+        raise ValueError("Unsupported Belgian sampling strategy")
+    if config.loss_strategy not in {"cross_entropy", "effective_number"}:
+        raise ValueError("Unsupported Belgian loss strategy")
+    if not 0.0 <= config.effective_number_beta < 1.0:
+        raise ValueError("effective_number_beta must be in [0, 1)")
     if config.precision not in {"fp32", "bf16"}:
         raise ValueError("precision must be fp32 or bf16")
     if config.num_workers < 0:
@@ -132,6 +153,13 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
     adapter = experiment["shared_adapter"]
     if not all(isinstance(section, dict) for section in (features, training, adapter)):
         raise TypeError("Belgian experiment config sections are invalid")
+    normalization = training.get("normalization", "none")
+    if normalization == "train_fold_global_scalar" and config.normalization_stats_path is None:
+        raise ValueError("This Belgian experiment requires train-fold normalization statistics")
+    if normalization == "none" and config.normalization_stats_path is not None:
+        raise ValueError("Frozen Belgian attention runs do not use external normalization")
+    if normalization not in {"none", "train_fold_global_scalar"}:
+        raise ValueError(f"Unsupported Belgian normalization: {normalization}")
     expected = {
         "clip_duration": features["clip_duration_seconds"],
         "source_sample_rate": features["source_sample_rate"],
@@ -147,6 +175,9 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
         "attention_temporal_kernel_size": adapter["temporal_kernel_size"],
         "attention_dropout": adapter["dropout"],
         "attention_gate_init": adapter["gate_init"],
+        "sampling_strategy": training["sampling"],
+        "loss_strategy": training.get("loss", "cross_entropy"),
+        "effective_number_beta": training.get("effective_number_beta", 0.999),
         "batch_size": training["batch_size"],
         "eval_batch_size": training["eval_batch_size"],
         "gradient_accumulation_steps": training["gradient_accumulation_steps"],
@@ -158,6 +189,7 @@ def validate_config(config: BelgianTrainConfig, experiment: dict[str, object]) -
         "warmup_epochs": training["warmup_epochs"],
         "early_stopping_patience": training["early_stopping_patience"],
         "early_stopping_min_delta": training["early_stopping_min_delta"],
+        "early_stopping_start_epoch": training.get("early_stopping_start_epoch", 1),
         "precision": training["precision"],
         "num_workers": training["num_workers"],
     }
@@ -217,6 +249,32 @@ def build_dataloaders(config: BelgianTrainConfig):
         config.split_manifest,
         require_strict_audio=not config.allow_experiment_overrides,
     )
+    normalization: dict[str, object] | None = None
+    if config.normalization_stats_path is not None:
+        stats_path = resolve_path(config.normalization_stats_path)
+        normalization = json.loads(stats_path.read_text(encoding="utf-8"))
+        expected_stats = {
+            "split_manifest_sha256": manifest["manifest_sha256"],
+            "split": "train",
+            "test_evaluated": False,
+            "sample_rate": TARGET_SAMPLE_RATE,
+            "clip_duration_seconds": config.clip_duration,
+            "n_fft": config.n_fft,
+            "win_length": config.win_length,
+            "hop_length": config.hop_length,
+            "n_mels": config.n_mels,
+        }
+        mismatches = {
+            key: {"expected": value, "actual": normalization.get(key)}
+            for key, value in expected_stats.items()
+            if normalization.get(key) != value
+        }
+        if mismatches:
+            raise ValueError(f"Belgian normalization statistics mismatch: {mismatches}")
+        if int(normalization.get("records", -1)) != len(train_records):
+            raise ValueError("Belgian normalization statistics use another training set")
+        if float(normalization.get("std", 0.0)) <= 0:
+            raise ValueError("Belgian normalization standard deviation must be positive")
     dataset_kwargs = {
         "data_root": config.data_root,
         "sample_rate": TARGET_SAMPLE_RATE,
@@ -227,10 +285,15 @@ def build_dataloaders(config: BelgianTrainConfig):
         "win_length": config.win_length,
         "hop_length": config.hop_length,
         "n_mels": config.n_mels,
+        "normalization_mean": None if normalization is None else float(normalization["mean"]),
+        "normalization_std": None if normalization is None else float(normalization["std"]),
     }
     train_dataset = BelgianMelDataset(train_records, return_index=False, **dataset_kwargs)
     val_dataset = BelgianMelDataset(val_records, return_index=True, **dataset_kwargs)
-    sampler = ClassDateBalancedEpochSampler(train_records, seed=config.seed)
+    if config.sampling_strategy == "class_date_balanced_dynamic":
+        sampler = ClassDateBalancedEpochSampler(train_records, seed=config.seed)
+    else:
+        sampler = FullEpochShuffleSampler(train_records, seed=config.seed)
     worker_options: dict[str, object] = {}
     if config.num_workers > 0:
         worker_options = {
@@ -270,6 +333,11 @@ def build_dataloaders(config: BelgianTrainConfig):
         "train_records": len(train_records),
         "val_records": len(val_records),
         "train_samples_per_epoch": len(sampler),
+        "train_class_counts": dict(Counter(record.class_name for record in train_records)),
+        "sampling_strategy": config.sampling_strategy,
+        "loss_strategy": config.loss_strategy,
+        "normalization_stats_path": config.normalization_stats_path,
+        "normalization": normalization,
         "initial_sampling_audit": sampler.audit(),
         "test_evaluated": False,
     }
@@ -330,6 +398,8 @@ def run_epoch(
     total_loss = 0.0
     total_correct = 0
     total_samples = 0
+    all_targets: list[int] = []
+    all_predictions: list[int] = []
     rows: list[dict[str, object]] = []
     dataset = dataloader.dataset
     if not isinstance(dataset, BelgianMelDataset):
@@ -378,6 +448,8 @@ def run_epoch(
             total_loss += float(loss.item()) * batch_size
             total_correct += int((predictions == targets).sum().item())
             total_samples += batch_size
+            all_targets.extend(int(value) for value in targets.detach().cpu().tolist())
+            all_predictions.extend(int(value) for value in predictions.detach().cpu().tolist())
             if not is_train:
                 if indexes is None:
                     raise RuntimeError("Belgian validation requires dataset indexes")
@@ -420,7 +492,8 @@ def run_epoch(
                 )
     if total_samples == 0:
         raise RuntimeError(f"No Belgian samples processed during {phase}")
-    return total_loss / total_samples, total_correct / total_samples, rows
+    epoch_metrics = compute_metrics(all_targets, all_predictions, CLASS_NAMES)
+    return total_loss / total_samples, total_correct / total_samples, rows, epoch_metrics
 
 
 def _scheduler(optimizer: torch.optim.Optimizer, config: BelgianTrainConfig):
@@ -448,6 +521,33 @@ def _optimizer(model: nn.Module, config: BelgianTrainConfig):
         lr=config.learning_rate,
         weight_decay=config.weight_decay,
     )
+
+
+def _training_criterion(
+    config: BelgianTrainConfig,
+    class_counts: dict[str, int],
+) -> tuple[nn.Module, dict[str, object]]:
+    ordered_counts = [int(class_counts[name]) for name in CLASS_NAMES]
+    if any(count <= 0 for count in ordered_counts):
+        raise ValueError(f"Belgian training set is missing a class: {class_counts}")
+    if config.loss_strategy == "cross_entropy":
+        return nn.CrossEntropyLoss(), {
+            "strategy": "cross_entropy",
+            "class_counts": dict(zip(CLASS_NAMES, ordered_counts, strict=True)),
+            "class_weights": dict.fromkeys(CLASS_NAMES, 1.0),
+        }
+    beta = config.effective_number_beta
+    effective_numbers = [(1.0 - beta**count) / (1.0 - beta) for count in ordered_counts]
+    inverse = torch.tensor([1.0 / value for value in effective_numbers], dtype=torch.float32)
+    weights = inverse / inverse.mean()
+    report = {
+        "strategy": "effective_number",
+        "beta": beta,
+        "class_counts": dict(zip(CLASS_NAMES, ordered_counts, strict=True)),
+        "effective_numbers": dict(zip(CLASS_NAMES, effective_numbers, strict=True)),
+        "class_weights": dict(zip(CLASS_NAMES, weights.tolist(), strict=True)),
+    }
+    return nn.CrossEntropyLoss(weight=weights.to(config.device)), report
 
 
 def _validation_metrics(rows: list[dict[str, object]]):
@@ -523,12 +623,21 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
     (directories["reports"] / "model_report.json").write_text(
         json.dumps(model_report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
-    criterion = nn.CrossEntropyLoss()
+    criterion, loss_report = _training_criterion(
+        config,
+        {name: int(split_report["train_class_counts"][name]) for name in CLASS_NAMES},
+    )
+    validation_criterion = nn.CrossEntropyLoss()
+    (directories["reports"] / "loss_configuration.json").write_text(
+        json.dumps(loss_report, indent=2) + "\n", encoding="utf-8"
+    )
     optimizer = _optimizer(model, config)
     scheduler = _scheduler(optimizer, config)
     history = {
         "train_loss": [],
         "train_acc": [],
+        "train_macro_f1": [],
+        "train_per_class_f1": [],
         "val_loss": [],
         "val_acc": [],
         "val_clip_macro_f1": [],
@@ -555,6 +664,8 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
         history = checkpoint["history"]
+        history.setdefault("train_macro_f1", [])
+        history.setdefault("train_per_class_f1", [])
         best_epoch = int(checkpoint["best_epoch"])
         best_value = float(checkpoint["best_value"])
         best_val_loss = float(checkpoint["best_val_loss"])
@@ -569,7 +680,10 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
         for epoch in range(start_epoch, config.epochs + 1):
             started = time.perf_counter()
             sampler = dataloaders["train"].sampler
-            if not isinstance(sampler, ClassDateBalancedEpochSampler):
+            if not isinstance(
+                sampler,
+                (ClassDateBalancedEpochSampler, FullEpochShuffleSampler),
+            ):
                 raise TypeError("Belgian training sampler is invalid")
             sampler.set_epoch(epoch)
             sampling_dir = directories["reports"] / "sampling_audits"
@@ -578,7 +692,7 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
                 json.dumps(sampler.audit(), indent=2) + "\n", encoding="utf-8"
             )
             current_lr = float(optimizer.param_groups[0]["lr"])
-            train_loss, train_acc, _ = run_epoch(
+            train_loss, train_acc, _, train_metrics = run_epoch(
                 model,
                 dataloaders["train"],
                 criterion,
@@ -591,10 +705,10 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
                 validate_gradients=not gradients_validated,
             )
             gradients_validated = True
-            val_loss, val_acc, rows = run_epoch(
+            val_loss, val_acc, rows, _ = run_epoch(
                 model,
                 dataloaders["val"],
-                criterion,
+                validation_criterion,
                 config,
                 epoch=epoch,
                 phase="val",
@@ -606,6 +720,13 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
             clip_value = float(metrics["clip"]["macro_f1"])
             history["train_loss"].append(train_loss)
             history["train_acc"].append(train_acc)
+            history["train_macro_f1"].append(float(train_metrics["macro_f1"]))
+            history["train_per_class_f1"].append(
+                {
+                    name: float(train_metrics["classification_report"][name]["f1-score"])
+                    for name in CLASS_NAMES
+                }
+            )
             history["val_loss"].append(val_loss)
             history["val_acc"].append(val_acc)
             history["val_clip_macro_f1"].append(clip_value)
@@ -615,7 +736,10 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
             checkpoint_improved = date_value > best_value or (
                 date_value == best_value and val_loss < best_val_loss
             )
-            meaningful = date_value >= early_reference + config.early_stopping_min_delta
+            early_stopping_active = epoch >= config.early_stopping_start_epoch
+            meaningful = early_stopping_active and (
+                date_value >= early_reference + config.early_stopping_min_delta
+            )
             if meaningful:
                 early_reference = date_value
                 early_reference_epoch = epoch
@@ -686,11 +810,12 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
                 },
                 last_path,
             )
-            wait = epoch - early_reference_epoch
-            stop = wait >= config.early_stopping_patience
+            wait = 0 if not early_stopping_active else epoch - early_reference_epoch
+            stop = early_stopping_active and wait >= config.early_stopping_patience
             summary = (
                 f"Epoch {epoch}/{config.epochs} | done | train_loss={train_loss:.4f} "
-                f"| train_acc={train_acc:.4f} | val_loss={val_loss:.4f} "
+                f"| train_acc={train_acc:.4f} | train_macro_f1={train_metrics['macro_f1']:.4f} "
+                f"| val_loss={val_loss:.4f} "
                 f"| val_acc={val_acc:.4f} | val_clip_f1={clip_value:.4f} "
                 f"| val_date_f1={date_value:.4f} | best_date_f1={best_value:.4f} "
                 f"| early_stop_wait={wait}/{config.early_stopping_patience} "
@@ -718,6 +843,7 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
     )
     result = {
         "status": "validation_complete",
+        "experiment_id": experiment["experiment_id"],
         "test_evaluated": False,
         "protocol": split_report["protocol"],
         "fold": split_report["fold"],
@@ -733,6 +859,9 @@ def train(config: BelgianTrainConfig) -> dict[str, object]:
         "num_parameters": model.num_parameters,
         "manifest_sha256": split_report["manifest_sha256"],
         "training_samples_per_epoch": split_report["train_samples_per_epoch"],
+        "sampling_strategy": config.sampling_strategy,
+        "loss_configuration": loss_report,
+        "normalization_stats_path": config.normalization_stats_path,
         "experiment_config_mismatches": mismatches,
     }
     (directories["reports"] / "run_complete.json").write_text(

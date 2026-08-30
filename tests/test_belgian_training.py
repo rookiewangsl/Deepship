@@ -12,11 +12,53 @@ import soundfile as sf
 from src.data.belgian_ais import BelgianRecord, canonical_sha256
 from src.pipelines.mel_ml.train_belgian_macnna_global import (
     BelgianTrainConfig,
+    _training_criterion,
+    load_experiment,
     train,
+    validate_config,
 )
 
 
 class BelgianTrainingTests(unittest.TestCase):
+    def test_sanity_recipe_is_frozen_and_uses_moderate_effective_number_weights(self) -> None:
+        config_path = Path("configs/experiments/belgian_training_sanity_v1.json")
+        experiment = load_experiment(str(config_path))
+        config = BelgianTrainConfig(
+            data_root="unused",
+            output_root="unused",
+            split_manifest="unused",
+            experiment_config=str(config_path),
+            model_variant="g0",
+            seed=42,
+            sampling_strategy="full_epoch_shuffle",
+            loss_strategy="effective_number",
+            effective_number_beta=0.999,
+            normalization_stats_path="train-only.json",
+            batch_size=16,
+            eval_batch_size=16,
+            gradient_accumulation_steps=2,
+            epochs=30,
+            learning_rate=3e-4,
+            weight_decay=1e-2,
+            max_grad_norm=1.0,
+            min_learning_rate=1e-6,
+            warmup_epochs=1,
+            early_stopping_patience=8,
+            early_stopping_min_delta=0.002,
+            early_stopping_start_epoch=5,
+            precision="bf16",
+            num_workers=8,
+        )
+        self.assertEqual(validate_config(config, experiment), [])
+        _criterion, report = _training_criterion(
+            config,
+            {"Cargo": 5031, "Passenger": 114, "Tank": 2425, "Tug": 132},
+        )
+        weights = report["class_weights"]
+        self.assertGreater(weights["Passenger"], weights["Cargo"])
+        self.assertGreater(weights["Tug"], weights["Tank"])
+        self.assertAlmostEqual(sum(weights.values()) / 4.0, 1.0, places=6)
+
     def test_validation_only_smoke_writes_required_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
