@@ -1,13 +1,16 @@
 {
   "status": "passed",
   "checks": {
+    "schema_version_supported": true,
     "manifest_hash_matches": true,
     "paths_unique": true,
     "test_absent": true,
     "dates_disjoint": true,
-    "all_classes_present": true
+    "all_classes_present": true,
+    "strict_audio_policy_matches": true,
+    "audio_inventory_hash_present": true
   },
-  "calculated_manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
-  "recorded_manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
+  "calculated_manifest_sha256": "3719e650a0b8fedee909e5471fff067614cb608868830d1f49ff043b23b019a7",
+  "recorded_manifest_sha256": "3719e650a0b8fedee909e5471fff067614cb608868830d1f49ff043b23b019a7",
   "date_overlap": []
 }

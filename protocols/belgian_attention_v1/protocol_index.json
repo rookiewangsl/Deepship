@@ -2,22 +2,23 @@
   "schema_version": 1,
   "experiment_id": "belgian_attention_v1",
   "fold_seed": 42,
+  "date_assignment_policy": "preserved_from_pre_audio_audit_frozen_manifests",
   "folds": [
     {
       "fold": 1,
-      "manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
+      "manifest_sha256": "3719e650a0b8fedee909e5471fff067614cb608868830d1f49ff043b23b019a7",
       "counts": {
         "train": {
-          "Cargo": 5139,
-          "Passenger": 116,
-          "Tank": 2489,
+          "Cargo": 5031,
+          "Passenger": 114,
+          "Tank": 2425,
           "Tug": 132
         },
         "val": {
-          "Cargo": 2582,
+          "Cargo": 2514,
           "Passenger": 59,
-          "Tank": 1223,
-          "Tug": 66
+          "Tank": 1194,
+          "Tug": 64
         }
       },
       "train_dates": 47,
@@ -26,18 +27,18 @@
     },
     {
       "fold": 2,
-      "manifest_sha256": "e99e8c7e1a185e8a735a7691bb5e99d813d483a9349e49180d0f05317323b5a9",
+      "manifest_sha256": "f4fc610e86320331d226e47a55457ead99fbd218c016889d60fe81b541d5cd63",
       "counts": {
         "train": {
-          "Cargo": 5090,
-          "Passenger": 116,
-          "Tank": 2488,
-          "Tug": 134
+          "Cargo": 4962,
+          "Passenger": 115,
+          "Tank": 2430,
+          "Tug": 132
         },
         "val": {
-          "Cargo": 2631,
-          "Passenger": 59,
-          "Tank": 1224,
+          "Cargo": 2583,
+          "Passenger": 58,
+          "Tank": 1189,
           "Tug": 64
         }
       },
@@ -47,18 +48,18 @@
     },
     {
       "fold": 3,
-      "manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
+      "manifest_sha256": "4782c36bb180b7b3d98f6e8cbb3824b32dc5d7bf558f1dadccbb436642be9e0c",
       "counts": {
         "train": {
-          "Cargo": 5213,
-          "Passenger": 118,
-          "Tank": 2447,
-          "Tug": 130
+          "Cargo": 5097,
+          "Passenger": 117,
+          "Tank": 2383,
+          "Tug": 128
         },
         "val": {
-          "Cargo": 2508,
-          "Passenger": 57,
-          "Tank": 1265,
+          "Cargo": 2448,
+          "Passenger": 56,
+          "Tank": 1236,
           "Tug": 68
         }
       },
@@ -86,46 +87,69 @@
     "2022-04-24",
     "2022-05-04"
   ],
+  "development_audio_policy": {
+    "source_sample_rate_hz": 48000,
+    "duration_seconds": 10.0,
+    "duration_rule": "frames == source_sample_rate_hz * duration_seconds",
+    "accepted_source_channels": [
+      1,
+      2
+    ],
+    "channel_policy": "fixed_channel_0",
+    "selected_channel_index": 0
+  },
+  "development_audio_inventory_sha256": "3bee3a23d9f60dde439362c4111c279713849683d3fd1a23ea153fdc01c4eb6d",
+  "sealed_test_audio_status": "not_inspected",
   "validations": [
     {
       "status": "passed",
       "checks": {
+        "schema_version_supported": true,
         "manifest_hash_matches": true,
         "paths_unique": true,
         "test_absent": true,
         "dates_disjoint": true,
-        "all_classes_present": true
+        "all_classes_present": true,
+        "strict_audio_policy_matches": true,
+        "audio_inventory_hash_present": true
       },
-      "calculated_manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
-      "recorded_manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000",
+      "calculated_manifest_sha256": "3719e650a0b8fedee909e5471fff067614cb608868830d1f49ff043b23b019a7",
+      "recorded_manifest_sha256": "3719e650a0b8fedee909e5471fff067614cb608868830d1f49ff043b23b019a7",
       "date_overlap": []
     },
     {
       "status": "passed",
       "checks": {
+        "schema_version_supported": true,
         "manifest_hash_matches": true,
         "paths_unique": true,
         "test_absent": true,
         "dates_disjoint": true,
-        "all_classes_present": true
+        "all_classes_present": true,
+        "strict_audio_policy_matches": true,
+        "audio_inventory_hash_present": true
       },
-      "calculated_manifest_sha256": "e99e8c7e1a185e8a735a7691bb5e99d813d483a9349e49180d0f05317323b5a9",
-      "recorded_manifest_sha256": "e99e8c7e1a185e8a735a7691bb5e99d813d483a9349e49180d0f05317323b5a9",
+      "calculated_manifest_sha256": "f4fc610e86320331d226e47a55457ead99fbd218c016889d60fe81b541d5cd63",
+      "recorded_manifest_sha256": "f4fc610e86320331d226e47a55457ead99fbd218c016889d60fe81b541d5cd63",
       "date_overlap": []
     },
     {
       "status": "passed",
       "checks": {
+        "schema_version_supported": true,
         "manifest_hash_matches": true,
         "paths_unique": true,
         "test_absent": true,
         "dates_disjoint": true,
-        "all_classes_present": true
+        "all_classes_present": true,
+        "strict_audio_policy_matches": true,
+        "audio_inventory_hash_present": true
       },
-      "calculated_manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
-      "recorded_manifest_sha256": "4b74d8d24ddec3a2deba8b86dbdacd1cef8e55b47901cebacc3b700a24ff115f",
+      "calculated_manifest_sha256": "4782c36bb180b7b3d98f6e8cbb3824b32dc5d7bf558f1dadccbb436642be9e0c",
+      "recorded_manifest_sha256": "4782c36bb180b7b3d98f6e8cbb3824b32dc5d7bf558f1dadccbb436642be9e0c",
       "date_overlap": []
     }
   ],
-  "eligible_record_count": 13627
+  "eligible_record_count": 13354,
+  "strict_development_record_count": 11533
 }

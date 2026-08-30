@@ -91,8 +91,10 @@ def main() -> None:
         json.dumps(audit, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+    persisted_audio_audit = dict(audio_audit)
+    persisted_audio_audit.pop("inventory", None)
     (audit_dir / "development_audio_admission.json").write_text(
-        json.dumps(audio_audit, indent=2, ensure_ascii=False) + "\n",
+        json.dumps(persisted_audio_audit, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     validations = []

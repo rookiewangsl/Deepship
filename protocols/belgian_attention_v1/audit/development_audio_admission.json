@@ -1,0 +1,387 @@
+{
+  "schema_version": 2,
+  "policy": {
+    "source_sample_rate_hz": 48000,
+    "duration_seconds": 10.0,
+    "duration_rule": "frames == source_sample_rate_hz * duration_seconds",
+    "accepted_source_channels": [
+      1,
+      2
+    ],
+    "channel_policy": "fixed_channel_0",
+    "selected_channel_index": 0
+  },
+  "development_candidates": 11806,
+  "development_admitted": 11533,
+  "development_rejected": 273,
+  "retention_fraction": 0.9768761646620363,
+  "admitted_by_class": {
+    "Cargo": 7545,
+    "Tank": 3619,
+    "Passenger": 173,
+    "Tug": 196
+  },
+  "admitted_by_channels": {
+    "2": 5823,
+    "1": 5710
+  },
+  "rejected_by_reason": {
+    "not_exact_10_seconds": 273
+  },
+  "rejected_examples": [
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_01-06-50_302-846903_Tanker_underway-using-engine_10-5_3208.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 190517,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_02-33-46_303-917045_Tanker_underway-using-engine_13-9_3732.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 139150,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_05-07-10_297-029381_Tanker_underway-using-engine_11-9_4531.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 469758,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_13-43-38_302-542068_Cargo_underway-using-engine_12-2_4654.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 205149,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_14-45-00_304-471331_Cargo_underway-using-engine_11-5_4270.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 112545,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_05-22-31_303-24147_Cargo_underway-using-engine_7-9_4017.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 171578,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_06-13-39_303-958583_Cargo_underway-using-engine_18-3_2767.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 137157,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_08-06-09_300-291152_Cargo_underway-using-engine_13-4_3064.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 313193,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_18-50-27_301-316439_Cargo_underway-using-engine_9-9_3136.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 263979,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_18-55-33_299-28818_Cargo_underway-using-engine_9-8_3492.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 361336,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-28_00-05-28_297-778007_Cargo_underway-using-engine_8-0_4226.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 433824,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_03-30-01_305-14837_Cargo_underway-using-engine_9-1_4323.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 80047,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_06-23-52_300-832102_Tanker_underway-using-engine_9-9_3968.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 287228,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_21-18-44_302-806259_Tanker_underway-using-engine_13-6_1719.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 192468,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_00-31-02_300-114594_Cargo_underway-using-engine_18-9_2106.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 321668,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_06-49-26_305-037096_Tanker_underway-using-engine_11-5_4363.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 85388,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_07-30-21_304-745373_Cargo_underway-using-engine_8-9_3628.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 99391,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_03-19-47_303-140716_Cargo_underway-using-engine_18-5_2517.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 176414,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_08-41-56_304-086244_Tanker_underway-using-engine_11-6_4728.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 131029,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_15-00-20_299-569244_Tanker_underway-using-engine_14-6_3038.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 347845,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_20-12-15_303-857504_Tanker_underway-using-engine_12-6_3088.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 142008,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-09_04-51-50_303-036571_Tanker_underway-using-engine_13-0_2924.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 181413,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-09_04-56-57_298-311592_Tanker_underway-using-engine_13-2_2260.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 408212,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-09_06-54-33_300-459226_Cargo_underway-using-engine_11-7_2423.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 305126,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_01-22-11_303-384646_Tanker_underway-using-engine_14-2_4583.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 164705,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_09-38-11_303-565443_Cargo_underway-using-engine_12-2_2575.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 156027,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_10-49-46_305-965173_Cargo_underway-using-engine_11-2_3011.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 40840,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-15_03-19-47_297-8661_Tanker_underway-using-engine_12-9_4819.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 429596,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-15_06-54-33_301-23131_Tanker_underway-using-engine_11-5_3607.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 268066,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-17_11-40-55_303-098302_Tanker_underway-using-engine_8-3_2177.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 178450,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-17_12-37-10_305-759058_Tanker_underway-using-engine_16-4_4253.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 50734,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-17_17-23-31_297-584529_Cargo_underway-using-engine_16-1_4259.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 443111,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-19_02-13-19_302-034838_Tanker_underway-using-engine_10-4_2790.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 229496,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-21_20-42-56_302-214599_Tanker_underway-using-engine_9-0_1890.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 220868,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_03-14-40_302-337009_Cargo_underway-using-engine_12-4_2965.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 214992,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_08-26-36_297-319299_Cargo_underway-using-engine_12-5_2559.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 455842,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_11-00-00_304-138454_Cargo_underway-using-engine_11-9_1983.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 128523,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_13-43-38_300-600086_Cargo_underway-using-engine_11-2_1945.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 298364,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_21-49-25_306-68203_Cargo_underway-using-engine_13-7_3122.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 6431,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-01_00-20-49_303-117795_Cargo_underway-using-engine_11-6_1419.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 177514,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-01_05-37-51_300-413283_Cargo_underway-using-engine_8-1_2424.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 307331,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-01_21-54-32_305-200764_Tanker_underway-using-engine_12-2_4234.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 77532,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_02-23-32_305-366733_Cargo_underway-using-engine_12-6_1157.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 69565,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_15-00-20_302-232229_Tanker_underway-using-engine_8-7_1564.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 220022,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_15-25-54_297-145029_Cargo_underway-using-engine_11-8_2478.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 464207,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_18-19-48_300-540556_Cargo_underway-using-engine_12-9_2044.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 301222,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_01-06-50_298-4625_Cargo_underway-using-engine_11-8_3006.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 400968,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_12-37-10_302-430624_Cargo_underway-using-engine_13-5_1851.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 210499,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_18-19-46_301-958852_Cargo_underway-using-engine_7-0_2429.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 233144,
+      "reason": "not_exact_10_seconds"
+    },
+    {
+      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_20-17-22_300-465743_Tanker_underway-using-engine_15-9_3208.wav",
+      "source_sample_rate_hz": 48000,
+      "source_channels": 2,
+      "source_frames": 304813,
+      "reason": "not_exact_10_seconds"
+    }
+  ],
+  "sealed_test_records_preserved": 1444,
+  "development_records_skipped_for_test_date_isolation": 377,
+  "sealed_test_audio_status": "not_inspected",
+  "admitted_inventory_sha256": "3bee3a23d9f60dde439362c4111c279713849683d3fd1a23ea153fdc01c4eb6d"
+}

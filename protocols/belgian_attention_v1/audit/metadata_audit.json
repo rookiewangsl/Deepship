@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "metadata_path": "/tmp/belgian_public_meta/metadata_database.csv",
+  "metadata_path": "/home/slwang/deepship/datasets/belgian_ais/extracted/metadata_database.csv",
   "metadata_sha256": "de6180ed8c8235465493889621b61951acf15d47222deee083ab362dfd7d5da3",
   "metadata_rows": 28341,
   "metadata_unique_paths": 28144,

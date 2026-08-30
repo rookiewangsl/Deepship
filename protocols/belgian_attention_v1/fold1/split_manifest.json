@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "experiment_id": "belgian_attention_v1",
   "protocol": "utc_date_disjoint",
   "fold": 1,
@@ -81,19 +81,6 @@
       "calendar_date": "2022-01-20",
       "station": "GardenCity",
       "distance_km": 4.368342039049647,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_01-06-50_302-846903_Tanker_underway-using-engine_10-5_3208.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-01-20 01:11:52.846903+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "GardenCity",
-      "distance_km": 3.207951281877994,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -241,19 +228,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_02-33-46_303-917045_Tanker_underway-using-engine_13-9_3732.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-01-20 02:38:49.917045+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "GardenCity",
-      "distance_km": 3.7316267282782,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_02-44-00_275-660603_Tanker_underway-using-engine_10-7_4762.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -393,19 +367,6 @@
       "calendar_date": "2022-01-20",
       "station": "GardenCity",
       "distance_km": 4.2497548994793,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_05-07-10_297-029381_Tanker_underway-using-engine_11-9_4531.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-01-20 05:12:07.029381+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "GardenCity",
-      "distance_km": 4.530645035858288,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -904,19 +865,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_13-43-38_302-542068_Cargo_underway-using-engine_12-2_4654.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-20 13:48:40.542068+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "GardenCity",
-      "distance_km": 4.654042813375092,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_14-29-39_16-024833_Cargo_underway-using-engine_11-6_3942.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -965,19 +913,6 @@
       "calendar_date": "2022-01-20",
       "station": "GardenCity",
       "distance_km": 2.226568539573333,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-20_14-45-00_304-471331_Cargo_underway-using-engine_11-5_4270.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-20 14:50:04.471331+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "GardenCity",
-      "distance_km": 4.270104262873795,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -2048,19 +1983,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_03-19-47_303-140716_Cargo_underway-using-engine_18-5_2517.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-05 03:24:50.140716+00:00",
-      "calendar_date": "2022-02-05",
-      "station": "GardenCity",
-      "distance_km": 2.5168430938615063,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_03-35-08_37-455617_Tanker_underway-using-engine_14-5_3571.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -2213,19 +2135,6 @@
       "calendar_date": "2022-02-05",
       "station": "GardenCity",
       "distance_km": 4.969257532879409,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_08-41-56_304-086244_Tanker_underway-using-engine_11-6_4728.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-05 08:47:00.086244+00:00",
-      "calendar_date": "2022-02-05",
-      "station": "GardenCity",
-      "distance_km": 4.728064397958013,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -2698,19 +2607,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_15-00-20_299-569244_Tanker_underway-using-engine_14-6_3038.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-05 15:05:19.569244+00:00",
-      "calendar_date": "2022-02-05",
-      "station": "GardenCity",
-      "distance_km": 3.0382293788164474,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_15-05-27_203-748319_Tanker_underway-using-engine_14-6_2702.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -3006,19 +2902,6 @@
       "calendar_date": "2022-02-05",
       "station": "GardenCity",
       "distance_km": 4.681308958670607,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-05_20-12-15_303-857504_Tanker_underway-using-engine_12-6_3088.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-05 20:17:18.857504+00:00",
-      "calendar_date": "2022-02-05",
-      "station": "GardenCity",
-      "distance_km": 3.088082821651262,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -3530,32 +3413,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-09_04-51-50_303-036571_Tanker_underway-using-engine_13-0_2924.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-09 04:56:53.036571+00:00",
-      "calendar_date": "2022-02-09",
-      "station": "GardenCity",
-      "distance_km": 2.9236813142294245,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-09_04-56-57_298-311592_Tanker_underway-using-engine_13-2_2260.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-09 05:01:55.311592+00:00",
-      "calendar_date": "2022-02-09",
-      "station": "GardenCity",
-      "distance_km": 2.259886975569679,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-09_05-07-10_8-840534_Tanker_underway-using-engine_13-3_2972.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -3695,19 +3552,6 @@
       "calendar_date": "2022-02-09",
       "station": "GardenCity",
       "distance_km": 3.3624469364576,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-09_06-54-33_300-459226_Cargo_underway-using-engine_11-7_2423.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-09 06:59:33.459226+00:00",
-      "calendar_date": "2022-02-09",
-      "station": "GardenCity",
-      "distance_km": 2.423498831214373,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -4700,19 +4544,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_01-22-11_303-384646_Tanker_underway-using-engine_14-2_4583.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-13 01:27:14.384646+00:00",
-      "calendar_date": "2022-02-13",
-      "station": "GardenCity",
-      "distance_km": 4.58347919272559,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_01-22-11_63-281643_Tanker_underway-using-engine_14-2_4825.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -5129,19 +4960,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_09-38-11_303-565443_Cargo_underway-using-engine_12-2_2575.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-13 09:43:14.565443+00:00",
-      "calendar_date": "2022-02-13",
-      "station": "GardenCity",
-      "distance_km": 2.57534697222124,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_09-48-25_164-467476_Cargo_underway-using-engine_13-5_3097.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -5268,19 +5086,6 @@
       "calendar_date": "2022-02-13",
       "station": "GardenCity",
       "distance_km": 3.529257086276364,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-13_10-49-46_305-965173_Cargo_underway-using-engine_11-2_3011.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-13 10:54:51.965173+00:00",
-      "calendar_date": "2022-02-13",
-      "station": "GardenCity",
-      "distance_km": 3.010553610658173,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -6039,19 +5844,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-15_03-19-47_297-8661_Tanker_underway-using-engine_12-9_4819.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-15 03:24:44.866100+00:00",
-      "calendar_date": "2022-02-15",
-      "station": "GardenCity",
-      "distance_km": 4.819481432504929,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-15_03-19-47_86-768174_Tanker_underway-using-engine_12-5_3997.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -6269,19 +6061,6 @@
       "calendar_date": "2022-02-15",
       "station": "GardenCity",
       "distance_km": 4.689784332509834,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-15_06-54-33_301-23131_Tanker_underway-using-engine_11-5_3607.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-15 06:59:34.231310+00:00",
-      "calendar_date": "2022-02-15",
-      "station": "GardenCity",
-      "distance_km": 3.606719561130719,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -7222,19 +7001,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-17_11-40-55_303-098302_Tanker_underway-using-engine_8-3_2177.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-17 11:45:58.098302+00:00",
-      "calendar_date": "2022-02-17",
-      "station": "GardenCity",
-      "distance_km": 2.177140195950913,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-17_11-51-08_130-154313_Cargo_underway-using-engine_9-3_822.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -7322,19 +7088,6 @@
       "calendar_date": "2022-02-17",
       "station": "GardenCity",
       "distance_km": 3.0175846782866715,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-17_12-37-10_305-759058_Tanker_underway-using-engine_16-4_4253.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-17 12:42:15.759058+00:00",
-      "calendar_date": "2022-02-17",
-      "station": "GardenCity",
-      "distance_km": 4.253361615460094,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -7504,19 +7257,6 @@
       "calendar_date": "2022-02-17",
       "station": "GardenCity",
       "distance_km": 4.33578373640344,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-17_17-23-31_297-584529_Cargo_underway-using-engine_16-1_4259.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-17 17:28:28.584529+00:00",
-      "calendar_date": "2022-02-17",
-      "station": "GardenCity",
-      "distance_km": 4.259327998315902,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -7907,19 +7647,6 @@
       "calendar_date": "2022-02-19",
       "station": "GardenCity",
       "distance_km": 1.8578755404494944,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-19_02-13-19_302-034838_Tanker_underway-using-engine_10-4_2790.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-19 02:18:21.034838+00:00",
-      "calendar_date": "2022-02-19",
-      "station": "GardenCity",
-      "distance_km": 2.790497433898949,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -9055,19 +8782,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_03-14-40_302-337009_Cargo_underway-using-engine_12-4_2965.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-27 03:19:42.337009+00:00",
-      "calendar_date": "2022-02-27",
-      "station": "GardenCity",
-      "distance_km": 2.964583879859801,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_03-19-47_291-953079_Cargo_underway-using-engine_12-4_4585.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -9289,19 +9003,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_08-26-36_297-319299_Cargo_underway-using-engine_12-5_2559.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-27 08:31:33.319299+00:00",
-      "calendar_date": "2022-02-27",
-      "station": "GardenCity",
-      "distance_km": 2.558961819791288,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_08-36-49_24-544645_Cargo_underway-using-engine_12-6_2987.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -9441,19 +9142,6 @@
       "calendar_date": "2022-02-27",
       "station": "GardenCity",
       "distance_km": 4.045446188483804,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_11-00-00_304-138454_Cargo_underway-using-engine_11-9_1983.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-27 11:05:04.138454+00:00",
-      "calendar_date": "2022-02-27",
-      "station": "GardenCity",
-      "distance_km": 1.9834494574934136,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -9636,19 +9324,6 @@
       "calendar_date": "2022-02-27",
       "station": "GardenCity",
       "distance_km": 2.593833087140314,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_13-43-38_300-600086_Cargo_underway-using-engine_11-2_1945.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-27 13:48:38.600086+00:00",
-      "calendar_date": "2022-02-27",
-      "station": "GardenCity",
-      "distance_km": 1.94466042324376,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -9991,19 +9666,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_21-49-25_306-68203_Cargo_underway-using-engine_13-7_3122.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-27 21:54:31.682030+00:00",
-      "calendar_date": "2022-02-27",
-      "station": "GardenCity",
-      "distance_km": 3.122370195327151,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-27_21-49-25_6-435673_Cargo_underway-using-engine_13-6_2181.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -10130,19 +9792,6 @@
       "calendar_date": "2022-03-03",
       "station": "GardenCity",
       "distance_km": 2.8334552976203344,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_02-23-32_305-366733_Cargo_underway-using-engine_12-6_1157.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-03 02:28:37.366733+00:00",
-      "calendar_date": "2022-03-03",
-      "station": "GardenCity",
-      "distance_km": 1.1572867731827752,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -10277,19 +9926,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_15-00-20_302-232229_Tanker_underway-using-engine_8-7_1564.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-03 15:05:22.232229+00:00",
-      "calendar_date": "2022-03-03",
-      "station": "GardenCity",
-      "distance_km": 1.56421645454441,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_15-10-34_148-799874_Tanker_underway-using-engine_14-9_1140.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -10338,19 +9974,6 @@
       "calendar_date": "2022-03-03",
       "station": "GardenCity",
       "distance_km": 2.5329627325553514,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_15-25-54_297-145029_Cargo_underway-using-engine_11-8_2478.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-03 15:30:51.145029+00:00",
-      "calendar_date": "2022-03-03",
-      "station": "GardenCity",
-      "distance_km": 2.477765288839167,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -10637,19 +10260,6 @@
       "calendar_date": "2022-03-03",
       "station": "GardenCity",
       "distance_km": 2.0026301892591136,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-03_18-19-48_300-540556_Cargo_underway-using-engine_12-9_2044.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-03 18:24:48.540556+00:00",
-      "calendar_date": "2022-03-03",
-      "station": "GardenCity",
-      "distance_km": 2.0441704109414607,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -11092,19 +10702,6 @@
       "calendar_date": "2022-03-07",
       "station": "GardenCity",
       "distance_km": 3.908092740150866,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-07_01-01-43_306-289174_Cargo_underway-using-engine_11-3_4265.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-07 01:06:49.289174+00:00",
-      "calendar_date": "2022-03-07",
-      "station": "GardenCity",
-      "distance_km": 4.264958515448147,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -11586,19 +11183,6 @@
       "calendar_date": "2022-03-07",
       "station": "GardenCity",
       "distance_km": 4.100355899007549,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-07_08-36-49_303-285815_Cargo_underway-using-engine_12-9_4446.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-07 08:41:52.285815+00:00",
-      "calendar_date": "2022-03-07",
-      "station": "GardenCity",
-      "distance_km": 4.4459450513301375,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -12266,32 +11850,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-09_04-26-16_302-42359_Tanker_underway-using-engine_10-8_3447.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-09 04:28:13.684527+00:00",
-      "calendar_date": "2022-03-09",
-      "station": "GardenCity",
-      "distance_km": 3.2155892236183896,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-09_04-36-29_301-285458_Cargo_underway-using-engine_16-7_2399.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-09 04:31:18.423590+00:00",
-      "calendar_date": "2022-03-09",
-      "station": "GardenCity",
-      "distance_km": 3.446622558244737,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-09_04-41-36_210-828798_Cargo_underway-using-engine_16-8_1539.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -12600,32 +12158,6 @@
       "calendar_date": "2022-03-09",
       "station": "GardenCity",
       "distance_km": 3.440546357070491,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-09_12-32-03_298-985671_Cargo_underway-using-engine_14-4_4160.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-09 12:31:43.535937+00:00",
-      "calendar_date": "2022-03-09",
-      "station": "GardenCity",
-      "distance_km": 3.350537430741597,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-09_12-37-09_298-613429_Cargo_underway-using-engine_14-5_5797.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-09 12:37:01.985671+00:00",
-      "calendar_date": "2022-03-09",
-      "station": "GardenCity",
-      "distance_km": 4.160271781146089,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -12977,19 +12509,6 @@
       "calendar_date": "2022-03-09",
       "station": "GardenCity",
       "distance_km": 2.988030317869644,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-09_17-43-58_302-026968_Cargo_underway-using-engine_12-1_4495.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-09 17:42:30.247219+00:00",
-      "calendar_date": "2022-03-09",
-      "station": "GardenCity",
-      "distance_km": 2.85245687482251,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -13514,19 +13033,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_00-25-56_303-759065_Cargo_underway-using-engine_9-4_1624.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-11 00:30:59.759065+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "GardenCity",
-      "distance_km": 1.6244478063324168,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_00-36-09_1-343492_Cargo_underway-using-engine_9-2_2692.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -13666,19 +13172,6 @@
       "calendar_date": "2022-03-11",
       "station": "GardenCity",
       "distance_km": 4.72721074259344,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_02-18-26_302-38233_Cargo_underway-using-engine_11-3_3499.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-11 02:23:28.382330+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "GardenCity",
-      "distance_km": 3.49947633805158,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -13848,19 +13341,6 @@
       "calendar_date": "2022-03-11",
       "station": "GardenCity",
       "distance_km": 3.7892111496405865,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_03-40-15_301-282597_Tanker_underway-using-engine_11-8_3567.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-11 03:45:16.282597+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "GardenCity",
-      "distance_km": 3.5674154838471424,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -14372,19 +13852,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_09-17-44_303-361496_Tanker_underway-using-engine_10-0_4161.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-11 09:22:47.361496+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "GardenCity",
-      "distance_km": 4.160746447927118,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_09-22-51_225-762171_Tanker_underway-using-engine_10-0_3983.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -14827,19 +14294,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_16-32-23_297-99136_Cargo_underway-using-engine_10-4_3616.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-11 16:37:20.991360+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "GardenCity",
-      "distance_km": 3.616150249591775,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_16-37-30_291-824529_Cargo_underway-using-engine_10-4_4737.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -15226,19 +14680,6 @@
       "calendar_date": "2022-03-11",
       "station": "GardenCity",
       "distance_km": 1.5153289707847122,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-11_23-31-41_300-248871_Cargo_underway-using-engine_9-6_1539.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-11 23:36:41.248871+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "GardenCity",
-      "distance_km": 1.5392758987627655,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -16127,19 +15568,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-21_18-29-59_301-223713_Tanker_underway-using-engine_12-9_4302.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-21 18:35:00.223713+00:00",
-      "calendar_date": "2022-03-21",
-      "station": "GardenCity",
-      "distance_km": 4.30226475292951,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-21_18-40-13_126-177533_Tanker_underway-using-engine_12-8_3818.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -16920,32 +16348,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_05-42-58_302-167785_Cargo_underway-using-engine_15-7_3915.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-23 05:48:00.167785+00:00",
-      "calendar_date": "2022-03-23",
-      "station": "GardenCity",
-      "distance_km": 3.915391451584702,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_06-18-46_302-814605_Tanker_underway-using-engine_11-2_3301.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-23 06:23:48.814605+00:00",
-      "calendar_date": "2022-03-23",
-      "station": "GardenCity",
-      "distance_km": 3.300937336788285,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_06-28-59_23-127619_Tanker_underway-using-engine_11-2_2395.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -17245,19 +16647,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_10-19-06_304-85991_Cargo_underway-using-engine_6-4_4403.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-23 10:24:10.859910+00:00",
-      "calendar_date": "2022-03-23",
-      "station": "GardenCity",
-      "distance_km": 4.402643376965721,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_10-29-19_52-622721_Tanker_underway-using-engine_10-0_4500.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -17362,19 +16751,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_11-56-15_297-834715_Cargo_underway-using-engine_11-2_2569.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-23 12:01:12.834715+00:00",
-      "calendar_date": "2022-03-23",
-      "station": "GardenCity",
-      "distance_km": 2.568990379047136,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_12-06-29_4-594543_Cargo_underway-using-engine_11-2_3274.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -17466,19 +16842,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_13-12-57_306-333709_Cargo_underway-using-engine_9-4_3071.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-23 13:18:03.333709+00:00",
-      "calendar_date": "2022-03-23",
-      "station": "GardenCity",
-      "distance_km": 3.071064404333052,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_14-09-12_159-443876_Tanker_underway-using-engine_11-3_3465.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -17514,19 +16877,6 @@
       "calendar_date": "2022-03-23",
       "station": "GardenCity",
       "distance_km": 2.670015869551892,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_14-19-26_305-210571_Tanker_underway-using-engine_11-6_3794.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-23 14:24:31.210571+00:00",
-      "calendar_date": "2022-03-23",
-      "station": "GardenCity",
-      "distance_km": 3.794177961777796,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -18090,19 +17440,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_21-13-37_302-233487_Tanker_underway-using-engine_12-2_4434.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-23 21:18:39.233487+00:00",
-      "calendar_date": "2022-03-23",
-      "station": "GardenCity",
-      "distance_km": 4.434281623051841,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-23_22-04-45_44-948777_Passenger_underway-using-engine_14-2_3310.wav",
       "class_name": "Passenger",
       "label_index": 1,
@@ -18385,19 +17722,6 @@
       "calendar_date": "2022-03-27",
       "station": "GardenCity",
       "distance_km": 2.4519335791647565,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_01-42-38_301-962099_Tanker_underway-using-engine_10-1_1499.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-27 01:47:39.962099+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "GardenCity",
-      "distance_km": 1.4989014128906255,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -18701,19 +18025,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_07-30-21_302-529453_Tanker_underway-using-engine_10-0_4744.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-27 07:35:23.529453+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "GardenCity",
-      "distance_km": 4.744170024530409,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_07-40-35_216-902647_Tanker_underway-using-engine_10-2_4240.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -18892,19 +18203,6 @@
       "calendar_date": "2022-03-27",
       "station": "GardenCity",
       "distance_km": 4.2703011347364255,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_09-48-25_305-30598_Cargo_underway-using-engine_18-5_2759.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-27 09:53:30.305980+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "GardenCity",
-      "distance_km": 2.759142335095249,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -19126,19 +18424,6 @@
       "calendar_date": "2022-03-27",
       "station": "GardenCity",
       "distance_km": 4.745719236958132,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_13-12-57_299-409995_Cargo_underway-using-engine_9-5_1444.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-27 13:17:56.409995+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "GardenCity",
-      "distance_km": 1.4443827095141344,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -19386,19 +18671,6 @@
       "calendar_date": "2022-03-27",
       "station": "GardenCity",
       "distance_km": 4.22731186761723,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_16-17-02_302-670114_Cargo_underway-using-engine_9-6_2846.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-27 16:22:04.670114+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "GardenCity",
-      "distance_km": 2.845817871175224,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -19858,19 +19130,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_21-13-37_297-405386_Tanker_underway-using-engine_7-9_2842.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-27 21:18:34.405386+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "GardenCity",
-      "distance_km": 2.842220139694541,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-27_21-23-51_65-027217_Tanker_underway-using-engine_7-7_3452.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -20300,19 +19559,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-29_03-55-35_300-66225_Tanker_underway-using-engine_10-0_2458.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-29 04:00:35.662250+00:00",
-      "calendar_date": "2022-03-29",
-      "station": "GardenCity",
-      "distance_km": 2.4576516950917133,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-29_03-55-35_81-310178_Tanker_underway-using-engine_10-0_2227.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -20677,19 +19923,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-29_09-48-25_302-71016_Cargo_underway-using-engine_12-3_2371.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-29 09:53:27.710160+00:00",
-      "calendar_date": "2022-03-29",
-      "station": "GardenCity",
-      "distance_km": 2.3714238351548795,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-29_09-53-32_55-582698_Cargo_underway-using-engine_12-3_2410.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -20712,19 +19945,6 @@
       "calendar_date": "2022-03-29",
       "station": "GardenCity",
       "distance_km": 3.9459629599033033,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-29_12-01-22_249-338625_Tanker_underway-using-engine_12-5_2449.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-29 12:05:31.338625+00:00",
-      "calendar_date": "2022-03-29",
-      "station": "GardenCity",
-      "distance_km": 2.449059688561855,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -21951,19 +21171,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-22_05-53-11_306-592473_Cargo_underway-using-engine_12-5_1984.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-22 05:58:17.592473+00:00",
-      "calendar_date": "2022-04-22",
-      "station": "GardenCity",
-      "distance_km": 1.98370280155911,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-04-22_05-58-18_241-076195_Cargo_underway-using-engine_12-8_2582.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -22627,19 +21834,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-22_21-54-32_298-187225_Cargo_underway-using-engine_9-2_3818.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-22 21:59:30.187225+00:00",
-      "calendar_date": "2022-04-22",
-      "station": "GardenCity",
-      "distance_km": 3.818315017083788,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-04-22_22-04-45_54-68743_Cargo_underway-using-engine_8-7_2255.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -22757,19 +21951,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-22_23-36-48_305-55269_Cargo_underway-using-engine_8-1_3456.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-22 23:41:53.552690+00:00",
-      "calendar_date": "2022-04-22",
-      "station": "GardenCity",
-      "distance_km": 3.456130938037877,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-04-22_23-41-55_67-797177_Cargo_underway-using-engine_8-2_3437.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -22857,19 +22038,6 @@
       "calendar_date": "2022-04-28",
       "station": "GardenCity",
       "distance_km": 3.768930420421912,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-28_10-24-12_302-679122_Cargo_underway-using-engine_11-9_4078.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-28 10:29:14.679122+00:00",
-      "calendar_date": "2022-04-28",
-      "station": "GardenCity",
-      "distance_km": 4.077733295694455,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -23316,32 +22484,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-28_18-29-59_305-378126_Tanker_underway-using-engine_9-4_2995.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-28 18:35:04.378126+00:00",
-      "calendar_date": "2022-04-28",
-      "station": "GardenCity",
-      "distance_km": 2.9949263515886906,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-28_18-35-06_300-607611_Tanker_underway-using-engine_9-5_2530.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-28 18:40:06.607611+00:00",
-      "calendar_date": "2022-04-28",
-      "station": "GardenCity",
-      "distance_km": 2.530437389350895,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-04-28_18-40-13_172-643184_Tanker_underway-using-engine_9-5_2631.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -23585,19 +22727,6 @@
       "calendar_date": "2022-04-28",
       "station": "GardenCity",
       "distance_km": 3.853683383757178,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-28_23-01-00_306-121507_Cargo_underway-using-engine_11-8_4787.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-28 23:06:06.121507+00:00",
-      "calendar_date": "2022-04-28",
-      "station": "GardenCity",
-      "distance_km": 4.786849559611081,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -23871,19 +23000,6 @@
       "calendar_date": "2022-04-30",
       "station": "GardenCity",
       "distance_km": 3.6812453538998775,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-30_02-13-19_306-660775_Cargo_underway-using-engine_15-3_3713.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-30 02:18:25.660775+00:00",
-      "calendar_date": "2022-04-30",
-      "station": "GardenCity",
-      "distance_km": 3.71320662249352,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -24343,19 +23459,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-30_07-30-21_306-461011_Cargo_underway-using-engine_9-3_2867.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-30 07:35:27.461011+00:00",
-      "calendar_date": "2022-04-30",
-      "station": "GardenCity",
-      "distance_km": 2.8673856251369707,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-04-30_07-35-28_259-858686_Cargo_underway-using-engine_9-3_1894.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -24417,19 +23520,6 @@
       "calendar_date": "2022-04-30",
       "station": "GardenCity",
       "distance_km": 4.085925074561273,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-30_08-36-49_298-285653_Cargo_underway-using-engine_12-0_1987.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-30 08:41:47.285653+00:00",
-      "calendar_date": "2022-04-30",
-      "station": "GardenCity",
-      "distance_km": 1.9872509930823703,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -25643,19 +24733,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-02_04-10-55_306-109035_Cargo_underway-using-engine_11-6_3706.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-02 04:16:01.109035+00:00",
-      "calendar_date": "2022-05-02",
-      "station": "GardenCity",
-      "distance_km": 3.705554996269948,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-02_04-10-55_38-700185_Cargo_underway-using-engine_11-7_4060.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -25704,19 +24781,6 @@
       "calendar_date": "2022-05-02",
       "station": "GardenCity",
       "distance_km": 4.089263131395746,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-02_04-36-29_299-242361_Tanker_underway-using-engine_10-5_3575.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-02 04:41:28.242361+00:00",
-      "calendar_date": "2022-05-02",
-      "station": "GardenCity",
-      "distance_km": 3.574608531660655,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -25994,19 +25058,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-02_12-37-09_299-436729_Cargo_underway-using-engine_12-3_3780.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-02 12:42:08.436729+00:00",
-      "calendar_date": "2022-05-02",
-      "station": "GardenCity",
-      "distance_km": 3.779944630050532,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-02_13-23-11_17-235458_Tanker_underway-using-engine_15-6_4794.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -26120,19 +25171,6 @@
       "calendar_date": "2022-05-02",
       "station": "GardenCity",
       "distance_km": 3.1298095781815416,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-02_15-41-15_304-530897_Tanker_underway-using-engine_14-1_4683.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-02 15:46:19.530897+00:00",
-      "calendar_date": "2022-05-02",
-      "station": "GardenCity",
-      "distance_km": 4.683255065496979,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -27957,19 +26995,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-08_17-49-15_300-515331_Cargo_underway-using-engine_9-5_1705.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-08 17:54:15.515331+00:00",
-      "calendar_date": "2022-05-08",
-      "station": "GardenCity",
-      "distance_km": 1.7051136016282402,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-08_17-59-29_53-532877_Cargo_underway-using-engine_9-6_3172.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -28018,19 +27043,6 @@
       "calendar_date": "2022-05-08",
       "station": "GardenCity",
       "distance_km": 2.0218307681647585,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-08_18-30-09_301-079598_Cargo_underway-using-engine_11-2_851.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-08 18:35:10.079598+00:00",
-      "calendar_date": "2022-05-08",
-      "station": "GardenCity",
-      "distance_km": 0.8509976170138994,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -28503,19 +27515,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_00-36-09_298-352876_Cargo_underway-using-engine_7-1_1659.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-12 00:41:07.352876+00:00",
-      "calendar_date": "2022-05-12",
-      "station": "GardenCity",
-      "distance_km": 1.6593309652904873,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_00-41-16_51-198065_Cargo_underway-using-engine_7-1_1663.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -28971,19 +27970,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_10-49-47_304-825116_Cargo_underway-using-engine_10-6_4059.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-12 10:54:51.825116+00:00",
-      "calendar_date": "2022-05-12",
-      "station": "GardenCity",
-      "distance_km": 4.05938503682781,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_11-00-00_282-811678_Tanker_underway-using-engine_13-7_3102.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -29400,19 +28386,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_19-00-40_301-290991_Cargo_underway-using-engine_13-1_2989.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-12 19:05:41.290991+00:00",
-      "calendar_date": "2022-05-12",
-      "station": "GardenCity",
-      "distance_km": 2.988957604674773,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_19-05-47_54-637251_Cargo_underway-using-engine_13-1_3009.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -29530,19 +28503,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_20-12-16_304-419508_Cargo_underway-using-engine_12-4_3839.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-12 20:17:20.419508+00:00",
-      "calendar_date": "2022-05-12",
-      "station": "GardenCity",
-      "distance_km": 3.839124901226179,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_20-17-22_178-53526_Cargo_underway-using-engine_12-4_3663.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -29656,19 +28616,6 @@
       "calendar_date": "2022-05-12",
       "station": "GardenCity",
       "distance_km": 3.201534581834469,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-12_21-23-51_299-292784_Cargo_underway-using-engine_12-9_1706.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-12 21:28:50.292784+00:00",
-      "calendar_date": "2022-05-12",
-      "station": "GardenCity",
-      "distance_km": 1.7056514726960572,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -30297,19 +29244,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-14_05-07-10_305-475467_Passenger_underway-using-engine_14-8_4135.wav",
-      "class_name": "Passenger",
-      "label_index": 1,
-      "vessel_type": "Passenger",
-      "official_split": "train",
-      "event_time": "2022-05-14 05:12:15.475467+00:00",
-      "calendar_date": "2022-05-14",
-      "station": "GardenCity",
-      "distance_km": 4.13452100070199,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-14_05-07-10_5-401847_Passenger_underway-using-engine_14-7_3566.wav",
       "class_name": "Passenger",
       "label_index": 1,
@@ -30709,19 +29643,6 @@
       "calendar_date": "2022-05-14",
       "station": "GardenCity",
       "distance_km": 3.198465762782744,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-14_12-47-23_305-296577_Cargo_underway-using-engine_8-4_2816.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-14 12:52:28.296577+00:00",
-      "calendar_date": "2022-05-14",
-      "station": "GardenCity",
-      "distance_km": 2.8156524627474324,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -31623,19 +30544,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_05-24-26_301-108607_Tanker_underway-using-engine_12-2_4071.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-16 05:29:27.108607+00:00",
-      "calendar_date": "2022-05-16",
-      "station": "GardenCity",
-      "distance_km": 4.071275844494202,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_05-29-32_60-574717_Tanker_underway-using-engine_12-2_4051.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -32130,19 +31038,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_14-41-48_306-584551_Tanker_underway-using-engine_14-8_4446.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-16 14:46:54.584551+00:00",
-      "calendar_date": "2022-05-16",
-      "station": "GardenCity",
-      "distance_km": 4.445916336856621,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_14-52-01_125-499168_Tanker_underway-using-engine_14-7_3757.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -32377,19 +31272,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_20-19-17_297-602433_Passenger_underway-using-engine_11-7_4464.wav",
-      "class_name": "Passenger",
-      "label_index": 1,
-      "vessel_type": "Passenger",
-      "official_split": "train",
-      "event_time": "2022-05-16 20:24:14.602433+00:00",
-      "calendar_date": "2022-05-16",
-      "station": "GardenCity",
-      "distance_km": 4.4636524343436745,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_21-10-25_77-309743_Cargo_underway-using-engine_13-6_4834.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -32585,19 +31467,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_23-13-09_303-073201_Cargo_underway-using-engine_13-4_4178.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-16 23:18:12.073201+00:00",
-      "calendar_date": "2022-05-16",
-      "station": "GardenCity",
-      "distance_km": 4.177887653560995,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-16_23-23-22_42-052217_Cargo_underway-using-engine_11-1_4391.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -32776,19 +31645,6 @@
       "calendar_date": "2022-05-18",
       "station": "GardenCity",
       "distance_km": 3.1869230937094786,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-18_01-06-50_298-084243_Tanker_underway-using-engine_14-6_3958.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-18 01:11:48.084243+00:00",
-      "calendar_date": "2022-05-18",
-      "station": "GardenCity",
-      "distance_km": 3.957878419655154,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -33049,19 +31905,6 @@
       "calendar_date": "2022-05-18",
       "station": "GardenCity",
       "distance_km": 3.913656869261564,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-18_04-46-43_304-034591_Cargo_underway-using-engine_12-1_1136.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-18 04:51:47.034591+00:00",
-      "calendar_date": "2022-05-18",
-      "station": "GardenCity",
-      "distance_km": 1.1359060557242282,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -33335,19 +32178,6 @@
       "calendar_date": "2022-05-18",
       "station": "GardenCity",
       "distance_km": 2.016267195226932,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-18_07-55-55_299-5271_Cargo_underway-using-engine_8-2_2060.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-18 08:00:54.527100+00:00",
-      "calendar_date": "2022-05-18",
-      "station": "GardenCity",
-      "distance_km": 2.059930979691243,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -33998,19 +32828,6 @@
       "calendar_date": "2022-01-26",
       "station": "GardenCity",
       "distance_km": 0.4022185665192845,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_01-01-43_298-499656_Cargo_underway-using-engine_12-1_350.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-01-26 01:06:41.499656+00:00",
-      "calendar_date": "2022-01-26",
-      "station": "GardenCity",
-      "distance_km": 0.3500534144702334,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -34756,19 +33573,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_11-46-01_301-435529_Cargo_underway-using-engine_8-7_2913.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-01-26 11:51:02.435529+00:00",
-      "calendar_date": "2022-01-26",
-      "station": "GardenCity",
-      "distance_km": 2.912834956934738,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_12-26-58_239-565425_Cargo_underway-using-engine_16-0_3779.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -34886,19 +33690,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_14-19-28_299-375663_Tanker_underway-using-engine_13-1_3649.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-01-26 14:24:27.375663+00:00",
-      "calendar_date": "2022-01-26",
-      "station": "GardenCity",
-      "distance_km": 3.648710931434252,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_14-19-28_59-34679_Tanker_underway-using-engine_13-1_3315.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -34986,19 +33777,6 @@
       "calendar_date": "2022-01-26",
       "station": "GardenCity",
       "distance_km": 2.7512827608264314,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_17-49-07_306-194966_Cargo_underway-using-engine_15-5_4403.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-01-26 17:54:13.194966+00:00",
-      "calendar_date": "2022-01-26",
-      "station": "GardenCity",
-      "distance_km": 4.402754453049337,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -35211,19 +33989,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_21-49-27_306-082477_Tanker_underway-using-engine_10-2_4955.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-01-26 21:54:33.082477+00:00",
-      "calendar_date": "2022-01-26",
-      "station": "GardenCity",
-      "distance_km": 4.954812733244377,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_22-04-48_71-531178_Cargo_underway-using-engine_10-2_4740.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -35285,19 +34050,6 @@
       "calendar_date": "2022-01-26",
       "station": "GardenCity",
       "distance_km": 2.176639076572223,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_22-25-15_297-111405_Tanker_underway-using-engine_15-8_3851.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-01-26 22:30:12.111405+00:00",
-      "calendar_date": "2022-01-26",
-      "station": "GardenCity",
-      "distance_km": 3.8512594118538814,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -35428,19 +34180,6 @@
       "calendar_date": "2022-01-26",
       "station": "GardenCity",
       "distance_km": 4.880617078398419,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-01-26_23-41-57_301-636569_Cargo_underway-using-engine_9-6_4991.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-01-26 23:46:58.636569+00:00",
-      "calendar_date": "2022-01-26",
-      "station": "GardenCity",
-      "distance_km": 4.990731156036311,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -35779,19 +34518,6 @@
       "calendar_date": "2022-02-11",
       "station": "GardenCity",
       "distance_km": 3.6716684147997376,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-02-11_06-23-52_306-430915_Cargo_underway-using-engine_8-4_3006.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-02-11 06:28:58.430915+00:00",
-      "calendar_date": "2022-02-11",
-      "station": "GardenCity",
-      "distance_km": 3.005929094598041,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -38682,32 +37408,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-03-25_06-13-39_303-383575_Tanker_underway-using-engine_15-1_4423.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-03-25 06:18:42.383575+00:00",
-      "calendar_date": "2022-03-25",
-      "station": "GardenCity",
-      "distance_km": 4.423370766911951,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-03-25_06-23-52_300-988893_Cargo_underway-using-engine_20-9_3328.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-03-25 06:28:52.988893+00:00",
-      "calendar_date": "2022-03-25",
-      "station": "GardenCity",
-      "distance_km": 3.3278206162753223,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_val/G_15811_2022-03-25_06-28-59_113-089186_Cargo_underway-using-engine_20-7_3503.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -39319,19 +38019,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-03-25_17-18-24_304-587915_Cargo_underway-using-engine_14-4_4354.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-03-25 17:23:28.587915+00:00",
-      "calendar_date": "2022-03-25",
-      "station": "GardenCity",
-      "distance_km": 4.354056672140189,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_val/G_15811_2022-03-25_17-28-38_185-509106_Cargo_underway-using-engine_14-6_2035.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -39458,19 +38145,6 @@
       "calendar_date": "2022-03-25",
       "station": "GardenCity",
       "distance_km": 4.930825795669295,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-03-25_20-12-16_305-602835_Tanker_underway-using-engine_13-4_3708.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-03-25 20:17:21.602835+00:00",
-      "calendar_date": "2022-03-25",
-      "station": "GardenCity",
-      "distance_km": 3.707776335211413,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -40047,19 +38721,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-04-06_07-55-55_298-433089_Cargo_underway-using-engine_12-0_4695.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-04-06 08:00:53.433089+00:00",
-      "calendar_date": "2022-04-06",
-      "station": "GardenCity",
-      "distance_km": 4.694597001164274,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_15811_val/G_15811_2022-04-06_09-02-23_206-620556_Cargo_underway-using-engine_9-9_4764.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -40628,19 +39289,6 @@
       "calendar_date": "2022-04-06",
       "station": "GardenCity",
       "distance_km": 3.644497736145598,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_15811_val/G_15811_2022-04-06_15-25-54_301-138754_Tanker_underway-using-engine_14-6_4264.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-04-06 15:30:55.138754+00:00",
-      "calendar_date": "2022-04-06",
-      "station": "GardenCity",
-      "distance_km": 4.264463471069908,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -41256,19 +39904,6 @@
       "split": "train"
     },
     {
-      "relative_path": "GardenCity_26981_train/G_26981_2022-06-24_03-24-53_605-458459_Cargo_underway-using-engine_12-7_1769.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-06-24 03:34:58.458459+00:00",
-      "calendar_date": "2022-06-24",
-      "station": "GardenCity",
-      "distance_km": 1.7693767846357489,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "GardenCity_26981_train/G_26981_2022-06-24_03-35-07_111-471783_Cargo_underway-using-engine_12-6_1879.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -41473,19 +40108,6 @@
       "calendar_date": "2022-06-24",
       "station": "GardenCity",
       "distance_km": 1.5701981256650677,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "GardenCity_26981_train/G_26981_2022-06-24_07-20-06_607-122958_Cargo_underway-using-engine_14-6_2168.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-06-24 07:30:13.122958+00:00",
-      "calendar_date": "2022-06-24",
-      "station": "GardenCity",
-      "distance_km": 2.1682224629758893,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -42816,19 +41438,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-20_01-32-23_612-905221_Cargo_underway-using-engine_9-3_3406.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-20 01:42:35.905221+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "Grafton",
-      "distance_km": 3.4057394939322183,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-01-20_01-52-50_23-345055_Tanker_underway-using-engine_10-0_3730.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -43228,19 +41837,6 @@
       "calendar_date": "2022-01-20",
       "station": "Grafton",
       "distance_km": 1.6769862568465643,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-20_06-08-31_611-315265_Tanker_underway-using-engine_11-5_1980.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-01-20 06:18:42.315265+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "Grafton",
-      "distance_km": 1.9801576051877536,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -43826,19 +42422,6 @@
       "calendar_date": "2022-01-20",
       "station": "Grafton",
       "distance_km": 4.0017799713666,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-20_14-19-25_609-487833_Cargo_underway-using-engine_17-8_1841.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-20 14:29:34.487833+00:00",
-      "calendar_date": "2022-01-20",
-      "station": "Grafton",
-      "distance_km": 1.840676135062536,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -46339,19 +44922,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-05_01-32-24_608-222941_Cargo_underway-using-engine_10-2_1854.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-05 01:42:32.222941+00:00",
-      "calendar_date": "2022-02-05",
-      "station": "Grafton",
-      "distance_km": 1.853559506021281,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-05_01-42-38_373-424778_Cargo_underway-using-engine_10-3_2573.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -47665,19 +46235,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-05_18-24-52_612-40539_Tanker_underway-using-engine_10-5_4270.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-05 18:35:04.405390+00:00",
-      "calendar_date": "2022-02-05",
-      "station": "Grafton",
-      "distance_km": 4.269901948706606,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-05_18-35-06_376-993414_Tanker_underway-using-engine_10-7_3890.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -47973,19 +46530,6 @@
       "calendar_date": "2022-02-05",
       "station": "Grafton",
       "distance_km": 1.6922887541065228,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-05_21-08-30_606-46974_Cargo_underway-using-engine_9-7_1724.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-05 21:18:36.469740+00:00",
-      "calendar_date": "2022-02-05",
-      "station": "Grafton",
-      "distance_km": 1.7241269076723618,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -48991,19 +47535,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-09_10-13-59_605-284236_Tanker_underway-using-engine_11-8_4062.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-09 10:24:04.284236+00:00",
-      "calendar_date": "2022-02-09",
-      "station": "Grafton",
-      "distance_km": 4.062333458389466,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-09_10-34-26_278-416474_Cargo_underway-using-engine_8-6_2691.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -49992,19 +48523,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-09_22-20-06_608-808283_Cargo_underway-using-engine_15-3_2111.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-09 22:30:14.808283+00:00",
-      "calendar_date": "2022-02-09",
-      "station": "Grafton",
-      "distance_km": 2.110514962697795,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-09_22-30-19_378-147776_Cargo_underway-using-engine_11-5_3501.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -50482,19 +49000,6 @@
       "calendar_date": "2022-02-13",
       "station": "Grafton",
       "distance_km": 4.261492762273274,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-13_03-35-08_603-712058_Tanker_underway-using-engine_11-7_4072.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-13 03:45:11.712058+00:00",
-      "calendar_date": "2022-02-13",
-      "station": "Grafton",
-      "distance_km": 4.072400794868031,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -51301,19 +49806,6 @@
       "calendar_date": "2022-02-13",
       "station": "Grafton",
       "distance_km": 3.973370107421621,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-13_16-01-42_605-906807_Cargo_underway-using-engine_15-5_4916.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-13 16:11:47.906807+00:00",
-      "calendar_date": "2022-02-13",
-      "station": "Grafton",
-      "distance_km": 4.916232099443,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -52527,19 +51019,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-15_06-18-46_608-135742_Cargo_underway-using-engine_14-1_2248.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-15 06:28:54.135742+00:00",
-      "calendar_date": "2022-02-15",
-      "station": "Grafton",
-      "distance_km": 2.248064311652684,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-15_06-28-59_115-143983_Cargo_underway-using-engine_14-3_2409.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -52683,19 +51162,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-15_08-31-43_610-249364_Tanker_underway-using-engine_12-9_3603.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-15 08:41:53.249364+00:00",
-      "calendar_date": "2022-02-15",
-      "station": "Grafton",
-      "distance_km": 3.6033005968858776,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-15_08-41-56_361-300647_Cargo_underway-using-engine_10-0_2548.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -52826,19 +51292,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-15_10-44-40_604-834368_Cargo_underway-using-engine_9-4_4288.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-15 10:54:44.834368+00:00",
-      "calendar_date": "2022-02-15",
-      "station": "Grafton",
-      "distance_km": 4.287754079276897,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-15_10-54-53_580-366083_Tanker_underway-using-engine_13-1_4776.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -52952,19 +51405,6 @@
       "calendar_date": "2022-02-17",
       "station": "Grafton",
       "distance_km": 4.957302443669186,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-17_03-55-35_607-43041_Cargo_underway-using-engine_11-3_4819.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-17 04:05:42.430410+00:00",
-      "calendar_date": "2022-02-17",
-      "station": "Grafton",
-      "distance_km": 4.819003330449664,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -53606,19 +52046,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-17_13-38-31_605-660965_Cargo_underway-using-engine_7-7_4553.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-17 13:48:36.660965+00:00",
-      "calendar_date": "2022-02-17",
-      "station": "Grafton",
-      "distance_km": 4.553100775304727,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-17_13-48-45_512-219935_Cargo_underway-using-engine_6-1_4650.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -54083,19 +52510,6 @@
       "calendar_date": "2022-02-17",
       "station": "Grafton",
       "distance_km": 3.642859480608468,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-17_18-55-33_605-691_Cargo_underway-using-engine_16-7_3587.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-17 19:05:38.691000+00:00",
-      "calendar_date": "2022-02-17",
-      "station": "Grafton",
-      "distance_km": 3.586595266598282,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -55604,19 +54018,6 @@
       "calendar_date": "2022-02-27",
       "station": "Grafton",
       "distance_km": 3.150896041956054,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-27_16-01-42_608-050257_Cargo_underway-using-engine_12-7_1688.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-27 16:11:50.050257+00:00",
-      "calendar_date": "2022-02-27",
-      "station": "Grafton",
-      "distance_km": 1.6881238728681016,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -57762,19 +56163,6 @@
       "calendar_date": "2022-03-07",
       "station": "Grafton",
       "distance_km": 4.676928633578971,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-07_08-31-41_610-717821_Tanker_underway-using-engine_10-3_2232.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-07 08:35:21.266137+00:00",
-      "calendar_date": "2022-03-07",
-      "station": "Grafton",
-      "distance_km": 3.1444214065675884,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -60197,19 +58585,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-09_17-13-17_607-173505_Cargo_underway-using-engine_14-4_3796.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-09 17:23:24.173505+00:00",
-      "calendar_date": "2022-03-09",
-      "station": "Grafton",
-      "distance_km": 3.7960306978204135,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-09_17-23-31_53-176698_Cargo_underway-using-engine_14-2_3800.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -60912,19 +59287,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-11_02-54-13_610-577185_Tanker_underway-using-engine_11-7_4400.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-11 03:04:23.577185+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "Grafton",
-      "distance_km": 4.399600084099597,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-11_03-04-27_116-575225_Tanker_underway-using-engine_11-5_4428.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -61298,19 +59660,6 @@
       "calendar_date": "2022-03-11",
       "station": "Grafton",
       "distance_km": 1.908854135239743,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-11_09-02-23_609-066803_Cargo_underway-using-engine_13-2_3716.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-11 09:12:32.066803+00:00",
-      "calendar_date": "2022-03-11",
-      "station": "Grafton",
-      "distance_km": 3.715903251733246,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -63811,19 +62160,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-21_07-20-07_610-897573_Tanker_underway-using-engine_11-1_4441.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-21 07:24:41.798619+00:00",
-      "calendar_date": "2022-03-21",
-      "station": "Grafton",
-      "distance_km": 3.111777032119363,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-21_07-30-21_367-803209_Tanker_underway-using-engine_11-2_5621.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -65943,19 +64279,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-25_03-14-40_613-455145_Cargo_underway-using-engine_10-7_4870.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-25 03:24:53.455145+00:00",
-      "calendar_date": "2022-03-25",
-      "station": "Grafton",
-      "distance_km": 4.869896528894597,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-25_04-16-02_473-015692_Cargo_underway-using-engine_12-6_4156.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -66524,19 +64847,6 @@
       "calendar_date": "2022-03-25",
       "station": "Grafton",
       "distance_km": 4.14236932652845,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-25_13-07-50_605-651494_Cargo_underway-using-engine_16-9_3227.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-25 13:17:55.651494+00:00",
-      "calendar_date": "2022-03-25",
-      "station": "Grafton",
-      "distance_km": 3.226973836794156,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -67490,19 +65800,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-27_00-00-19_603-670886_Cargo_constrained-by-her-draught_14-7_1975.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-27 00:10:22.670886+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "Grafton",
-      "distance_km": 1.975285290987859,
-      "activity": "constrained-by-her-draught",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-27_00-10-35_192-336971_Cargo_constrained-by-her-draught_12-7_2269.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -67526,19 +65823,6 @@
       "station": "Grafton",
       "distance_km": 2.987004045053,
       "activity": "constrained-by-her-draught",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-27_01-01-43_613-611926_Tanker_underway-using-engine_13-6_3901.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-27 01:11:56.611926+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "Grafton",
-      "distance_km": 3.901366938314988,
-      "activity": "underway-using-engine",
       "split": "train"
     },
     {
@@ -67577,19 +65861,6 @@
       "calendar_date": "2022-03-27",
       "station": "Grafton",
       "distance_km": 2.182291214153175,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-27_01-22-11_611-149392_Tanker_underway-using-engine_13-7_3873.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-27 01:32:22.149392+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "Grafton",
-      "distance_km": 3.8725163696074256,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -67837,19 +66108,6 @@
       "calendar_date": "2022-03-27",
       "station": "Grafton",
       "distance_km": 3.892285101990556,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-27_04-26-16_604-871305_Cargo_underway-using-engine_9-6_3994.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-27 04:36:20.871305+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "Grafton",
-      "distance_km": 3.993730113691645,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -69388,19 +67646,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-27_22-50-47_606-225724_Cargo_underway-using-engine_10-8_4368.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-27 23:00:53.225724+00:00",
-      "calendar_date": "2022-03-27",
-      "station": "Grafton",
-      "distance_km": 4.367542564229871,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-27_23-21-28_468-266345_Cargo_underway-using-engine_18-6_4690.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -69800,19 +68045,6 @@
       "calendar_date": "2022-03-29",
       "station": "Grafton",
       "distance_km": 1.3691484290585547,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-29_15-31-01_608-322489_Cargo_underway-using-engine_10-0_4926.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-29 15:41:09.322489+00:00",
-      "calendar_date": "2022-03-29",
-      "station": "Grafton",
-      "distance_km": 4.925991537589825,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -71802,19 +70034,6 @@
       "calendar_date": "2022-04-02",
       "station": "Grafton",
       "distance_km": 2.9470790722098488,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-02_05-17-24_610-374211_Cargo_underway-using-engine_8-1_1502.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-02 05:27:34.374211+00:00",
-      "calendar_date": "2022-04-02",
-      "station": "Grafton",
-      "distance_km": 1.5015035874707288,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -74471,19 +72690,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-04_17-43-58_613-501127_Cargo_underway-using-engine_13-6_4259.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-04 17:54:11.501127+00:00",
-      "calendar_date": "2022-04-04",
-      "station": "Grafton",
-      "distance_km": 4.259057496328586,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-04_20-27-36_126-920274_Tanker_underway-using-engine_14-8_3015.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -74506,19 +72712,6 @@
       "calendar_date": "2022-04-04",
       "station": "Grafton",
       "distance_km": 1.7191599933427426,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-04_20-27-36_610-604355_Tanker_underway-using-engine_13-6_1549.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-04 20:37:46.604355+00:00",
-      "calendar_date": "2022-04-04",
-      "station": "Grafton",
-      "distance_km": 1.5494186008228572,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -75173,19 +73366,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-08_03-55-35_608-856134_Cargo_underway-using-engine_10-7_4558.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-08 04:05:43.856134+00:00",
-      "calendar_date": "2022-04-08",
-      "station": "Grafton",
-      "distance_km": 4.558279543756616,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-08_04-05-49_296-189272_Cargo_underway-using-engine_14-1_4075.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -75247,19 +73427,6 @@
       "calendar_date": "2022-04-08",
       "station": "Grafton",
       "distance_km": 1.883913436108025,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-08_04-26-16_612-145088_Cargo_underway-using-engine_14-7_2800.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-08 04:36:28.145088+00:00",
-      "calendar_date": "2022-04-08",
-      "station": "Grafton",
-      "distance_km": 2.800394331848992,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -76330,19 +74497,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-08_17-13-17_612-474471_Cargo_underway-using-engine_11-7_3673.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-08 17:23:29.474471+00:00",
-      "calendar_date": "2022-04-08",
-      "station": "Grafton",
-      "distance_km": 3.672975732988631,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-08_17-23-31_378-886581_Cargo_underway-using-engine_11-7_1872.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -76759,19 +74913,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-08_21-49-25_609-324873_Tanker_underway-using-engine_10-6_3659.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-08 21:59:34.324873+00:00",
-      "calendar_date": "2022-04-08",
-      "station": "Grafton",
-      "distance_km": 3.6591051584241057,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-08_21-59-39_329-78525_Cargo_moored_16-0_1904.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -76807,19 +74948,6 @@
       "calendar_date": "2022-04-08",
       "station": "Grafton",
       "distance_km": 0.7866486312118106,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-12_00-00-19_613-520811_Tanker_underway-using-engine_10-6_1867.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-12 00:10:32.520811+00:00",
-      "calendar_date": "2022-04-12",
-      "station": "Grafton",
-      "distance_km": 1.8671650590328568,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -77474,19 +75602,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-12_15-31-01_612-670157_Tanker_underway-using-engine_11-3_4563.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-12 15:41:13.670157+00:00",
-      "calendar_date": "2022-04-12",
-      "station": "Grafton",
-      "distance_km": 4.563057205188855,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-12_15-41-15_397-518021_Tanker_underway-using-engine_11-5_3733.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -77990,19 +76105,6 @@
       "calendar_date": "2022-04-22",
       "station": "Grafton",
       "distance_km": 4.001605823816519,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-22_00-41-16_612-825287_Cargo_underway-using-engine_15-2_3985.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-22 00:42:52.276658+00:00",
-      "calendar_date": "2022-04-22",
-      "station": "Grafton",
-      "distance_km": 4.189953830890266,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -80360,19 +78462,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-30_21-49-25_607-32659_Tanker_underway-using-engine_12-7_1559.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-30 21:59:32.326590+00:00",
-      "calendar_date": "2022-04-30",
-      "station": "Grafton",
-      "distance_km": 1.5591993664735209,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-30_21-59-39_327-287339_Tanker_underway-using-engine_11-2_750.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -81071,19 +79160,6 @@
       "calendar_date": "2022-05-02",
       "station": "Grafton",
       "distance_km": 3.785894992637645,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-02_18-14-39_609-579686_Tanker_underway-using-engine_10-2_3863.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-02 18:24:48.579686+00:00",
-      "calendar_date": "2022-05-02",
-      "station": "Grafton",
-      "distance_km": 3.862916965070892,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -83259,19 +81335,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_val/G_15810_2022-02-03_04-26-17_613-62677_Cargo_underway-using-engine_14-3_4954.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-02-03 04:36:30.626770+00:00",
-      "calendar_date": "2022-02-03",
-      "station": "Grafton",
-      "distance_km": 4.954248102683335,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_val/G_15810_2022-02-03_05-37-52_241-14557_Cargo_underway-using-engine_15-7_3026.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -84039,19 +82102,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_val/G_15810_2022-02-03_16-01-43_607-194004_Cargo_underway-using-engine_14-9_4229.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-02-03 16:11:50.194004+00:00",
-      "calendar_date": "2022-02-03",
-      "station": "Grafton",
-      "distance_km": 4.228880783781844,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_val/G_15810_2022-02-03_16-11-57_113-398251_Cargo_underway-using-engine_15-1_4061.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -84282,19 +82332,6 @@
       "calendar_date": "2022-02-03",
       "station": "Grafton",
       "distance_km": 1.4588816170433614,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_val/G_15810_2022-02-03_18-14-40_604-40181_Cargo_underway-using-engine_16-0_4302.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-02-03 18:24:44.401810+00:00",
-      "calendar_date": "2022-02-03",
-      "station": "Grafton",
-      "distance_km": 4.301998364351314,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -85781,19 +83818,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_val/G_15810_2022-02-11_16-01-42_608-607471_Tanker_underway-using-engine_9-9_1918.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-02-11 16:11:50.607471+00:00",
-      "calendar_date": "2022-02-11",
-      "station": "Grafton",
-      "distance_km": 1.918427458875004,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_val/G_15810_2022-02-11_16-11-55_356-462088_Tanker_underway-using-engine_9-4_1649.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -86219,19 +84243,6 @@
       "calendar_date": "2022-02-11",
       "station": "Grafton",
       "distance_km": 4.43026484333057,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_15810_val/G_15810_2022-02-11_21-49-25_609-399758_Cargo_underway-using-engine_13-2_3558.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-02-11 21:59:34.399758+00:00",
-      "calendar_date": "2022-02-11",
-      "station": "Grafton",
-      "distance_km": 3.557726006357462,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -87640,19 +85651,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_15810_val/G_15810_2022-04-06_23-01-00_605-491192_Cargo_underway-using-engine_15-3_1838.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-04-06 23:11:05.491192+00:00",
-      "calendar_date": "2022-04-06",
-      "station": "Grafton",
-      "distance_km": 1.8383863796485973,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_15810_val/G_15810_2022-04-06_23-11-14_236-986753_Cargo_underway-using-engine_15-3_376.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -87961,19 +85959,6 @@
       "calendar_date": "2022-08-22",
       "station": "Grafton",
       "distance_km": 1.868927856234324,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-22_22-50-47_301-573958_Cargo_underway-using-engine_10-3_3237.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-08-22 22:55:48.573958+00:00",
-      "calendar_date": "2022-08-22",
-      "station": "Grafton",
-      "distance_km": 3.2373721155942765,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -89044,19 +87029,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-26_14-55-13_300-640926_Cargo_underway-using-engine_13-9_2979.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-08-26 15:00:13.640926+00:00",
-      "calendar_date": "2022-08-26",
-      "station": "Grafton",
-      "distance_km": 2.978682736658882,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-08-26_15-00-20_293-224883_Tanker_underway-using-engine_11-7_3900.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -89313,19 +87285,6 @@
       "calendar_date": "2022-08-26",
       "station": "Grafton",
       "distance_km": 1.4805384376148882,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-26_17-23-31_306-084332_Cargo_underway-using-engine_15-7_1623.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-08-26 17:28:37.084332+00:00",
-      "calendar_date": "2022-08-26",
-      "station": "Grafton",
-      "distance_km": 1.6233804800450309,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -89876,19 +87835,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-30_06-34-06_306-555406_Tanker_underway-using-engine_13-8_4333.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-08-30 06:39:12.555406+00:00",
-      "calendar_date": "2022-08-30",
-      "station": "Grafton",
-      "distance_km": 4.3329287329679005,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-08-30_06-39-13_121-155303_Tanker_underway-using-engine_13-8_4261.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -90015,19 +87961,6 @@
       "calendar_date": "2022-08-30",
       "station": "Grafton",
       "distance_km": 1.8533663443875803,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-30_07-30-21_296-866737_Cargo_underway-using-engine_9-7_4175.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-08-30 07:35:17.866737+00:00",
-      "calendar_date": "2022-08-30",
-      "station": "Grafton",
-      "distance_km": 4.1752064095831285,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -91826,32 +89759,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-01_06-49-26_305-354766_Cargo_underway-using-engine_12-3_4623.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-01 06:54:31.354766+00:00",
-      "calendar_date": "2022-09-01",
-      "station": "Grafton",
-      "distance_km": 4.622515113798117,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-01_06-54-33_305-76861_Cargo_underway-using-engine_17-4_3926.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-01 06:59:38.768610+00:00",
-      "calendar_date": "2022-09-01",
-      "station": "Grafton",
-      "distance_km": 3.9264327550663287,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-01_07-15-01_46-878301_Cargo_underway-using-engine_12-4_3635.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -91874,19 +89781,6 @@
       "calendar_date": "2022-09-01",
       "station": "Grafton",
       "distance_km": 4.757718834362502,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-01_07-20-07_303-875213_Cargo_underway-using-engine_9-5_4780.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-01 07:25:10.875213+00:00",
-      "calendar_date": "2022-09-01",
-      "station": "Grafton",
-      "distance_km": 4.77988216846805,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -93620,19 +91514,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-03_07-09-54_304-815833_Cargo_underway-using-engine_13-9_1462.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-03 07:14:58.815833+00:00",
-      "calendar_date": "2022-09-03",
-      "station": "Grafton",
-      "distance_km": 1.4619616038977932,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-03_07-09-54_4-713418_Cargo_underway-using-engine_15-1_2472.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -94231,19 +92112,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-03_13-18-04_306-349726_Tanker_underway-using-engine_12-5_1571.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-09-03 13:23:10.349726+00:00",
-      "calendar_date": "2022-09-03",
-      "station": "Grafton",
-      "distance_km": 1.5708401246132906,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-03_13-23-11_118-714273_Tanker_underway-using-engine_12-5_1833.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -94448,19 +92316,6 @@
       "calendar_date": "2022-09-03",
       "station": "Grafton",
       "distance_km": 1.6776475821267791,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-03_16-11-56_305-531645_Cargo_underway-using-engine_11-7_4157.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-03 16:17:01.531645+00:00",
-      "calendar_date": "2022-09-03",
-      "station": "Grafton",
-      "distance_km": 4.15714333252174,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -94881,19 +92736,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-03_22-35-26_303-832747_Tanker_underway-using-engine_11-4_4472.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-09-03 22:40:29.832747+00:00",
-      "calendar_date": "2022-09-03",
-      "station": "Grafton",
-      "distance_km": 4.4723130424061255,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-03_22-35-26_63-09768_Tanker_underway-using-engine_11-6_4282.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -94955,19 +92797,6 @@
       "calendar_date": "2022-09-05",
       "station": "Grafton",
       "distance_km": 4.231462603471307,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-05_00-00-19_300-374725_Cargo_underway-using-engine_13-8_4423.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-05 00:05:19.374725+00:00",
-      "calendar_date": "2022-09-05",
-      "station": "Grafton",
-      "distance_km": 4.422949436853694,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -95228,19 +93057,6 @@
       "calendar_date": "2022-09-05",
       "station": "Grafton",
       "distance_km": 4.941523983579866,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-05_21-39-11_303-445445_Tanker_underway-using-engine_13-3_4003.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-09-05 21:44:14.445445+00:00",
-      "calendar_date": "2022-09-05",
-      "station": "Grafton",
-      "distance_km": 4.002829028680981,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -96168,19 +93984,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-07_11-25-34_306-473782_Cargo_underway-using-engine_17-0_4062.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-07 11:28:41.101509+00:00",
-      "calendar_date": "2022-09-07",
-      "station": "Grafton",
-      "distance_km": 3.845247869309892,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-07_11-35-48_264-075061_Cargo_underway-using-engine_13-4_5512.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -96870,19 +94673,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-07_23-16-21_297-003337_Cargo_underway-using-engine_10-0_4650.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-07 23:16:48.952921+00:00",
-      "calendar_date": "2022-09-07",
-      "station": "Grafton",
-      "distance_km": 4.381471030982833,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-07_23-21-28_253-067715_Cargo_underway-using-engine_9-9_5236.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -97247,19 +95037,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-09_03-35-08_299-650534_Tanker_underway-using-engine_12-4_3616.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-09-09 03:40:07.650534+00:00",
-      "calendar_date": "2022-09-09",
-      "station": "Grafton",
-      "distance_km": 3.616379948046661,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-09_03-35-08_44-854284_Tanker_underway-using-engine_11-9_2298.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -97594,19 +95371,6 @@
       "calendar_date": "2022-09-09",
       "station": "Grafton",
       "distance_km": 4.636156569400466,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-09_06-34-06_306-365489_Tanker_underway-using-engine_10-9_2016.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-09-09 06:39:12.365489+00:00",
-      "calendar_date": "2022-09-09",
-      "station": "Grafton",
-      "distance_km": 2.016007513163061,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -100575,19 +98339,6 @@
       "split": "train"
     },
     {
-      "relative_path": "Grafton_29187_train/G_29187_2022-11-01_00-20-48_612-586194_Tanker_underway-using-engine_13-3_4856.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-11-01 00:31:00.586194+00:00",
-      "calendar_date": "2022-11-01",
-      "station": "Grafton",
-      "distance_km": 4.85582944322428,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
       "relative_path": "Grafton_29187_train/G_29187_2022-11-01_01-32-23_110-359425_Cargo_underway-using-engine_16-6_4387.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -101052,19 +98803,6 @@
       "calendar_date": "2022-11-01",
       "station": "Grafton",
       "distance_km": 2.5583712490208708,
-      "activity": "underway-using-engine",
-      "split": "train"
-    },
-    {
-      "relative_path": "Grafton_29187_train/G_29187_2022-11-01_06-49-26_610-360537_Cargo_underway-using-engine_10-1_4983.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-11-01 06:59:36.360537+00:00",
-      "calendar_date": "2022-11-01",
-      "station": "Grafton",
-      "distance_km": 4.983197459426784,
       "activity": "underway-using-engine",
       "split": "train"
     },
@@ -102824,19 +100562,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_05-22-31_303-24147_Cargo_underway-using-engine_7-9_4017.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-24 05:27:34.241470+00:00",
-      "calendar_date": "2022-01-24",
-      "station": "GardenCity",
-      "distance_km": 4.0165617592925,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_05-22-31_84-224433_Cargo_underway-using-engine_8-0_4215.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -102950,19 +100675,6 @@
       "calendar_date": "2022-01-24",
       "station": "GardenCity",
       "distance_km": 2.7130803051129813,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_06-13-39_303-958583_Cargo_underway-using-engine_18-3_2767.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-24 06:18:42.958583+00:00",
-      "calendar_date": "2022-01-24",
-      "station": "GardenCity",
-      "distance_km": 2.767368515037463,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -103119,19 +100831,6 @@
       "calendar_date": "2022-01-24",
       "station": "GardenCity",
       "distance_km": 4.071141658612031,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_08-06-09_300-291152_Cargo_underway-using-engine_13-4_3064.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-24 08:11:09.291152+00:00",
-      "calendar_date": "2022-01-24",
-      "station": "GardenCity",
-      "distance_km": 3.063921873815725,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -103656,32 +101355,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_18-50-27_301-316439_Cargo_underway-using-engine_9-9_3136.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-24 18:55:28.316439+00:00",
-      "calendar_date": "2022-01-24",
-      "station": "GardenCity",
-      "distance_km": 3.136457162266779,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_18-55-33_299-28818_Cargo_underway-using-engine_9-8_3492.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-24 19:00:32.288180+00:00",
-      "calendar_date": "2022-01-24",
-      "station": "GardenCity",
-      "distance_km": 3.492470982698068,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-01-24_19-05-47_252-973488_Cargo_underway-using-engine_14-6_3469.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -103938,19 +101611,6 @@
       "calendar_date": "2022-01-28",
       "station": "GardenCity",
       "distance_km": 4.89740882153487,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-28_00-05-28_297-778007_Cargo_underway-using-engine_8-0_4226.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-28 00:10:25.778007+00:00",
-      "calendar_date": "2022-01-28",
-      "station": "GardenCity",
-      "distance_km": 4.225780959639133,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -105567,19 +103227,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_03-30-01_305-14837_Cargo_underway-using-engine_9-1_4323.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-30 03:35:06.148370+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "GardenCity",
-      "distance_km": 4.323219298040475,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_03-40-14_41-774813_Cargo_underway-using-engine_8-9_3044.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -105849,19 +103496,6 @@
       "calendar_date": "2022-01-30",
       "station": "GardenCity",
       "distance_km": 4.327285352535285,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_06-23-52_300-832102_Tanker_underway-using-engine_9-9_3968.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-01-30 06:28:52.832102+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "GardenCity",
-      "distance_km": 3.968327418210394,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -106425,19 +104059,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_21-18-44_302-806259_Tanker_underway-using-engine_13-6_1719.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-01-30 21:23:46.806259+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "GardenCity",
-      "distance_km": 1.7190625244656428,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-01-30_21-23-51_115-338386_Tanker_underway-using-engine_13-6_1585.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -106724,19 +104345,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_00-31-02_300-114594_Cargo_underway-using-engine_18-9_2106.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-01 00:36:02.114594+00:00",
-      "calendar_date": "2022-02-01",
-      "station": "GardenCity",
-      "distance_km": 2.105616432085955,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_00-41-16_46-248563_Cargo_underway-using-engine_19-0_4889.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -106841,19 +104449,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_06-49-26_305-037096_Tanker_underway-using-engine_11-5_4363.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-01 06:54:31.037096+00:00",
-      "calendar_date": "2022-02-01",
-      "station": "GardenCity",
-      "distance_km": 4.363287405499407,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_07-25-14_253-231592_Cargo_underway-using-engine_10-3_4953.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -106863,19 +104458,6 @@
       "calendar_date": "2022-02-01",
       "station": "GardenCity",
       "distance_km": 4.953150683464484,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-01_07-30-21_304-745373_Cargo_underway-using-engine_8-9_3628.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-01 07:35:25.745373+00:00",
-      "calendar_date": "2022-02-01",
-      "station": "GardenCity",
-      "distance_km": 3.628158368834895,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -108726,19 +106308,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-02-21_20-42-56_302-214599_Tanker_underway-using-engine_9-0_1890.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-21 20:47:58.214599+00:00",
-      "calendar_date": "2022-02-21",
-      "station": "GardenCity",
-      "distance_km": 1.890283484084128,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-02-21_20-48-03_56-962736_Tanker_underway-using-engine_8-8_1899.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -108969,19 +106538,6 @@
       "calendar_date": "2022-03-01",
       "station": "GardenCity",
       "distance_km": 1.635432732226889,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-01_00-20-49_303-117795_Cargo_underway-using-engine_11-6_1419.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-01 00:25:52.117795+00:00",
-      "calendar_date": "2022-03-01",
-      "station": "GardenCity",
-      "distance_km": 1.418681429325722,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -109372,19 +106928,6 @@
       "calendar_date": "2022-03-01",
       "station": "GardenCity",
       "distance_km": 2.377272863854954,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-01_05-37-51_300-413283_Cargo_underway-using-engine_8-1_2424.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-01 05:42:51.413283+00:00",
-      "calendar_date": "2022-03-01",
-      "station": "GardenCity",
-      "distance_km": 2.423957125568703,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -110390,19 +107933,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-01_21-54-32_305-200764_Tanker_underway-using-engine_12-2_4234.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-01 21:59:37.200764+00:00",
-      "calendar_date": "2022-03-01",
-      "station": "GardenCity",
-      "distance_km": 4.234498170568604,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-01_22-04-45_12-345353_Tanker_underway-using-engine_12-1_3391.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -110685,19 +108215,6 @@
       "calendar_date": "2022-03-05",
       "station": "GardenCity",
       "distance_km": 3.828879661571885,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_01-06-50_298-4625_Cargo_underway-using-engine_11-8_3006.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-05 01:11:48.462500+00:00",
-      "calendar_date": "2022-03-05",
-      "station": "GardenCity",
-      "distance_km": 3.0060394963235124,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -111469,19 +108986,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_12-37-10_302-430624_Cargo_underway-using-engine_13-5_1851.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-05 12:42:12.430624+00:00",
-      "calendar_date": "2022-03-05",
-      "station": "GardenCity",
-      "distance_km": 1.8514513864446884,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_12-52-30_63-63155_Tanker_underway-using-engine_11-1_2965.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -111950,19 +109454,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_18-19-46_301-958852_Cargo_underway-using-engine_7-0_2429.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-05 18:24:47.958852+00:00",
-      "calendar_date": "2022-03-05",
-      "station": "GardenCity",
-      "distance_km": 2.429191041651437,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_18-29-59_62-816339_Cargo_underway-using-engine_6-8_3338.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -112132,19 +109623,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_20-17-22_300-465743_Tanker_underway-using-engine_15-9_3208.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-05 20:22:22.465743+00:00",
-      "calendar_date": "2022-03-05",
-      "station": "GardenCity",
-      "distance_km": 3.208248432012781,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_20-22-29_120-346018_Tanker_underway-using-engine_16-0_3332.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -112180,19 +109658,6 @@
       "calendar_date": "2022-03-05",
       "station": "GardenCity",
       "distance_km": 3.057112000138205,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-05_20-37-50_301-585751_Cargo_underway-using-engine_11-6_3078.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-05 20:42:51.585751+00:00",
-      "calendar_date": "2022-03-05",
-      "station": "GardenCity",
-      "distance_km": 3.0780050494529068,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -113848,19 +111313,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-15_23-01-00_298-945555_Cargo_underway-using-engine_13-6_3457.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-15 23:05:58.945555+00:00",
-      "calendar_date": "2022-03-15",
-      "station": "GardenCity",
-      "distance_km": 3.456742266232168,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-15_23-11-14_83-551222_Cargo_underway-using-engine_13-7_4524.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -113965,19 +111417,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-17_03-30-01_306-036052_Cargo_underway-using-engine_9-5_694.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-17 03:35:07.036052+00:00",
-      "calendar_date": "2022-03-17",
-      "station": "GardenCity",
-      "distance_km": 0.6942005813678861,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-17_03-35-08_58-973065_Cargo_underway-using-engine_9-8_593.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -114026,19 +111465,6 @@
       "calendar_date": "2022-03-17",
       "station": "GardenCity",
       "distance_km": 4.178929609595344,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-17_04-00-42_306-699706_Tanker_underway-using-engine_11-7_4014.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-17 04:05:48.699706+00:00",
-      "calendar_date": "2022-03-17",
-      "station": "GardenCity",
-      "distance_km": 4.013973661037312,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -114403,19 +111829,6 @@
       "calendar_date": "2022-03-17",
       "station": "GardenCity",
       "distance_km": 3.848258430118133,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-17_08-06-09_304-533721_Cargo_underway-using-engine_13-9_2728.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-17 08:11:13.533721+00:00",
-      "calendar_date": "2022-03-17",
-      "station": "GardenCity",
-      "distance_km": 2.7275888515851565,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -114819,19 +112232,6 @@
       "calendar_date": "2022-03-17",
       "station": "GardenCity",
       "distance_km": 1.7069915229364987,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-17_13-43-38_302-430642_Cargo_underway-using-engine_11-1_1865.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-17 13:48:40.430642+00:00",
-      "calendar_date": "2022-03-17",
-      "station": "GardenCity",
-      "distance_km": 1.864939984576252,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -115343,19 +112743,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-19_00-00-31_297-353661_Cargo_underway-using-engine_14-9_4761.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-19 00:05:28.353661+00:00",
-      "calendar_date": "2022-03-19",
-      "station": "GardenCity",
-      "distance_km": 4.76072836680501,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-19_00-10-54_34-733514_Cargo_underway-using-engine_14-9_3550.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -115573,19 +112960,6 @@
       "calendar_date": "2022-03-19",
       "station": "GardenCity",
       "distance_km": 2.350826079068322,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-19_01-48-04_304-334146_Cargo_underway-using-engine_14-5_1094.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-19 01:53:08.334146+00:00",
-      "calendar_date": "2022-03-19",
-      "station": "GardenCity",
-      "distance_km": 1.094415157881479,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -116379,19 +113753,6 @@
       "calendar_date": "2022-03-19",
       "station": "GardenCity",
       "distance_km": 1.6912046287192748,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-19_10-50-06_304-331758_Cargo_underway-using-engine_10-1_1552.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-19 10:55:10.331758+00:00",
-      "calendar_date": "2022-03-19",
-      "station": "GardenCity",
-      "distance_km": 1.5515231958873652,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -117332,19 +114693,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-03-19_23-42-14_297-686499_Cargo_underway-using-engine_11-6_4461.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-19 23:47:11.686499+00:00",
-      "calendar_date": "2022-03-19",
-      "station": "GardenCity",
-      "distance_km": 4.460834674734996,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-03-19_23-47-21_177-818849_Cargo_underway-using-engine_11-8_3433.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -117618,19 +114966,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-20_03-55-35_298-961785_Tanker_underway-using-engine_16-2_4598.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-20 03:56:31.284877+00:00",
-      "calendar_date": "2022-04-20",
-      "station": "GardenCity",
-      "distance_km": 4.24084890029908,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-04-20_03-55-35_56-284877_Tanker_underway-using-engine_16-2_4241.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -117887,19 +115222,6 @@
       "calendar_date": "2022-04-20",
       "station": "GardenCity",
       "distance_km": 4.87358656066418,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-04-20_09-48-25_306-486024_Cargo_underway-using-engine_8-3_2903.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-20 09:47:21.372643+00:00",
-      "calendar_date": "2022-04-20",
-      "station": "GardenCity",
-      "distance_km": 3.9332510420922224,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -118576,19 +115898,6 @@
       "calendar_date": "2022-05-06",
       "station": "GardenCity",
       "distance_km": 4.861947833533908,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-06_00-25-56_303-340134_Tanker_underway-using-engine_10-4_4877.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-06 00:30:59.340134+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "GardenCity",
-      "distance_km": 4.877337477038989,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -119451,19 +116760,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-06_16-27-16_300-420176_Tanker_underway-using-engine_14-1_4391.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-06 16:32:16.420176+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "GardenCity",
-      "distance_km": 4.390826561876936,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-06_16-32-23_245-494929_Tanker_underway-using-engine_14-1_4785.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -119724,19 +117020,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-06_20-42-56_301-546573_Cargo_underway-using-engine_9-9_3802.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 20:47:57.546573+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "GardenCity",
-      "distance_km": 3.802277511945485,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_15811_train/G_15811_2022-05-06_20-53-10_188-518057_Cargo_underway-using-engine_9-7_1749.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -119785,19 +117068,6 @@
       "calendar_date": "2022-05-06",
       "station": "GardenCity",
       "distance_km": 2.457530300724927,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "GardenCity_15811_train/G_15811_2022-05-06_21-08-30_299-148127_Cargo_underway-using-engine_9-5_4185.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 21:13:29.148127+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "GardenCity",
-      "distance_km": 4.18544950703774,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -121453,19 +118723,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_26981_train/G_26981_2022-06-26_09-43-17_610-707352_Cargo_underway-using-engine_5-7_3379.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-06-26 09:53:27.707352+00:00",
-      "calendar_date": "2022-06-26",
-      "station": "GardenCity",
-      "distance_km": 3.378687296574735,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_26981_train/G_26981_2022-06-26_09-53-31_246-600874_Cargo_underway-using-engine_9-2_3237.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -122324,19 +119581,6 @@
       "split": "val"
     },
     {
-      "relative_path": "GardenCity_26981_train/G_26981_2022-06-26_21-39-10_608-182916_Tanker_underway-using-engine_11-3_3466.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-06-26 21:49:18.182916+00:00",
-      "calendar_date": "2022-06-26",
-      "station": "GardenCity",
-      "distance_km": 3.4658458085999446,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "GardenCity_26981_train/G_26981_2022-06-26_21-49-24_304-992244_Tanker_underway-using-engine_11-4_3848.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -122827,19 +120071,6 @@
       "calendar_date": "2022-01-24",
       "station": "Grafton",
       "distance_km": 3.966339921391689,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-24_06-08-32_608-024705_Cargo_underway-using-engine_13-9_3973.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-24 06:18:40.024705+00:00",
-      "calendar_date": "2022-01-24",
-      "station": "Grafton",
-      "distance_km": 3.973282043633183,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -125327,19 +122558,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-30_04-26-16_609-27227_Cargo_underway-using-engine_10-5_4096.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-30 04:36:25.272270+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "Grafton",
-      "distance_km": 4.095810654897692,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-01-30_04-36-29_335-932295_Cargo_underway-using-engine_10-8_4848.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -125674,19 +122892,6 @@
       "calendar_date": "2022-01-30",
       "station": "Grafton",
       "distance_km": 1.3971291302697482,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-30_07-50-48_611-222141_Cargo_underway-using-engine_10-7_1587.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-30 08:00:59.222141+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "Grafton",
-      "distance_km": 1.587201712870847,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -126107,19 +123312,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-30_12-37-10_605-87685_Cargo_underway-using-engine_15-1_3674.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-30 12:47:15.876850+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "Grafton",
-      "distance_km": 3.6742469622754896,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-01-30_12-47-23_178-415182_Cargo_underway-using-engine_15-3_3463.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -126302,19 +123494,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-30_15-20-47_605-548003_Cargo_underway-using-engine_11-4_2801.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-30 15:30:52.548003+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "Grafton",
-      "distance_km": 2.801389082308944,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-01-30_15-41-15_367-467347_Cargo_underway-using-engine_16-7_4141.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -126324,19 +123503,6 @@
       "calendar_date": "2022-01-30",
       "station": "Grafton",
       "distance_km": 4.140514567497879,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-01-30_15-41-15_607-353641_Cargo_underway-using-engine_16-1_3707.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-01-30 15:51:22.353641+00:00",
-      "calendar_date": "2022-01-30",
-      "station": "Grafton",
-      "distance_km": 3.706659567637796,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -127745,19 +124911,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-01_07-50-48_607-233303_Tanker_underway-using-engine_11-8_2192.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-01 08:00:55.233303+00:00",
-      "calendar_date": "2022-02-01",
-      "station": "Grafton",
-      "distance_km": 2.192301406886637,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-01_08-01-02_353-86425_Tanker_underway-using-engine_11-7_3717.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -128027,19 +125180,6 @@
       "calendar_date": "2022-02-01",
       "station": "Grafton",
       "distance_km": 4.124543922057226,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-01_12-37-10_610-312986_Tanker_underway-using-engine_7-8_4505.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-01 12:47:20.312986+00:00",
-      "calendar_date": "2022-02-01",
-      "station": "Grafton",
-      "distance_km": 4.505459081196863,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -128404,19 +125544,6 @@
       "calendar_date": "2022-02-01",
       "station": "Grafton",
       "distance_km": 1.8349003787622888,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-01_16-32-23_609-329735_Cargo_underway-using-engine_15-8_2209.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-01 16:42:32.329735+00:00",
-      "calendar_date": "2022-02-01",
-      "station": "Grafton",
-      "distance_km": 2.2086418487991484,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -129240,19 +126367,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-21_11-56-15_612-316051_Tanker_underway-using-engine_5-7_3494.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-21 12:06:27.316051+00:00",
-      "calendar_date": "2022-02-21",
-      "station": "Grafton",
-      "distance_km": 3.4936461852133407,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-21_12-06-29_368-05167_Tanker_underway-using-engine_7-5_4255.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -129977,19 +127091,6 @@
       "calendar_date": "2022-02-25",
       "station": "Grafton",
       "distance_km": 3.9031556520142336,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-25_01-32-24_606-06072_Cargo_underway-using-engine_17-0_4001.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-02-25 01:42:30.060720+00:00",
-      "calendar_date": "2022-02-25",
-      "station": "Grafton",
-      "distance_km": 4.000939878154327,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -131125,19 +128226,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-02-25_15-31-01_605-681109_Tanker_underway-using-engine_9-9_1771.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-02-25 15:41:06.681109+00:00",
-      "calendar_date": "2022-02-25",
-      "station": "Grafton",
-      "distance_km": 1.7708495690133392,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-02-25_15-31-01_8-526744_Cargo_underway-using-engine_17-4_1776.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -132191,19 +129279,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-01_04-26-16_605-475332_Tanker_underway-using-engine_11-3_4428.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-01 04:36:21.475332+00:00",
-      "calendar_date": "2022-03-01",
-      "station": "Grafton",
-      "distance_km": 4.4279464783257945,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-01_04-56-57_167-781321_Cargo_underway-using-engine_13-5_4818.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -132369,19 +129444,6 @@
       "calendar_date": "2022-03-01",
       "station": "Grafton",
       "distance_km": 1.6765879458731945,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-01_07-50-48_606-180343_Tanker_underway-using-engine_12-2_1914.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-03-01 08:00:54.180343+00:00",
-      "calendar_date": "2022-03-01",
-      "station": "Grafton",
-      "distance_km": 1.9138256916197889,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -133110,19 +130172,6 @@
       "calendar_date": "2022-03-01",
       "station": "Grafton",
       "distance_km": 2.071416720147029,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-01_19-46-42_610-029117_Cargo_underway-using-engine_14-5_1786.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-01 19:56:52.029117+00:00",
-      "calendar_date": "2022-03-01",
-      "station": "Grafton",
-      "distance_km": 1.785860706242574,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -134700,19 +131749,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-05_15-51-28_610-035304_Cargo_underway-using-engine_16-4_3028.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-05 16:01:38.035304+00:00",
-      "calendar_date": "2022-03-05",
-      "station": "Grafton",
-      "distance_km": 3.028228868635991,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-05_16-01-42_579-484669_Cargo_underway-using-engine_15-3_2961.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -135714,19 +132750,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-19_09-43-18_612-634861_Cargo_underway-using-engine_19-3_4181.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-19 09:53:30.634861+00:00",
-      "calendar_date": "2022-03-19",
-      "station": "Grafton",
-      "distance_km": 4.181436231414101,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-03-19_09-53-32_184-876725_Cargo_underway-using-engine_16-6_3907.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -135983,19 +133006,6 @@
       "calendar_date": "2022-03-19",
       "station": "Grafton",
       "distance_km": 4.0383570185859545,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-03-19_12-37-10_612-388899_Cargo_underway-using-engine_13-0_4919.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-03-19 12:47:22.388899+00:00",
-      "calendar_date": "2022-03-19",
-      "station": "Grafton",
-      "distance_km": 4.919361683467215,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -136819,19 +133829,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-10_01-01-42_611-350332_Cargo_underway-using-engine_8-7_4222.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-10 01:05:36.534096+00:00",
-      "calendar_date": "2022-04-10",
-      "station": "Grafton",
-      "distance_km": 4.436232611189704,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-10_01-11-56_67-124976_Cargo_underway-using-engine_8-8_4244.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -137248,19 +134245,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-10_07-20-06_611-494238_Tanker_underway-using-engine_13-2_4448.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-10 07:24:56.645783+00:00",
-      "calendar_date": "2022-04-10",
-      "station": "Grafton",
-      "distance_km": 3.835015951320758,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-10_07-30-20_351-76975_Cargo_underway-using-engine_12-2_5744.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -137309,19 +134293,6 @@
       "calendar_date": "2022-04-10",
       "station": "Grafton",
       "distance_km": 4.825670838153531,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-10_08-21-28_608-873307_Cargo_underway-using-engine_9-5_4699.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-10 08:28:48.774173+00:00",
-      "calendar_date": "2022-04-10",
-      "station": "Grafton",
-      "distance_km": 4.796858697886631,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -138054,19 +135025,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-10_18-24-51_607-838594_Tanker_underway-using-engine_12-8_3864.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-04-10 18:25:02.968818+00:00",
-      "calendar_date": "2022-04-10",
-      "station": "Grafton",
-      "distance_km": 4.415184986765724,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-10_18-35-05_119-045913_Tanker_underway-using-engine_12-8_3764.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -138401,19 +135359,6 @@
       "calendar_date": "2022-04-20",
       "station": "Grafton",
       "distance_km": 1.739509067870554,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-20_01-32-24_603-806246_Cargo_underway-using-engine_13-1_1675.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-20 01:42:27.806246+00:00",
-      "calendar_date": "2022-04-20",
-      "station": "Grafton",
-      "distance_km": 1.6753565072619214,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -139133,19 +136078,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-20_13-38-31_608-280255_Cargo_underway-using-engine_11-4_1627.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-20 13:48:39.280255+00:00",
-      "calendar_date": "2022-04-20",
-      "station": "Grafton",
-      "distance_km": 1.6273901463038205,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-20_13-48-45_363-278358_Cargo_underway-using-engine_11-6_2755.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -139510,19 +136442,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-04-20_19-26-14_608-125483_Cargo_underway-using-engine_12-1_1906.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-04-20 19:36:22.125483+00:00",
-      "calendar_date": "2022-04-20",
-      "station": "Grafton",
-      "distance_km": 1.905805466213247,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-04-20_19-36-28_354-071024_Cargo_underway-using-engine_12-7_3366.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -139757,19 +136676,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_00-20-49_610-756435_Cargo_underway-using-engine_13-9_4601.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 00:30:59.756435+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 4.600610171127992,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-05-06_00-41-16_389-724799_Cargo_underway-using-engine_13-2_4439.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -139874,19 +136780,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_01-32-24_606-897076_Cargo_underway-using-engine_8-7_4741.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 01:42:30.897076+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 4.741306792463625,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-05-06_01-52-52_400-362741_Cargo_underway-using-engine_11-0_4492.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -139961,32 +136854,6 @@
       "calendar_date": "2022-05-06",
       "station": "Grafton",
       "distance_km": 4.87221233484991,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_03-14-40_609-587708_Cargo_underway-using-engine_16-0_4910.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 03:24:49.587708+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 4.909974413218344,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_03-24-54_612-069094_Tanker_underway-using-engine_11-4_3905.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-05-06 03:35:06.069094+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 3.90504058740225,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -140472,19 +137339,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_10-44-40_610-393566_Cargo_underway-using-engine_12-9_1656.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 10:54:50.393566+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 1.65635254562664,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-05-06_11-05-07_231-575345_Cargo_underway-using-engine_16-1_1717.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -140628,19 +137482,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_11-56-15_609-113057_Cargo_constrained-by-her-draught_10-0_3012.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 12:06:24.113057+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 3.012039850448148,
-      "activity": "constrained-by-her-draught",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_train/G_15810_2022-05-06_12-26-56_579-118931_Tanker_underway-using-engine_12-7_3968.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -140650,19 +137491,6 @@
       "calendar_date": "2022-05-06",
       "station": "Grafton",
       "distance_km": 3.968426031931248,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_12-37-10_607-876906_Cargo_underway-using-engine_16-5_3738.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 12:47:17.876906+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 3.7376627211504143,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -140988,19 +137816,6 @@
       "calendar_date": "2022-05-06",
       "station": "Grafton",
       "distance_km": 2.844127368841845,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_15810_train/G_15810_2022-05-06_16-01-42_607-388244_Cargo_underway-using-engine_15-0_1953.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-05-06 16:11:49.388244+00:00",
-      "calendar_date": "2022-05-06",
-      "station": "Grafton",
-      "distance_km": 1.9533520877668344,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -142513,19 +139328,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_15810_val/G_15810_2022-03-15_20-17-22_605-769102_Cargo_underway-using-engine_7-0_2976.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-03-15 20:27:27.769102+00:00",
-      "calendar_date": "2022-03-15",
-      "station": "Grafton",
-      "distance_km": 2.9764115457740057,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_15810_val/G_15810_2022-03-15_20-27-36_412-457258_Cargo_underway-using-engine_6-9_3846.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -143111,19 +139913,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-24_00-25-56_304-876414_Tanker_underway-using-engine_11-5_4263.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-08-24 00:31:00.876414+00:00",
-      "calendar_date": "2022-08-24",
-      "station": "Grafton",
-      "distance_km": 4.263195869108895,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-08-24_00-36-09_190-512867_Tanker_underway-using-engine_12-7_4043.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -143432,19 +140221,6 @@
       "calendar_date": "2022-08-24",
       "station": "Grafton",
       "distance_km": 1.943832274084542,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-24_03-35-08_305-93339_Cargo_underway-using-engine_15-1_2090.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-08-24 03:40:13.933390+00:00",
-      "calendar_date": "2022-08-24",
-      "station": "Grafton",
-      "distance_km": 2.089948442526706,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -143904,19 +140680,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-24_08-47-03_297-828927_Cargo_underway-using-engine_15-2_1683.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-08-24 08:52:00.828927+00:00",
-      "calendar_date": "2022-08-24",
-      "station": "Grafton",
-      "distance_km": 1.6834494942737517,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-08-24_08-52-10_170-039208_Cargo_underway-using-engine_15-1_2222.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -144346,19 +141109,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-24_15-25-54_302-089515_Cargo_underway-using-engine_15-4_4314.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-08-24 15:30:56.089515+00:00",
-      "calendar_date": "2022-08-24",
-      "station": "Grafton",
-      "distance_km": 4.31408955433692,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-08-24_16-27-16_261-088209_Cargo_underway-using-engine_16-3_4057.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -144654,19 +141404,6 @@
       "calendar_date": "2022-08-24",
       "station": "Grafton",
       "distance_km": 1.7502823521424549,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-08-24_22-09-52_305-002444_Tanker_underway-using-engine_16-5_4670.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-08-24 22:14:57.002444+00:00",
-      "calendar_date": "2022-08-24",
-      "station": "Grafton",
-      "distance_km": 4.67003774129416,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -145347,19 +142084,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-11_05-53-12_305-20842_Cargo_underway-using-engine_5-0_2350.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-11 05:58:17.208420+00:00",
-      "calendar_date": "2022-09-11",
-      "station": "Grafton",
-      "distance_km": 2.3498639368626195,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-11_05-58-18_121-122626_Cargo_underway-using-engine_5-0_2360.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -145594,19 +142318,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-11_10-08-52_305-169417_Cargo_underway-using-engine_17-1_4337.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-11 10:13:57.169417+00:00",
-      "calendar_date": "2022-09-11",
-      "station": "Grafton",
-      "distance_km": 4.337128545659268,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-11_10-19-06_153-912595_Cargo_underway-using-engine_17-6_1689.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -145685,19 +142396,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-11_10-49-47_301-616321_Cargo_underway-using-engine_13-1_2226.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-11 10:54:48.616321+00:00",
-      "calendar_date": "2022-09-11",
-      "station": "Grafton",
-      "distance_km": 2.22641463425722,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-11_10-49-47_4-052935_Cargo_underway-using-engine_12-4_4164.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -145707,19 +142405,6 @@
       "calendar_date": "2022-09-11",
       "station": "Grafton",
       "distance_km": 4.163755637422508,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-11_10-54-53_298-368552_Cargo_underway-using-engine_13-6_383.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-11 10:59:51.368552+00:00",
-      "calendar_date": "2022-09-11",
-      "station": "Grafton",
-      "distance_km": 0.3825193043826593,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -145785,19 +142470,6 @@
       "calendar_date": "2022-09-11",
       "station": "Grafton",
       "distance_km": 1.770422361647868,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-11_11-35-48_300-58938_Cargo_underway-using-engine_19-0_1876.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-11 11:40:48.589380+00:00",
-      "calendar_date": "2022-09-11",
-      "station": "Grafton",
-      "distance_km": 1.876055203303646,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -146647,19 +143319,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_train/G_28434_2022-09-11_22-45-40_299-102273_Cargo_underway-using-engine_13-3_3692.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-09-11 22:50:39.102273+00:00",
-      "calendar_date": "2022-09-11",
-      "station": "Grafton",
-      "distance_km": 3.6916892881566015,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_train/G_28434_2022-09-11_23-36-48_172-847843_Tanker_underway-using-engine_12-8_4410.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -146998,19 +143657,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_val/G_28434_2022-08-28_04-05-49_305-659138_Cargo_underway-using-engine_13-8_4261.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-08-28 04:10:54.659138+00:00",
-      "calendar_date": "2022-08-28",
-      "station": "Grafton",
-      "distance_km": 4.261376833494124,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_val/G_28434_2022-08-28_04-10-55_249-662515_Cargo_underway-using-engine_12-4_4793.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -147020,19 +143666,6 @@
       "calendar_date": "2022-08-28",
       "station": "Grafton",
       "distance_km": 4.793389971755007,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_val/G_28434_2022-08-28_04-16-02_298-002957_Tanker_underway-using-engine_9-9_4893.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-08-28 04:21:00.002957+00:00",
-      "calendar_date": "2022-08-28",
-      "station": "Grafton",
-      "distance_km": 4.892877172618709,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -147713,19 +144346,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_val/G_28434_2022-08-28_14-14-19_305-064069_Cargo_underway-using-engine_15-2_2042.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-08-28 14:19:24.064069+00:00",
-      "calendar_date": "2022-08-28",
-      "station": "Grafton",
-      "distance_km": 2.042369865833096,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_val/G_28434_2022-08-28_14-14-19_4-471456_Cargo_underway-using-engine_15-8_3717.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -147986,19 +144606,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_val/G_28434_2022-08-28_18-19-46_304-160018_Tanker_underway-using-engine_13-7_4385.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-08-28 18:24:50.160018+00:00",
-      "calendar_date": "2022-08-28",
-      "station": "Grafton",
-      "distance_km": 4.384809621258748,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_val/G_28434_2022-08-28_18-24-53_177-03932_Tanker_underway-using-engine_13-8_4325.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -148034,19 +144641,6 @@
       "calendar_date": "2022-08-28",
       "station": "Grafton",
       "distance_km": 4.204060230955871,
-      "activity": "moored",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_val/G_28434_2022-08-28_18-35-06_298-994814_Cargo_moored_10-5_4701.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-08-28 18:40:04.994814+00:00",
-      "calendar_date": "2022-08-28",
-      "station": "Grafton",
-      "distance_km": 4.700764295550513,
       "activity": "moored",
       "split": "val"
     },
@@ -148701,19 +145295,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_val/G_28434_2022-09-15_06-44-20_297-971007_Cargo_underway-using-engine_18-3_4990.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-09-15 06:49:17.971007+00:00",
-      "calendar_date": "2022-09-15",
-      "station": "Grafton",
-      "distance_km": 4.989709251204999,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_val/G_28434_2022-09-15_06-49-26_51-595486_Cargo_underway-using-engine_18-3_4924.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -149022,19 +145603,6 @@
       "calendar_date": "2022-09-15",
       "station": "Grafton",
       "distance_km": 2.4226062207624084,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_val/G_28434_2022-09-15_10-44-40_303-526619_Cargo_underway-using-engine_11-0_1532.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-09-15 10:49:43.526619+00:00",
-      "calendar_date": "2022-09-15",
-      "station": "Grafton",
-      "distance_km": 1.5317421803492743,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -149351,32 +145919,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_28434_val/G_28434_2022-09-15_14-24-33_299-729591_Tanker_underway-using-engine_9-1_4888.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-09-15 14:29:32.729591+00:00",
-      "calendar_date": "2022-09-15",
-      "station": "Grafton",
-      "distance_km": 4.888371600269543,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_val/G_28434_2022-09-15_14-29-39_298-62468_Tanker_underway-using-engine_9-0_4326.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-09-15 14:34:37.624680+00:00",
-      "calendar_date": "2022-09-15",
-      "station": "Grafton",
-      "distance_km": 4.326206681129109,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_28434_val/G_28434_2022-09-15_14-34-46_287-660265_Tanker_underway-using-engine_8-9_4010.wav",
       "class_name": "Tank",
       "label_index": 2,
@@ -149399,19 +145941,6 @@
       "calendar_date": "2022-09-15",
       "station": "Grafton",
       "distance_km": 3.965275094294718,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_val/G_28434_2022-09-15_14-45-00_303-27864_Tanker_underway-using-engine_7-2_4626.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "val",
-      "event_time": "2022-09-15 14:50:03.278640+00:00",
-      "calendar_date": "2022-09-15",
-      "station": "Grafton",
-      "distance_km": 4.626440283340885,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -149516,19 +146045,6 @@
       "calendar_date": "2022-09-15",
       "station": "Grafton",
       "distance_km": 2.2440265659914624,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_28434_val/G_28434_2022-09-15_16-32-23_296-961373_Cargo_underway-using-engine_7-4_1963.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "val",
-      "event_time": "2022-09-15 16:37:19.961373+00:00",
-      "calendar_date": "2022-09-15",
-      "station": "Grafton",
-      "distance_km": 1.9627048392152968,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -150556,19 +147072,6 @@
       "calendar_date": "2022-11-03",
       "station": "Grafton",
       "distance_km": 4.098170405053095,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_29187_train/G_29187_2022-11-03_08-01-01_607-383655_Cargo_underway-using-engine_13-3_4754.wav",
-      "class_name": "Cargo",
-      "label_index": 0,
-      "vessel_type": "Cargo",
-      "official_split": "train",
-      "event_time": "2022-11-03 08:11:08.383655+00:00",
-      "calendar_date": "2022-11-03",
-      "station": "Grafton",
-      "distance_km": 4.753819274932972,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -151613,19 +148116,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_29187_train/G_29187_2022-11-03_22-09-51_610-370692_Tanker_underway-using-engine_8-0_4655.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-11-03 22:20:01.370692+00:00",
-      "calendar_date": "2022-11-03",
-      "station": "Grafton",
-      "distance_km": 4.654809291456969,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_29187_train/G_29187_2022-11-03_22-50-46_530-067106_Cargo_underway-using-engine_12-6_4295.wav",
       "class_name": "Cargo",
       "label_index": 0,
@@ -152454,19 +148944,6 @@
       "calendar_date": "2022-11-05",
       "station": "Grafton",
       "distance_km": 4.162863833791815,
-      "activity": "underway-using-engine",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_29187_train/G_29187_2022-11-05_07-50-47_605-34664_Tanker_underway-using-engine_9-9_4323.wav",
-      "class_name": "Tank",
-      "label_index": 2,
-      "vessel_type": "Tanker",
-      "official_split": "train",
-      "event_time": "2022-11-05 08:00:52.346640+00:00",
-      "calendar_date": "2022-11-05",
-      "station": "Grafton",
-      "distance_km": 4.32328039494799,
       "activity": "underway-using-engine",
       "split": "val"
     },
@@ -153316,19 +149793,6 @@
       "split": "val"
     },
     {
-      "relative_path": "Grafton_29187_train/G_29187_2022-11-05_22-20-05_609-726992_Tug_restricted-maneuverability_5-1_3587.wav",
-      "class_name": "Tug",
-      "label_index": 3,
-      "vessel_type": "Tug",
-      "official_split": "train",
-      "event_time": "2022-11-05 22:30:14.726992+00:00",
-      "calendar_date": "2022-11-05",
-      "station": "Grafton",
-      "distance_km": 3.587108724335299,
-      "activity": "restricted-maneuverability",
-      "split": "val"
-    },
-    {
       "relative_path": "Grafton_29187_train/G_29187_2022-11-05_22-30-19_310-859387_Tug_restricted-maneuverability_5-3_3814.wav",
       "class_name": "Tug",
       "label_index": 3,
@@ -153338,19 +149802,6 @@
       "calendar_date": "2022-11-05",
       "station": "Grafton",
       "distance_km": 3.813947580540432,
-      "activity": "restricted-maneuverability",
-      "split": "val"
-    },
-    {
-      "relative_path": "Grafton_29187_train/G_29187_2022-11-05_22-30-19_610-90217_Tug_restricted-maneuverability_5-6_4183.wav",
-      "class_name": "Tug",
-      "label_index": 3,
-      "vessel_type": "Tug",
-      "official_split": "train",
-      "event_time": "2022-11-05 22:40:29.902170+00:00",
-      "calendar_date": "2022-11-05",
-      "station": "Grafton",
-      "distance_km": 4.183158756718381,
       "activity": "restricted-maneuverability",
       "split": "val"
     },
@@ -153498,5 +149949,17 @@
       "split": "val"
     }
   ],
-  "manifest_sha256": "e9ccff7cc492ae9eebecaa51945aa0c7e7ae561c4ee6375905c42d9e075d3000"
+  "audio_policy": {
+    "source_sample_rate_hz": 48000,
+    "duration_seconds": 10.0,
+    "duration_rule": "frames == source_sample_rate_hz * duration_seconds",
+    "accepted_source_channels": [
+      1,
+      2
+    ],
+    "channel_policy": "fixed_channel_0",
+    "selected_channel_index": 0
+  },
+  "development_audio_inventory_sha256": "3bee3a23d9f60dde439362c4111c279713849683d3fd1a23ea153fdc01c4eb6d",
+  "manifest_sha256": "3719e650a0b8fedee909e5471fff067614cb608868830d1f49ff043b23b019a7"
 }
