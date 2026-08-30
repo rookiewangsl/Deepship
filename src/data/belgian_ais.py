@@ -378,6 +378,7 @@ def build_fold_manifests(
     folds: int = 3,
     fold_seed: int = 42,
     audio_audit: Mapping[str, object] | None = None,
+    frozen_date_assignments: Mapping[str, int] | None = None,
 ) -> tuple[list[dict[str, object]], dict[str, object]]:
     sealed_test = [record for record in records if record.official_split == "test"]
     sealed_test_dates = {record.calendar_date for record in sealed_test}
@@ -390,7 +391,22 @@ def build_fold_manifests(
     development = [
         record for record in development_candidates if record.calendar_date not in sealed_test_dates
     ]
-    assignments = assign_date_folds(development, folds=folds, seed=fold_seed)
+    if frozen_date_assignments is None:
+        assignments = assign_date_folds(development, folds=folds, seed=fold_seed)
+        assignment_policy = "deterministic_balancing_search"
+    else:
+        assignments = {str(date): int(fold) for date, fold in frozen_date_assignments.items()}
+        development_dates = {record.calendar_date for record in development}
+        missing_dates = sorted(development_dates.difference(assignments))
+        invalid_folds = sorted(
+            {fold for date, fold in assignments.items() if date in development_dates and fold not in range(folds)}
+        )
+        if missing_dates or invalid_folds:
+            raise ValueError(
+                "Frozen date assignments do not cover the strict development pool: "
+                f"missing_dates={missing_dates}, invalid_folds={invalid_folds}"
+            )
+        assignment_policy = "preserved_from_pre_audio_audit_frozen_manifests"
     manifests: list[dict[str, object]] = []
     fold_summaries: list[dict[str, object]] = []
     for fold in range(folds):
@@ -448,6 +464,7 @@ def build_fold_manifests(
         "schema_version": PROTOCOL_SCHEMA_VERSION,
         "experiment_id": "belgian_attention_v1",
         "fold_seed": fold_seed,
+        "date_assignment_policy": assignment_policy,
         "folds": fold_summaries,
         "sealed_test_dates": sorted(sealed_test_dates),
         "development_records_excluded_for_test_date_isolation": len(

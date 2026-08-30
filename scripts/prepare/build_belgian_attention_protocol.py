@@ -31,7 +31,34 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--max-distance-km", type=float, default=5.0)
     parser.add_argument("--fold-seed", type=int, default=42)
+    parser.add_argument(
+        "--source-protocol-root",
+        default=None,
+        help="Optional existing frozen protocol whose validation-date assignments are preserved.",
+    )
     return parser
+
+
+def load_frozen_date_assignments(protocol_root: str | None) -> dict[str, int] | None:
+    if protocol_root is None:
+        return None
+    root = Path(protocol_root).expanduser().resolve()
+    assignments: dict[str, int] = {}
+    for fold in range(1, 4):
+        manifest = json.loads(
+            (root / f"fold{fold}" / "split_manifest.json").read_text(encoding="utf-8")
+        )
+        validation = validate_fold_manifest(manifest)
+        if validation["status"] != "passed":
+            raise ValueError(f"Source Belgian fold {fold} is invalid: {validation}")
+        for row in manifest["records"]:
+            if row["split"] != "val":
+                continue
+            date = str(row["calendar_date"])
+            previous = assignments.setdefault(date, fold - 1)
+            if previous != fold - 1:
+                raise ValueError(f"UTC date appears as validation in multiple folds: {date}")
+    return assignments
 
 
 def main() -> None:
@@ -49,12 +76,14 @@ def main() -> None:
         records,
         data_root=args.data_root,
     )
+    frozen_date_assignments = load_frozen_date_assignments(args.source_protocol_root)
     manifests, index = build_fold_manifests(
         records,
         audit,
         folds=3,
         fold_seed=args.fold_seed,
         audio_audit=audio_audit,
+        frozen_date_assignments=frozen_date_assignments,
     )
     audit_dir = output_root / "audit"
     audit_dir.mkdir(parents=True, exist_ok=True)

@@ -159,6 +159,41 @@ class BelgianAISTests(unittest.TestCase):
         for manifest in manifests:
             self.assertEqual(validate_fold_manifest(manifest)["status"], "passed")
 
+    def test_audio_refreeze_preserves_existing_validation_dates(self) -> None:
+        records = []
+        for date_index in range(12):
+            date = f"2022-04-{date_index + 1:02d}"
+            for class_name in ("Cargo", "Passenger", "Tank", "Tug"):
+                records.append(record(date_index * 10 + len(records), class_name, date))
+        audit = {"metadata_sha256": "abc", "filters": {"max_distance_km": 5.0}}
+        original, _ = build_fold_manifests(records, audit)
+        assignments = {
+            row["calendar_date"]: fold_index
+            for fold_index, manifest in enumerate(original)
+            for row in manifest["records"]
+            if row["split"] == "val"
+        }
+        strict, index = build_fold_manifests(
+            records,
+            audit,
+            audio_audit={"admitted_inventory_sha256": "a" * 64},
+            frozen_date_assignments=assignments,
+        )
+        self.assertEqual(
+            index["date_assignment_policy"],
+            "preserved_from_pre_audio_audit_frozen_manifests",
+        )
+        for fold_index, manifest in enumerate(strict):
+            self.assertEqual(manifest["schema_version"], 2)
+            self.assertEqual(validate_fold_manifest(manifest)["status"], "passed")
+            val_dates = {
+                row["calendar_date"] for row in manifest["records"] if row["split"] == "val"
+            }
+            self.assertEqual(
+                val_dates,
+                {date for date, assigned_fold in assignments.items() if assigned_fold == fold_index},
+            )
+
     def test_development_excludes_dates_present_in_sealed_test(self) -> None:
         records = []
         for date_index in range(9):
